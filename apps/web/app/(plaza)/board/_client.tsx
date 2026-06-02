@@ -305,8 +305,8 @@ function BoardPageContent() {
         <div
           className="absolute inset-0 bg-cover bg-center scale-105"
           style={{ backgroundImage: heroImage
-            ? `url('${encodeURI(heroImage).replace(/'/g, "%27")}'), url('/banners/board-banner.jpg'), url('/banners/hero-banner.jpg')`
-            : "url('/banners/board-banner.jpg'), url('/banners/hero-banner.jpg')" }}
+            ? `url('${encodeURI(heroImage).replace(/'/g, "%27")}'), url('/images/banner-news.jpg')`
+            : "url('/images/banner-news.jpg')" }}
           aria-hidden
         />
         {/* 라이트 그라데이션 오버레이 — 다른 히어로들과 톤 맞춤 */}
@@ -334,7 +334,7 @@ function BoardPageContent() {
               {/* Eyebrow */}
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white/90 tracking-wider mb-3">
                 <MapPin className="w-3 h-3" />
-                {displayRegion ? `${displayRegion} · ` : ''}우리 동네 이야기
+                {displayRegion ? `${displayRegion} · ` : ''}마을 커뮤니티
               </div>
               {/* Title
                 * 카카오톡 WebView 는 CSS filter(`drop-shadow-*`) 컨텍스트 하위에
@@ -344,9 +344,9 @@ function BoardPageContent() {
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 {/* 그림자는 "동네" 에만 — gradient 글자 뒤에 text-shadow 글리프가
                  * 깔리면 색이 탁해지므로 gradient span 은 그림자 없이 둔다. */}
-                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.35)' }}>동네</span>
-                <span className="bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
-                  게시판
+                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.35)' }}>전원 </span>
+                <span className="bg-gradient-to-r from-emerald-200 to-lime-200 bg-clip-text text-transparent">
+                  소식통
                 </span>
                 <Sparkles className="inline-block align-middle ml-2 w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
               </h1>
@@ -355,7 +355,7 @@ function BoardPageContent() {
                 className="text-sm sm:text-base text-white/85 mt-2"
                 style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
               >
-                우리 동네의 생생한 정보를 이웃과 나눠요
+이웃들의 동네 소식을 나눠요
               </p>
             </div>
             <Link href={user ? '/board/create' : '/auth/login'} className="flex-shrink-0">
