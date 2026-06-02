@@ -11,13 +11,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const SELECTED_PLAZA_KEY = "selected.plaza"
 export const SELECTED_PLAZA_NAME_KEY = "selected.plaza.name"
-export const DEFAULT_PLAZA_FALLBACK = "chuncheon"
-export const DEFAULT_PLAZA_NAME_FALLBACK = "춘천광장"
+export const DEFAULT_PLAZA_FALLBACK = "gangwon"
+export const DEFAULT_PLAZA_NAME_FALLBACK = "강원 전원일기"
 
 // 모바일에서 강제 차단되는 광장 — DB is_active 무시하고 모든 진입점에서 거부
 // (cached value / deep link / push notification 으로도 leak 방지)
-export const HIDDEN_PLAZA_IDS = new Set<string>(["wonju"])
-export const HIDDEN_PLAZA_NAMES = new Set<string>(["원주광장", "원주"])
+// 전원일기: 도 단위 재편으로 차단 대상 없음 (필요 시 도 id 추가)
+export const HIDDEN_PLAZA_IDS = new Set<string>([])
+export const HIDDEN_PLAZA_NAMES = new Set<string>([])
 
 function isHiddenPlaza(id?: string | null, name?: string | null): boolean {
   if (id && HIDDEN_PLAZA_IDS.has(id)) return true

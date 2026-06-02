@@ -1,4 +1,4 @@
-const tintColorLight = '#2f95dc';
+const tintColorLight = '#16A34A'; // 전원일기 그린
 const tintColorDark = '#fff';
 
 export default {

@@ -2,10 +2,17 @@
  * 앱 전역 상수 — 광장 라벨 등.
  */
 
-/** plaza id -> 한글 라벨 (cross-plaza 칩 표시용) */
+/** plaza id -> 한글 라벨 (cross-plaza 칩 표시용). DB plazas 에서 loadPlazaLabels() 로 병합됨. */
 export const PLAZA_LABEL: Record<string, string> = {
-  chuncheon: "춘천광장",
-  gangneung: "강릉광장",
+  gangwon: "강원 전원일기",
+  gyeonggi: "경기 전원일기",
+  chungbuk: "충북 전원일기",
+  chungnam: "충남 전원일기",
+  jeonbuk: "전북 전원일기",
+  jeonnam: "전남 전원일기",
+  gyeongbuk: "경북 전원일기",
+  gyeongnam: "경남 전원일기",
+  jeju: "제주 전원일기",
 }
 
 /**
