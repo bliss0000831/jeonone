@@ -25,8 +25,8 @@ export const lightColors = {
   popover: "#ffffff",
   popoverForeground: "#1a263d",
 
-  /* primary — 딥 스카이블루 (#0284c7, sky-600) */
-  primary: "#0284c7",
+  /* primary — 전원일기 그린 (#16a34a, green-600) */
+  primary: "#16a34a",
   primaryForeground: "#ffffff",
 
   /* secondary — 연한 하늘빛 배경 */
@@ -48,10 +48,10 @@ export const lightColors = {
   /* border / input / ring */
   border: "#d6dee5",
   input: "#e8ecef",
-  ring: "#0284c7",
+  ring: "#16a34a",
 
   /* 차트 팔레트 (스카이블루 기반) */
-  chart1: "#0284c7",
+  chart1: "#16a34a",
   chart2: "#1d8fc7",
   chart3: "#f97316",
   chart4: "#22a8d1",
@@ -60,12 +60,12 @@ export const lightColors = {
   /* 사이드바 */
   sidebar: "#f4f7fa",
   sidebarForeground: "#1a263d",
-  sidebarPrimary: "#0284c7",
+  sidebarPrimary: "#16a34a",
   sidebarPrimaryForeground: "#ffffff",
   sidebarAccent: "#e1edf6",
   sidebarAccentForeground: "#1f2c47",
   sidebarBorder: "#d6dee5",
-  sidebarRing: "#0284c7",
+  sidebarRing: "#16a34a",
 
   /* 채팅 — 순백 캔버스 */
   chatCanvas: "#ffffff",
@@ -92,7 +92,7 @@ export const darkColors = {
   popoverForeground: "#ebeef0",
 
   /* primary — 다크 모드는 약간 더 밝게 */
-  primary: "#38bdf8",
+  primary: "#22c55e",
   primaryForeground: "#152030",
 
   /* secondary */
@@ -114,10 +114,10 @@ export const darkColors = {
   /* border / input / ring */
   border: "#33425a",
   input: "#26334a",
-  ring: "#38bdf8",
+  ring: "#22c55e",
 
   /* 차트 (다크) */
-  chart1: "#38bdf8",
+  chart1: "#22c55e",
   chart2: "#1d8fc7",
   chart3: "#f97316",
   chart4: "#1d8fc7",
@@ -126,12 +126,12 @@ export const darkColors = {
   /* 사이드바 (다크) */
   sidebar: "#16202f",
   sidebarForeground: "#ebeef0",
-  sidebarPrimary: "#38bdf8",
+  sidebarPrimary: "#22c55e",
   sidebarPrimaryForeground: "#152030",
   sidebarAccent: "#28344a",
   sidebarAccentForeground: "#dde2ea",
   sidebarBorder: "#33425a",
-  sidebarRing: "#38bdf8",
+  sidebarRing: "#22c55e",
 
   /* 채팅 — 다크 세이지 */
   chatCanvas: "#1a2522",
