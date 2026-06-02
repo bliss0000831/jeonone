@@ -1,0 +1,41 @@
+{
+  "name": "@gwangjang/platform",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 플랫폼 추상화 — Capacitor / RN / web 환경 분기 (storage, camera, haptics, push 등)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./platform": "./src/platform.ts",
+    "./storage": "./src/storage.ts",
+    "./camera": "./src/camera.ts",
+    "./share": "./src/share.ts",
+    "./network": "./src/network.ts",
+    "./haptics": "./src/haptics.ts",
+    "./browser": "./src/browser.ts",
+    "./push": "./src/push.ts",
+    "./app-lifecycle": "./src/app-lifecycle.ts"
+  },
+  "peerDependencies": {
+    "@capacitor/app": "*",
+    "@capacitor/browser": "*",
+    "@capacitor/camera": "*",
+    "@capacitor/core": "*",
+    "@capacitor/haptics": "*",
+    "@capacitor/network": "*",
+    "@capacitor/preferences": "*",
+    "@capacitor/push-notifications": "*",
+    "@capacitor/share": "*"
+  },
+  "peerDependenciesMeta": {
+    "@capacitor/app": { "optional": true },
+    "@capacitor/browser": { "optional": true },
+    "@capacitor/camera": { "optional": true },
+    "@capacitor/core": { "optional": true },
+    "@capacitor/haptics": { "optional": true },
+    "@capacitor/network": { "optional": true },
+    "@capacitor/preferences": { "optional": true },
+    "@capacitor/push-notifications": { "optional": true },
+    "@capacitor/share": { "optional": true }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "// purpose": "모노레포 공유 TypeScript 베이스 — apps/* 와 packages/* 가 extends 로 사용. 현재(M1)는 unused, M3 부터 활성. 루트 tsconfig.json 은 변경하지 않음 (zero-risk).",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

@@ -1,0 +1,11 @@
+# pnpm workspaces — 모노레포 골격 (M1 단계)
+#
+# 현재 상태: apps/ packages/ 디렉토리는 아직 비어있음.
+# 후속 단계 (M2, M3) 에서 코드가 apps/web/ 으로 이동하고
+# packages/* 가 점진적으로 채워짐.
+#
+# 워크스페이스 패턴이 있어도 매칭되는 디렉토리가 없으면 pnpm 은
+# 단일 패키지 (root package.json) 로만 동작 — 빌드 영향 0.
+packages:
+  - 'apps/*'
+  - 'packages/*'

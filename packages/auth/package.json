@@ -1,0 +1,22 @@
+{
+  "name": "@gwangjang/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 인증 추상화 — 카카오 로그인 web/native 분기 (Phase 2 RN 통합 대비)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./kakao": "./src/kakao.ts",
+    "./kakao.web": "./src/kakao.web.ts",
+    "./kakao.native": "./src/kakao.native.ts"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2"
+  },
+  "peerDependenciesMeta": {
+    "@supabase/supabase-js": { "optional": true }
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2"
+  }
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  광장 브랜드 컬러.
+
+  웹의 oklch 컬러 시스템 (app/globals.css) 과 시각적으로 비슷하게 맞춤.
+  primary = 스카이블루 (#0EA5E9 근사)
+-->
+<resources>
+
+    <!-- Material Theme primary -->
+    <color name="colorPrimary">#0EA5E9</color>
+    <color name="colorPrimaryDark">#0284C7</color>
+    <color name="colorAccent">#F97316</color>  <!-- 로고 포인트 오렌지 -->
+
+    <!-- Splash 배경 -->
+    <color name="splashBackground">#FFFFFF</color>
+
+    <!-- 알림 LED / 액센트 -->
+    <color name="notificationColor">#0EA5E9</color>
+
+</resources>

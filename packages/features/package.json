@@ -1,0 +1,50 @@
+{
+  "name": "@gwangjang/features",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 도메인 비즈니스 로직 — auth, chat, clubs, group-buying, property",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./chat": "./src/chat/index.ts",
+    "./clubs": "./src/clubs/index.ts",
+    "./group-buying": "./src/group-buying/index.ts",
+    "./property": "./src/property/index.ts",
+    "./profile": "./src/profile/index.ts",
+    "./profile/ensure-plaza-profile": "./src/profile/ensure-plaza-profile.ts",
+    "./legal": "./src/legal/index.ts",
+    "./support": "./src/support/index.ts",
+    "./notifications": "./src/notifications/index.ts",
+    "./billing": "./src/billing/index.ts",
+    "./verify": "./src/verify/index.ts",
+    "./search": "./src/search/index.ts",
+    "./board": "./src/board/index.ts",
+    "./local-food": "./src/local-food/index.ts",
+    "./interior": "./src/interior/index.ts",
+    "./services": "./src/services/index.ts",
+    "./sharing": "./src/sharing/index.ts",
+    "./new-store": "./src/new-store/index.ts",
+    "./jobs": "./src/jobs/index.ts",
+    "./secondhand": "./src/secondhand/index.ts",
+    "./requests": "./src/requests/index.ts",
+    "./home": "./src/home/index.ts",
+    "./shared": "./src/shared/index.ts"
+  },
+  "dependencies": {
+    "@gwangjang/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "@supabase/supabase-js": "*"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "@supabase/supabase-js": { "optional": true }
+  },
+  "devDependencies": {
+    "react": "^19",
+    "@types/react": "^19",
+    "@supabase/supabase-js": "^2"
+  }
+}

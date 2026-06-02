@@ -1,0 +1,25 @@
+{
+  "name": "@gwangjang/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 API 클라이언트 — 서버/클라이언트 양쪽에서 사용 가능한 헬퍼 (api-error, file-validation, hero-banners, page-heroes, billing types)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api-error": "./src/api-error.ts",
+    "./file-validation": "./src/file-validation.ts",
+    "./hero-banners": "./src/hero-banners.ts",
+    "./page-heroes": "./src/page-heroes.ts",
+    "./billing/types": "./src/billing/types.ts"
+  },
+  "peerDependencies": {
+    "next": "^16"
+  },
+  "peerDependenciesMeta": {
+    "next": { "optional": true }
+  },
+  "devDependencies": {
+    "next": "^16",
+    "@types/node": "^22"
+  }
+}

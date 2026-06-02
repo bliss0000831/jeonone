@@ -1,0 +1,246 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* ============================================================================
+ * Pretendard 폰트 — 한국어 디자이너 디팩토 (당근/토스/무신사 다수 채택)
+ * Self-host (Vercel 1년 immutable cache) — CDN 의존 제거.
+ * 페이지 이동 시 매번 재다운로드 X → 모바일 / WebView 속도 큰 개선.
+ * ============================================================================ */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url('/PretendardVariable.woff2') format('woff2-variations');
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* 춘천광장 - 스카이블루 브랜드 컬러 (관리자 페이지에서 실시간 변경 가능) */
+:root {
+  /* 배경: 순백 */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.04 230);
+
+  /* 카드/팝오버: 순백 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.04 230);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.04 230);
+
+  /* primary: 스카이블루 (#0ea5e9 근사) */
+  --primary: oklch(0.68 0.14 230);
+  --primary-foreground: oklch(1 0 0);
+
+  /* secondary: 연한 하늘빛 배경 */
+  --secondary: oklch(0.95 0.02 230);
+  --secondary-foreground: oklch(0.22 0.04 230);
+
+  /* muted: 아주 옅은 뉴트럴 그레이 (노란톤 제거) */
+  --muted: oklch(0.978 0 0);
+  --muted-foreground: oklch(0.48 0.03 220);
+
+  /* accent: 로고 포인트 오렌지 */
+  --accent: oklch(0.68 0.16 40);
+  --accent-foreground: oklch(1 0 0);
+
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* border/input: 연한 하늘빛 */
+  --border: oklch(0.9 0.015 230);
+  --input: oklch(0.95 0.012 230);
+  --ring: oklch(0.68 0.14 230);
+
+  /* 차트: 스카이블루 기반 팔레트 */
+  --chart-1: oklch(0.68 0.14 230);
+  --chart-2: oklch(0.58 0.15 210);
+  --chart-3: oklch(0.68 0.16 40);
+  --chart-4: oklch(0.62 0.14 195);
+  --chart-5: oklch(0.72 0.12 260);
+
+  --radius: 0.625rem;
+
+  --sidebar: oklch(0.975 0.010 230);
+  --sidebar-foreground: oklch(0.18 0.04 230);
+  --sidebar-primary: oklch(0.68 0.14 230);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.93 0.02 230);
+  --sidebar-accent-foreground: oklch(0.22 0.04 230);
+  --sidebar-border: oklch(0.9 0.015 230);
+  --sidebar-ring: oklch(0.68 0.14 230);
+
+  /* 채팅 전용 팔레트 — 순백 캔버스 */
+  --chat-canvas: oklch(1 0 0);
+  --chat-bubble-other: oklch(1 0 0);
+  --chat-pill: oklch(1 0 0 / 0.8);
+  --chat-pattern: transparent;
+
+  /* 한국형 텍스트 위계 팔레트 — 당근/토스 톤
+   *   ink-900: 본문/제목 (#1A1A1A 근사)
+   *   ink-700: 보조 본문 (#4D4D4D)
+   *   ink-500: 메타 (#8E8E8E)
+   *   ink-300: 비활성 (#C8C8C8) */
+  --ink-900: #1a1a1a;
+  --ink-700: #4d4d4d;
+  --ink-500: #8e8e8e;
+  --ink-300: #c8c8c8;
+}
+
+.dark {
+  --background: oklch(0.13 0.02 230);
+  --foreground: oklch(0.94 0.008 230);
+  --card: oklch(0.17 0.02 230);
+  --card-foreground: oklch(0.94 0.008 230);
+  --popover: oklch(0.17 0.02 230);
+  --popover-foreground: oklch(0.94 0.008 230);
+  --primary: oklch(0.72 0.14 230);
+  --primary-foreground: oklch(0.15 0.02 230);
+  --secondary: oklch(0.22 0.03 230);
+  --secondary-foreground: oklch(0.88 0.008 230);
+  --muted: oklch(0.24 0.02 230);
+  --muted-foreground: oklch(0.62 0.02 230);
+  --accent: oklch(0.68 0.16 40);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.50 0.20 25);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.28 0.03 230);
+  --input: oklch(0.22 0.02 230);
+  --ring: oklch(0.72 0.14 230);
+  --chart-1: oklch(0.72 0.14 230);
+  --chart-2: oklch(0.58 0.12 210);
+  --chart-3: oklch(0.68 0.16 40);
+  --chart-4: oklch(0.58 0.14 195);
+  --chart-5: oklch(0.62 0.12 260);
+  --sidebar: oklch(0.15 0.02 230);
+  --sidebar-foreground: oklch(0.94 0.008 230);
+  --sidebar-primary: oklch(0.72 0.14 230);
+  --sidebar-primary-foreground: oklch(0.15 0.02 230);
+  --sidebar-accent: oklch(0.22 0.02 230);
+  --sidebar-accent-foreground: oklch(0.88 0.008 230);
+  --sidebar-border: oklch(0.28 0.03 230);
+  --sidebar-ring: oklch(0.72 0.14 230);
+
+  /* 채팅 전용 팔레트 — 다크 세이지 */
+  --chat-canvas: oklch(0.16 0.015 168);
+  --chat-bubble-other: oklch(0.20 0.018 210);
+  --chat-pill: oklch(0.22 0.02 210 / 0.8);
+  --chat-pattern: oklch(0.85 0.02 165 / 0.04);
+
+  /* 다크 모드 ink 팔레트 (밝게 반전) */
+  --ink-900: #f0f0f0;
+  --ink-700: #b8b8b8;
+  --ink-500: #8a8a8a;
+  --ink-300: #5a5a5a;
+}
+
+@theme inline {
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* 한국형 위계 컬러 토큰 — Tailwind 에서 text-ink-900 / text-ink-500 등으로 사용 */
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-ink-500: var(--ink-500);
+  --color-ink-300: var(--ink-300);
+
+  /* 추가 폰트 사이즈 — Tailwind 기본엔 없는 15px (한국 모바일 매물카드 본문 디팩토) */
+  --text-md: 0.9375rem;        /* 15px */
+  --text-md--line-height: 1.4rem;
+  --text-md--letter-spacing: -0.015em;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* 한국어 가독성 최적화 — 당근/토스 디팩토:
+     *  - letter-spacing -0.02em (Pretendard 모바일 권장 — 한글 자모 간격 살짝 좁게)
+     *  - word-break: keep-all (어절 단위로 줄바꿈 → "춘천시 동내 \n 면" 같은 어색한 분리 방지)
+     *  - antialiased (모바일 폰트 흐림 방지)
+     *  - tnum/lnum (가격/숫자 정렬용 tabular figures) */
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+  }
+  /* 헤딩은 더 강하게 좁힘 (당근 헤더 스타일) */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.03em;
+  }
+}
+
+/* 스크롤바 숨김 (캐러셀 썸네일 스트립용) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+ * iOS / Capacitor 안전 영역 (notch / Dynamic Island / 홈 인디케이터)
+ *
+ * viewport-fit=cover 와 함께 동작. 헤더/푸터에 자동 패딩.
+ *
+ * 사용:
+ *   <header class="safe-top"> ... </header>
+ *   <footer class="safe-bottom"> ... </footer>
+ *   <div class="safe-x"> ... </div>  // 가로 노치 대응
+ * ============================================================================ */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.safe-all {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+/* body 자동 패딩은 의도적으로 X (기존 헤더/푸터 디자인 보호).
+ * 각 컴포넌트 (headers / bottom nav / FAB) 가 .safe-top / .safe-bottom 클래스 opt-in. */
+

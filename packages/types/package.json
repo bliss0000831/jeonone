@@ -1,0 +1,15 @@
+{
+  "name": "@gwangjang/types",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 전역 공유 TypeScript 타입 (Property, SearchCategory 등)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./app": "./src/app.ts",
+    "./search": "./src/search.ts",
+    "./chat": "./src/chat.ts",
+    "./profile": "./src/profile.ts",
+    "./database": "./src/database.ts"
+  }
+}

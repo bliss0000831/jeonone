@@ -1,0 +1,15 @@
+{
+  "name": "@gwangjang/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "광장 디자인 토큰 (RN 용 TS 객체) — colors / typography / spacing / radius / shadows",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./colors": "./src/colors.ts",
+    "./typography": "./src/typography.ts",
+    "./spacing": "./src/spacing.ts",
+    "./radius": "./src/radius.ts",
+    "./shadows": "./src/shadows.ts"
+  }
+}

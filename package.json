@@ -1,0 +1,30 @@
+{
+  "name": "gwangjang-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "광장 (Gwangjang) — Korean local community + real estate platform monorepo",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm --filter web exec tsc --noEmit",
+    "cap:sync": "pnpm --filter web cap:sync",
+    "cap:android": "pnpm --filter web cap:android",
+    "cap:ios": "pnpm --filter web cap:ios",
+    "mobile": "pnpm --filter mobile start",
+    "mobile:tunnel": "pnpm --filter mobile start:tunnel",
+    "mobile:lan": "pnpm --filter mobile start:lan",
+    "db:types": "npx supabase gen types --lang=typescript --project-id bcmhziqnarkveoahytle > packages/types/src/database.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.33.1",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.14",
+      "@types/react-dom": "19.2.3"
+    }
+  }
+}

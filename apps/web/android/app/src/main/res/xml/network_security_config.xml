@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  광장 — Android 네트워크 보안 설정.
+
+  기본 정책:
+    - 모든 외부 도메인 HTTPS 강제 (cleartextTrafficPermitted=false)
+    - 시스템 신뢰 인증서만 사용
+
+  Dev 예외:
+    - 10.0.2.2 (Android 에뮬레이터 → 호스트 PC), localhost — http 허용
+    - debug 빌드에서만 (debug-overrides)
+
+  Capacitor 가 cleartext: true 시 동적으로 비슷한 설정 생성하지만,
+  여기 명시함으로써 production 보안 정책을 코드 리뷰 가능하게.
+-->
+<network-security-config>
+
+  <!-- 기본 정책: HTTPS 만 -->
+  <base-config cleartextTrafficPermitted="false">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+
+  <!-- Debug 빌드 전용 — 에뮬레이터 / 로컬 dev 서버 연결 허용.
+       release 빌드에는 적용 안 됨 (Google Play 출시 안전). -->
+  <debug-overrides>
+    <trust-anchors>
+      <certificates src="system" />
+      <certificates src="user" />  <!-- mitmproxy 같은 dev 인증서 -->
+    </trust-anchors>
+  </debug-overrides>
+
+  <!-- 명시적 cleartext 허용 도메인 (dev 만) -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">10.0.2.2</domain>           <!-- Android 에뮬 -->
+    <domain includeSubdomains="true">localhost</domain>           <!-- localhost + chuncheon.localhost 등 -->
+    <domain includeSubdomains="false">127.0.0.1</domain>          <!-- 직접 IP -->
+  </domain-config>
+
+</network-security-config>

@@ -1,0 +1,26 @@
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+next.user-config.*
+
+# Environment variables
+.env*.local
+.env.local.*
+apps/mobile/.env
+
+# Claude Code internal (로컬 설정 — 시크릿 포함 가능, 커밋 금지)
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+.vercel
+
+# TypeScript build cache
+*.tsbuildinfo
