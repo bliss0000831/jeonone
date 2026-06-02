@@ -20,8 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
     if (data?.name) cityName = plazaCityName(data.name)
   }
 
-  const title = `${cityName} 중고거래 — 우리 동네 안전 거래`
-  const description = `${cityName} 주민 간 중고거래. 디지털기기, 가구, 의류 등 안전하게 거래하세요.`
+  const title = `${cityName} 농기구/자재 장터 — 사고팔기`
+  const description = `${cityName} 농업인 간 농기구·자재 직거래. 트랙터, 경운기, 하우스 자재 등 안전하게 거래하세요.`
 
   return {
     title,
