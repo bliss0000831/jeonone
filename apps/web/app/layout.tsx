@@ -68,11 +68,11 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   }
 
-  const siteName = plazaName || (plaza ? '광장' : '전국 광장')
+  const siteName = plazaName || (plaza ? '전원일기' : '전국 전원일기')
   const title = plaza
-    ? `${siteName} - 우리 동네 부동산과 이웃`
-    : `${siteName} - 전국의 동네를 잇는 플랫폼`
-  const description = plaza ? settings.site_description : '지역별 부동산·생활정보·이웃 커뮤니티를 한 곳에서. 우리 동네 광장을 선택해 들어가세요.'
+    ? `${siteName} - 농기구 직거래·로컬푸드·이웃`
+    : `${siteName} - 전국의 농촌을 잇는 플랫폼`
+  const description = plaza ? settings.site_description : '지역별 농기구 직거래·대여·경매와 로컬푸드·이웃 커뮤니티를 한 곳에서. 우리 지역 전원일기를 선택해 들어가세요.'
   // favicon 은 브라우저가 며칠씩 캐시 → URL 자체에 hash 를 붙여 강제 갱신.
   // R2 URL 이 바뀌면 hash 도 바뀌므로 자동으로 새 favicon 으로 교체됨.
   const rawLogo = settings.site_logo || '/logo.png?v=3'
@@ -84,7 +84,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     generator: 'v0.app',
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gwangjang.app'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jeonwondiary.vercel.app'),
     robots: isProd
       ? { index: true, follow: true }
       : { index: false, follow: false },

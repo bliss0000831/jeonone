@@ -7,88 +7,30 @@
  * 빌드타임에 fetch 하기 어려워서 정적 배열 유지. 새 광장 활성화 시 이 배열 업데이트.
  */
 
+// 전원일기 — 도(道) 단위 광장.
+// 시군(강릉/춘천 등)은 plazas.coverage 배열 = in-app sub-region 필터로 처리.
 export const KNOWN_PLAZAS = [
-  // ─── 강원권 (현재 active) ──
-  'chuncheon',
-  'gangneung',
-  // ─── 강원권 (오픈예정) ──
-  'wonju',
-  'sokcho',
-  'donghae-samcheok',
-  'taebaek',
-  // ─── 서울권 ──
-  'seoul-south',
-  'seoul-north',
-  'seoul-west',
-  'seoul-mid',
-  // ─── 경기권 ──
-  'gyeonggi-north',
-  'goyang',
-  'guri',
-  'gimpo',
-  'bucheon-siheung',
-  'seongnam',
-  'suwon',
-  'ansan-sihwa',
-  'anyang',
-  'osan',
-  'yongin-suji',
-  'incheon',
-  'pyeongtaek-anseong',
-  'hanam-icheon',
-  // ─── 충청권 ──
-  'gongju-sejong',
-  'dangjin',
-  'daejeon',
-  'baekje',
-  'seosan',
-  'sejong',
-  'jecheon',
-  'cheonan',
-  'cheongju',
-  'chungseo',
-  'chungju',
-  // ─── 전라권 ──
-  'gwangju-jn',
-  'gunsan',
-  'namwon',
-  'mokpo',
-  'suncheon-gwangyang',
-  'yeosu',
-  'iksan',
-  'jeonju',
-  'jeongeup',
-  // ─── 경상권 ──
-  'gyeongsan-yeongcheon',
-  'gyeongseo',
-  'gyeongju',
-  'gumi',
-  'gimcheon',
-  'gimhae',
-  'miryang',
-  'busan',
-  'andong',
-  'yangsan',
-  'yeongju',
-  'ulsan',
-  'jinju',
-  'jinhae',
-  'changwon',
-  'pohang',
-  'hallyeo',
-  // ─── 제주권 ──
-  'jeju',
-  'seogwipo',
+  'gangwon',   // 강원 (현재 active)
+  'gyeonggi',  // 경기
+  'chungbuk',  // 충북
+  'chungnam',  // 충남
+  'jeonbuk',   // 전북
+  'jeonnam',   // 전남
+  'gyeongbuk', // 경북
+  'gyeongnam', // 경남
+  'jeju',      // 제주
 ] as const
 
 export type PlazaId = (typeof KNOWN_PLAZAS)[number]
 
 export const HUB_HOSTNAMES = new Set([
+  'jeonwondiary.vercel.app', // Vercel 기본 도메인
+  'jeonwondiary.app',        // 커스텀 도메인 (예정)
+  'www.jeonwondiary.app',
+  // 레거시 호환
   'gwangjang.app',
   'www.gwangjang.app',
-  'gwangjang.kr',         // 5월 도메인 변경 대비
-  'www.gwangjang.kr',
-  'gwangjang.vercel.app', // Vercel 기본 도메인
+  'gwangjang.vercel.app',
   'localhost',
   '127.0.0.1',
 ])
@@ -127,7 +69,7 @@ export function plazaFromHost(host: string | null | undefined): PlazaId | null {
  * 광장이 활성화된 상태인지 (KNOWN_PLAZAS 의 첫 N 개) 빠른 체크용.
  * 정확한 활성 여부는 DB 의 plazas.is_active 가 source of truth.
  */
-export const ACTIVE_PLAZAS: readonly PlazaId[] = ['chuncheon', 'gangneung']
+export const ACTIVE_PLAZAS: readonly PlazaId[] = ['gangwon']
 
 export function isActivePlaza(id: string | null | undefined): id is PlazaId {
   if (!id) return false

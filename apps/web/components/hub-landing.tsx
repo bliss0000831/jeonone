@@ -176,7 +176,7 @@ export function HubLanding({
               )}
             >
               <Sparkles className="w-3 h-3" />
-              전국 광장 플랫폼
+              전국 농업인 플랫폼
             </div>
           </div>
           <h1
@@ -186,13 +186,13 @@ export function HubLanding({
             )}
             style={hasBg ? { textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5)' } : undefined}
           >
-            우리 동네 광장,
+            우리 지역 전원일기,
             <br className="sm:hidden" />
             <span
               className={cn(
                 hasBg
                   ? 'text-white'
-                  : 'bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-600 bg-clip-text text-transparent',
+                  : 'bg-gradient-to-r from-green-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent',
               )}
             >
               {' '}한 곳에서
@@ -205,7 +205,7 @@ export function HubLanding({
             )}
             style={hasBg ? { textShadow: '0 1px 6px rgba(0,0,0,0.5)' } : undefined}
           >
-            지역별 부동산·생활정보·이웃 커뮤니티를 광장 하나로. 우리 동네를 선택해 들어가세요.
+            지역별 농기구 직거래·로컬푸드·이웃 커뮤니티를 전원일기 하나로. 우리 지역을 선택해 들어가세요.
           </p>
 
           {/* 검색 — 둥근 pill + 좌측 돋보기 + 우측 광장 찾기 버튼 */}
@@ -235,7 +235,7 @@ export function HubLanding({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="동네 이름으로 광장 찾기 — 예: 망원, 인제, 분당"
+                placeholder="지역으로 전원일기 찾기 — 예: 강원, 강릉, 춘천"
                 className={cn(
                   'flex-1 min-w-0 py-3 pr-2 text-sm bg-transparent focus:outline-none',
                   hasBg
@@ -261,7 +261,7 @@ export function HubLanding({
                 type="submit"
                 className="flex-shrink-0 px-5 sm:px-6 my-1 mr-1 rounded-full bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-sm font-bold transition-colors whitespace-nowrap"
               >
-                광장 찾기
+                지역 찾기
               </button>
             </form>
             {trimmed && (
@@ -272,7 +272,7 @@ export function HubLanding({
                 )}
                 style={hasBg ? { textShadow: '0 1px 4px rgba(0,0,0,0.5)' } : undefined}
               >
-                "{trimmed}" 검색 결과: {filtered.length}개 광장
+                "{trimmed}" 검색 결과: {filtered.length}곳
               </p>
             )}
           </div>
@@ -280,7 +280,7 @@ export function HubLanding({
           {/* 통계 — 검색 안 할 때만 */}
           {!trimmed && (
             <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4 max-w-md">
-              <Stat icon={<MapPin className="w-4 h-4" />} value={stats.total} label="전체 광장" glass={hasBg} />
+              <Stat icon={<MapPin className="w-4 h-4" />} value={stats.total} label="전체 지역" glass={hasBg} />
               <Stat icon={<Users className="w-4 h-4" />} value={stats.open} label="오픈" highlighted glass={hasBg} />
               <Stat icon={<Building2 className="w-4 h-4" />} value={stats.soon} label="오픈예정" glass={hasBg} />
             </div>
@@ -389,7 +389,7 @@ export function HubLanding({
               )}
               style={hasBg ? { textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5)' } : undefined}
             >
-              전체 광장 둘러보기
+              전체 지역 둘러보기
             </h2>
             <p
               className={cn(
@@ -398,7 +398,7 @@ export function HubLanding({
               )}
               style={hasBg ? { textShadow: '0 1px 6px rgba(0,0,0,0.6)' } : undefined}
             >
-              7개 권역 · 17개 광장 · 264개 지역 (확장 중)
+              6개 권역 · 9개 도 · 전국 농촌 (확장 중)
             </p>
           </div>
           <div className="space-y-6">
@@ -426,7 +426,7 @@ export function HubLanding({
                           hasBg ? 'text-white/95' : 'text-slate-600 dark:text-slate-300',
                         )}
                       >
-                        {ps.length}개 광장
+                        {ps.length}곳
                       </span>
                     </div>
                     {openCount > 0 ? (
@@ -477,7 +477,7 @@ export function HubLanding({
             )}
             style={hasBg ? { textShadow: '0 1px 4px rgba(0,0,0,0.5)' } : undefined}
           >
-            광장 — 전국의 동네를 잇는 플랫폼
+            전원일기 — 전국의 농촌을 잇는 플랫폼
           </p>
           <p
             className={cn(
@@ -486,7 +486,7 @@ export function HubLanding({
             )}
             style={hasBg ? { textShadow: '0 1px 3px rgba(0,0,0,0.4)' } : undefined}
           >
-            © {new Date().getFullYear()} gwangjang.app
+            © {new Date().getFullYear()} 전원일기
           </p>
         </footer>
       </main>
