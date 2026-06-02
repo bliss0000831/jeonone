@@ -14,8 +14,8 @@ import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { useCurrentPlazaState } from "@/lib/plaza"
 
-const GREEN = "#15803d"
-const GREEN_DARK = "#166534"
+const GREEN = "#225a39"
+const GREEN_DARK = "#1c4e31"
 const BROWN = "#8a6d3b"
 
 const IMG = {
