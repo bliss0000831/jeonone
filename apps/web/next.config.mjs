@@ -39,6 +39,8 @@ const nextConfig = {
     ],
     localPatterns: [
       { pathname: '/api/**' },
+      // public 폴더 로컬 이미지(배너/로고/아이콘 등) 허용 — Next 16 은 미지정 시 차단
+      { pathname: '/**' },
     ],
     formats: ['image/avif', 'image/webp'],
     // 홈/매물 카드 폭이 max ~600-800px 이라 1920 변형은 거의 안 쓰임 → 제거 (변환 CPU 절약)
