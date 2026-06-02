@@ -19,6 +19,7 @@
     "@gwangjang/platform": "workspace:*",
     "@gwangjang/tokens": "workspace:*",
     "@gwangjang/types": "workspace:*",
+    "@lottiefiles/dotlottie-react": "^0.19.4",
     "@mj-studio/react-native-naver-map": "^2.8.0",
     "@react-native-async-storage/async-storage": "~2.2.0",
     "@react-native-community/datetimepicker": "^8.4.4",
