@@ -60,7 +60,7 @@ export default function MyTradesScreen() {
     setBids(dedup)
 
     const { data: bk } = await (sb as any).from("rental_bookings")
-      .select("id, start_date, end_date, total_amount, deposit, status, created_at, rental:rental_listings(post:secondhand_posts(title, images))")
+      .select("id, start_date, end_date, total_amount, deposit, status, created_at, rental:rental_listings(owner_id, post:secondhand_posts(title, images))")
       .eq("renter_id", user.id).order("created_at", { ascending: false })
     setBookings(bk || [])
     setLoading(false)
@@ -167,6 +167,13 @@ export default function MyTradesScreen() {
                         </View>
                         <Text style={styles.metaSm}>{b.start_date} ~ {b.end_date}</Text>
                         <Text style={styles.cardPrice}>{won(b.total_amount)}{b.deposit ? `  +보증금 ${won(b.deposit)}` : ""}</Text>
+                        {(b.status === "completed" || b.status === "returned") && b.rental?.owner_id ? (
+                          <Pressable style={styles.reviewBtn}
+                            onPress={() => router.push(`/mypage/write-review?reviewed_user_id=${b.rental.owner_id}&source_type=rental&source_id=${b.id}&target_name=${encodeURIComponent(b.rental?.post?.title || "소유자")}` as any)}>
+                            <Ionicons name="star" size={13} color="#fff" />
+                            <Text style={styles.reviewBtnText}>소유자 후기 작성</Text>
+                          </Pressable>
+                        ) : null}
                       </View>
                     </View>
                   )
@@ -204,4 +211,6 @@ const styles = StyleSheet.create({
   statusBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
   statusText: { fontSize: 11, fontWeight: "800" },
   manageLink: { textAlign: "center", fontSize: 14, fontWeight: "700", color: GREEN, marginTop: 8 },
+  reviewBtn: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start", gap: 5, backgroundColor: GREEN, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginTop: 8 },
+  reviewBtnText: { color: "#fff", fontWeight: "800", fontSize: 12 },
 })

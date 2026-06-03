@@ -7,7 +7,7 @@ import { Header } from "@/components/header"
 import { BottomNav } from "@/components/bottom-nav"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-import { Tractor, Gavel, CalendarDays, Loader2, ArrowLeft, Package, TrendingUp } from "lucide-react"
+import { Tractor, Gavel, CalendarDays, Loader2, ArrowLeft, Package, TrendingUp, Star } from "lucide-react"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
@@ -78,7 +78,7 @@ export default function MyTradesPage() {
     // 내 예약 (신청자)
     const { data: bk } = await (supabase as any)
       .from("rental_bookings")
-      .select("id, start_date, end_date, total_amount, deposit, status, created_at, rental:rental_listings(post:secondhand_posts(title, images))")
+      .select("id, start_date, end_date, total_amount, deposit, status, created_at, rental:rental_listings(owner_id, post:secondhand_posts(title, images))")
       .eq("renter_id", u.id)
       .order("created_at", { ascending: false })
     setBookings((bk as any[]) || [])
@@ -215,6 +215,12 @@ export default function MyTradesPage() {
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" />{b.start_date} ~ {b.end_date}</p>
                         <p className="text-sm font-black text-primary mt-0.5">{won(b.total_amount)}{b.deposit ? <span className="text-xs font-medium text-muted-foreground"> + 보증금 {won(b.deposit)}</span> : null}</p>
+                        {(b.status === "completed" || b.status === "returned") && b.rental?.owner_id && (
+                          <Link href={`/mypage/write-review?reviewed_user_id=${b.rental.owner_id}&source_type=rental&source_id=${b.id}&target_name=${encodeURIComponent(b.rental?.post?.title || "소유자")}`}
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground font-bold px-3 py-1.5 text-xs">
+                            <Star className="w-3.5 h-3.5" /> 소유자 후기 작성
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )

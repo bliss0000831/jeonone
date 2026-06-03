@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { getAuthedUser } from "@/lib/supabase/auth-helpers"
+import { getCurrentPlaza } from "@/lib/plaza/server"
 import { NextResponse, type NextRequest } from "next/server"
 import { enforceRateLimit } from "@/lib/services/ratelimit"
 import { banGuardResponse } from "@/lib/services/user-ban-guard"
@@ -125,6 +126,44 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
+  } else if (source_type === "auction") {
+    // 경매 낙찰자 → 판매자 후기 (source_id = auction_listings.id)
+    const { data: a } = await (supabase as any)
+      .from("auction_listings")
+      .select("seller_id, winner_id, status")
+      .eq("id", source_id)
+      .maybeSingle()
+    if (!a) {
+      return NextResponse.json({ error: "경매를 찾을 수 없습니다" }, { status: 404 })
+    }
+    if (a.winner_id !== user.id) {
+      return NextResponse.json({ error: "낙찰자만 후기 작성 가능합니다" }, { status: 403 })
+    }
+    if (a.seller_id !== reviewed_user_id) {
+      return NextResponse.json({ error: "거래 상대가 아닙니다" }, { status: 400 })
+    }
+    if (a.status !== "ended") {
+      return NextResponse.json({ error: "경매 종료 후 후기를 남길 수 있습니다" }, { status: 400 })
+    }
+  } else if (source_type === "rental") {
+    // 대여 신청자 → 소유자 후기 (source_id = rental_bookings.id)
+    const { data: bk } = await (supabase as any)
+      .from("rental_bookings")
+      .select("renter_id, status, rental:rental_listings(owner_id)")
+      .eq("id", source_id)
+      .maybeSingle()
+    if (!bk) {
+      return NextResponse.json({ error: "예약을 찾을 수 없습니다" }, { status: 404 })
+    }
+    if (bk.renter_id !== user.id) {
+      return NextResponse.json({ error: "대여 신청자만 후기 작성 가능합니다" }, { status: 403 })
+    }
+    if (bk.rental?.owner_id !== reviewed_user_id) {
+      return NextResponse.json({ error: "거래 상대가 아닙니다" }, { status: 400 })
+    }
+    if (!["returned", "completed"].includes(bk.status)) {
+      return NextResponse.json({ error: "대여 완료 후 후기를 남길 수 있습니다" }, { status: 400 })
+    }
   } else if (source_type === "property" || source_type === "secondhand") {
     // 추후: 채팅방 거래 완료 시점에 source_id = chat_room_id 로 검증
     // 현재는 일단 차단 — 미래에 풀어줄 예정
@@ -151,6 +190,11 @@ export async function POST(request: NextRequest) {
     writer = wc
   }
 
+  const plaza = await getCurrentPlaza()
+  if (!plaza) {
+    return NextResponse.json({ error: "광장이 지정되지 않았습니다" }, { status: 400 })
+  }
+
   const { data, error } = await writer
     .from("reviews")
     .insert({
@@ -163,6 +207,7 @@ export async function POST(request: NextRequest) {
       kindness,
       total_score,
       content,
+      plaza_id: plaza,
     })
     .select("id, reviewer_id, reviewed_user_id, source_type, source_id, response_speed, accuracy, kindness, total_score, content, created_at")
     .single()

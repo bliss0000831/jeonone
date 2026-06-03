@@ -8,7 +8,7 @@ import { Header } from "@/components/header"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
-import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap } from "lucide-react"
+import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap, Star } from "lucide-react"
 
 const FALLBACK_IMG = "/images/card-auction.jpg"
 
@@ -132,7 +132,15 @@ export default function AuctionDetailPage() {
                 {user && a.winner_id === user.id ? "🎉 축하합니다! 낙찰되었습니다" : "경매가 종료되었습니다 (낙찰)"}
               </p>
               <p className="text-sm text-muted-foreground mt-1">최종 낙찰가 <span className="font-bold text-primary">{won(a.current_price)}</span></p>
-              {user && a.winner_id === user.id && <p className="text-xs text-muted-foreground mt-1">판매자와 채팅으로 거래를 진행해주세요.</p>}
+              {user && a.winner_id === user.id && (
+                <>
+                  <p className="text-xs text-muted-foreground mt-1">판매자와 채팅으로 거래를 진행해주세요.</p>
+                  <Link href={`/mypage/write-review?reviewed_user_id=${a.seller_id}&source_type=auction&source_id=${a.id}&target_name=${encodeURIComponent(a.post?.title || "판매자")}`}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2 text-sm">
+                    <Star className="w-4 h-4" /> 판매자 후기 작성
+                  </Link>
+                </>
+              )}
             </div>
           ) : (
             <div className="rounded-2xl p-4 mb-4 border-2 border-border bg-muted/40">

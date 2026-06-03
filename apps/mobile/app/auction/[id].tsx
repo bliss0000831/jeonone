@@ -111,7 +111,16 @@ export default function AuctionDetailScreen() {
               <View style={[styles.resultBox, uid && a.winner_id === uid ? styles.resultWin : styles.resultNeutral]}>
                 <Text style={styles.resultTitle}>{uid && a.winner_id === uid ? "🎉 축하합니다! 낙찰되었습니다" : "경매가 종료되었습니다 (낙찰)"}</Text>
                 <Text style={styles.resultSub}>최종 낙찰가 <Text style={{ fontWeight: "900", color: GREEN }}>{won(a.current_price)}</Text></Text>
-                {uid && a.winner_id === uid ? <Text style={styles.resultHint}>판매자와 채팅으로 거래를 진행해주세요.</Text> : null}
+                {uid && a.winner_id === uid ? (
+                  <>
+                    <Text style={styles.resultHint}>판매자와 채팅으로 거래를 진행해주세요.</Text>
+                    <Pressable style={styles.reviewBtn}
+                      onPress={() => router.push(`/mypage/write-review?reviewed_user_id=${a.seller_id}&source_type=auction&source_id=${a.id}&target_name=${encodeURIComponent(a.post?.title || "판매자")}` as any)}>
+                      <Ionicons name="star" size={15} color="#fff" />
+                      <Text style={styles.reviewBtnText}>판매자 후기 작성</Text>
+                    </Pressable>
+                  </>
+                ) : null}
               </View>
             ) : (
               <View style={[styles.resultBox, styles.resultNeutral]}>
@@ -169,6 +178,8 @@ const styles = StyleSheet.create({
   resultTitle: { fontSize: 15, fontWeight: "900", color: "#1e293b" },
   resultSub: { fontSize: 13, color: "#64748b", marginTop: 4 },
   resultHint: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
+  reviewBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, backgroundColor: GREEN, borderRadius: 10, paddingVertical: 9, marginTop: 10 },
+  reviewBtnText: { color: "#fff", fontWeight: "800", fontSize: 13 },
   desc: { fontSize: 14, color: "#334155", lineHeight: 21, marginBottom: 16 },
   bidsTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 8 },
   noBids: { color: "#94a3b8", fontSize: 14, paddingVertical: 8 },
