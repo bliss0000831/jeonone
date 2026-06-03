@@ -7,14 +7,14 @@ import { cn } from "@/lib/utils"
 
 // 소통과 나눔 / 정보와 혜택 — href 는 우리 라우트로 매핑
 const boardsRow1 = [
-  { id: "free", label: "자유게시판", icon: MessageSquare, href: "/board" },
-  { id: "daily", label: "일상 공유", icon: Camera, href: "/board" },
-  { id: "share", label: "무료 나눔", icon: Gift, href: "/sharing" },
+  { id: "free", label: "자유게시판", icon: MessageSquare, href: "/board/c/free" },
+  { id: "daily", label: "일상 공유", icon: Camera, href: "/board/c/daily" },
+  { id: "share", label: "무료 나눔", icon: Gift, href: "/board/c/share" },
 ]
 const boardsRow2 = [
-  { id: "life", label: "생활 정보", icon: Lightbulb, href: "/notice" },
-  { id: "subsidy", label: "정부 지원금", icon: Coins, href: "/notice" },
-  { id: "qna", label: "질문 답변", icon: HelpCircle, href: "/faq" },
+  { id: "life", label: "생활 정보", icon: Lightbulb, href: "/board/c/life" },
+  { id: "subsidy", label: "정부 지원금", icon: Coins, href: "/board/c/subsidy" },
+  { id: "qna", label: "질문 답변", icon: HelpCircle, href: "/board/c/qna" },
 ]
 
 export function BoardNavButtons() {
