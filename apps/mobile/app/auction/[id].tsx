@@ -28,13 +28,17 @@ export default function AuctionDetailScreen() {
   const [loading, setLoading] = useState(true)
   const [amount, setAmount] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [uid, setUid] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const sb = getSupabase()
-    const { data } = await sb.from("auction_listings")
+    sb.auth.getUser().then(({ data }) => setUid(data.user?.id || null))
+    // 만료 경매 자동 정산 (cron 대체)
+    try { await (sb as any).rpc("close_expired_auctions") } catch { /* ignore */ }
+    const { data } = await (sb as any).from("auction_listings")
       .select("*, post:secondhand_posts(title, description, images)").eq("id", id).maybeSingle()
     setA(data)
-    const { data: b } = await sb.from("auction_bids").select("amount, created_at").eq("auction_id", id).order("created_at", { ascending: false }).limit(10)
+    const { data: b } = await (sb as any).from("auction_bids").select("amount, created_at").eq("auction_id", id).order("created_at", { ascending: false }).limit(10)
     setBids(b || [])
     setLoading(false)
   }, [id])
@@ -47,7 +51,7 @@ export default function AuctionDetailScreen() {
     const amt = parseInt((amount || "").replace(/[^0-9]/g, ""), 10)
     if (!amt || amt < minBid) { Alert.alert("입찰 실패", `최소 입찰가는 ${won(minBid)} 입니다`); return }
     setSubmitting(true)
-    const { data, error } = await getSupabase().rpc("place_auction_bid", { p_auction: id, p_amount: amt })
+    const { data, error } = await (getSupabase() as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
     setSubmitting(false)
     if (error) { Alert.alert("입찰 실패", error.message); return }
     const res = data as any
@@ -82,6 +86,21 @@ export default function AuctionDetailScreen() {
             <Text style={styles.price}>{won(a.current_price || a.start_price)}</Text>
             <Text style={styles.sub}>시작가 {won(a.start_price)} · 단위 {won(a.bid_increment)}</Text>
           </View>
+
+          {ended && (
+            a.winner_id ? (
+              <View style={[styles.resultBox, uid && a.winner_id === uid ? styles.resultWin : styles.resultNeutral]}>
+                <Text style={styles.resultTitle}>{uid && a.winner_id === uid ? "🎉 축하합니다! 낙찰되었습니다" : "경매가 종료되었습니다 (낙찰)"}</Text>
+                <Text style={styles.resultSub}>최종 낙찰가 <Text style={{ fontWeight: "900", color: GREEN }}>{won(a.current_price)}</Text></Text>
+                {uid && a.winner_id === uid ? <Text style={styles.resultHint}>판매자와 채팅으로 거래를 진행해주세요.</Text> : null}
+              </View>
+            ) : (
+              <View style={[styles.resultBox, styles.resultNeutral]}>
+                <Text style={styles.resultSub}>입찰자가 없어 종료된 경매입니다 (유찰)</Text>
+              </View>
+            )
+          )}
+
           {a.post?.description ? <Text style={styles.desc}>{a.post.description}</Text> : null}
 
           <Text style={styles.bidsTitle}>입찰 내역</Text>
@@ -117,6 +136,12 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, color: "#64748b" },
   price: { fontSize: 30, fontWeight: "900", color: GREEN, marginTop: 2 },
   sub: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
+  resultBox: { borderWidth: 2, borderRadius: 16, padding: 14, marginBottom: 14 },
+  resultWin: { borderColor: GREEN, backgroundColor: "rgba(34,90,57,0.06)" },
+  resultNeutral: { borderColor: "#e2e8f0", backgroundColor: "#f8fafc" },
+  resultTitle: { fontSize: 15, fontWeight: "900", color: "#1e293b" },
+  resultSub: { fontSize: 13, color: "#64748b", marginTop: 4 },
+  resultHint: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
   desc: { fontSize: 14, color: "#334155", lineHeight: 21, marginBottom: 16 },
   bidsTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 8 },
   noBids: { color: "#94a3b8", fontSize: 14, paddingVertical: 8 },

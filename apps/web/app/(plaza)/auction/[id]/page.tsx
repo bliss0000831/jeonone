@@ -38,6 +38,8 @@ export default function AuctionDetailPage() {
   const load = useCallback(async () => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    // 만료 경매 자동 정산 (cron 대체) — 이 경매가 막 끝났다면 ended 로 갱신됨
+    try { await (supabase as any).rpc("close_expired_auctions") } catch { /* ignore */ }
     const { data } = await (supabase as any)
       .from("auction_listings")
       .select("*, post:secondhand_posts(title, description, images, location)")
@@ -105,6 +107,24 @@ export default function AuctionDetailPage() {
           <p className="text-xs text-muted-foreground mt-1">시작가 {won(a.start_price)} · 최소 입찰 단위 {won(a.bid_increment)}</p>
           {a.buy_now_price ? <p className="text-sm font-bold mt-2">즉시구매가 {won(a.buy_now_price)}</p> : null}
         </div>
+
+        {/* 종료/낙찰 결과 */}
+        {ended && (
+          a.winner_id ? (
+            <div className={`rounded-2xl p-4 mb-4 border-2 ${user && a.winner_id === user.id ? "border-primary bg-primary/5" : "border-border bg-muted/40"}`}>
+              <p className="font-black flex items-center gap-2">
+                <Gavel className="w-5 h-5 text-primary" />
+                {user && a.winner_id === user.id ? "🎉 축하합니다! 낙찰되었습니다" : "경매가 종료되었습니다 (낙찰)"}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">최종 낙찰가 <span className="font-bold text-primary">{won(a.current_price)}</span></p>
+              {user && a.winner_id === user.id && <p className="text-xs text-muted-foreground mt-1">판매자와 채팅으로 거래를 진행해주세요.</p>}
+            </div>
+          ) : (
+            <div className="rounded-2xl p-4 mb-4 border-2 border-border bg-muted/40">
+              <p className="font-bold text-muted-foreground">입찰자가 없어 종료된 경매입니다 (유찰)</p>
+            </div>
+          )
+        )}
 
         {a.post?.description && <p className="text-sm text-foreground/80 whitespace-pre-wrap mb-5">{a.post.description}</p>}
 

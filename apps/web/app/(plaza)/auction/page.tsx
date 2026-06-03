@@ -48,6 +48,8 @@ export default function AuctionPage() {
     const supabase = createClient()
     const plaza = getCurrentPlazaClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    // 만료 경매 자동 정산 (cron 대체)
+    try { await (supabase as any).rpc("close_expired_auctions") } catch { /* ignore */ }
     try {
       let q = (supabase as any)
         .from("auction_listings")

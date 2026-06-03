@@ -36,7 +36,9 @@ export default function AuctionListScreen() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      let q = getSupabase()
+      const sb = getSupabase()
+      try { await (sb as any).rpc("close_expired_auctions") } catch { /* ignore */ }
+      let q = (sb as any)
         .from("auction_listings")
         .select("id, start_price, current_price, bid_count, end_at, status, post:secondhand_posts(title, images)")
         .eq("status", "active")
