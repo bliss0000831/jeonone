@@ -97,7 +97,11 @@ export default function CreatePostPage() {
       .order('sort_order')
       .then(({ data }) => {
         setCategories(data || [])
-        if (data?.length) setCategoryId(data[0].id)
+        if (data?.length) {
+          const slug = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") : null
+          const match = slug ? (data as any[]).find((c) => c.slug === slug) : null
+          setCategoryId(match?.id || data[0].id)
+        }
       })
   }, [])
 
