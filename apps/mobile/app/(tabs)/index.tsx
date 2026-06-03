@@ -127,7 +127,7 @@ export default function HomeTab() {
         <View style={{ paddingHorizontal: 16, marginTop: 20, gap: 16 }}>
           <PhotoCard img={IMG.equipment} icon="construct" title="농기구/자재" subtitle="사고팔기" desc="트랙터, 경운기, 하우스 자재 등" onPress={go("/secondhand")} />
           <PhotoCard img={IMG.food} icon="nutrition" title="강원 로컬푸드" subtitle="직거래 장터" desc="방금 수확한 신선한 농산물" light onPress={go("/local-food")} />
-          <PhotoCard img={IMG.auction} icon="hammer" title="만물 경매장" subtitle="경매 / 즉시 거래" desc="농산물·농기구 경매 거래소" onPress={comingSoon} />
+          <PhotoCard img={IMG.auction} icon="hammer" title="만물 경매장" subtitle="경매 / 즉시 거래" desc="농산물·농기구 경매 거래소" onPress={go("/auction")} />
           <PhotoCard img={IMG.workers} icon="people" title="일손 찾기" subtitle="품앗이 / 인력" desc="구인·구직, 품앗이 게시판" onPress={go("/jobs")} />
 
           {/* 전원 소식통 배너 */}
