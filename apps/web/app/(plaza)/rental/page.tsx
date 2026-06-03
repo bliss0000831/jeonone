@@ -29,7 +29,7 @@ export default function RentalPage() {
     const plaza = getCurrentPlazaClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
     try {
-      let q = supabase
+      let q = (supabase as any)
         .from("rental_listings")
         .select("id, daily_price, deposit, post:secondhand_posts(title, images, location)")
         .order("created_at", { ascending: false })

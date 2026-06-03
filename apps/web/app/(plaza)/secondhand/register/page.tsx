@@ -156,7 +156,7 @@ export default function SecondhandRegisterPage() {
             const { data: { user } } = await supabase.auth.getUser()
             const days = Math.max(1, parseInt(auctionDays || "7", 10))
             const endAt = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString()
-            const { data: au } = await supabase.from("auction_listings").insert({
+            const { data: au } = await (supabase as any).from("auction_listings").insert({
               post_id: postId,
               seller_id: user?.id,
               plaza_id: getCurrentPlazaClient(),
@@ -175,7 +175,7 @@ export default function SecondhandRegisterPage() {
           try {
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
-            const { data: rl } = await supabase.from("rental_listings").insert({
+            const { data: rl } = await (supabase as any).from("rental_listings").insert({
               post_id: postId,
               owner_id: user?.id,
               plaza_id: getCurrentPlazaClient(),

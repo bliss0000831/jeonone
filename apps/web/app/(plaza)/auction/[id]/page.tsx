@@ -38,13 +38,13 @@ export default function AuctionDetailPage() {
   const load = useCallback(async () => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("auction_listings")
       .select("*, post:secondhand_posts(title, description, images, location)")
       .eq("id", id)
       .maybeSingle()
     setA(data)
-    const { data: b } = await supabase
+    const { data: b } = await (supabase as any)
       .from("auction_bids")
       .select("amount, created_at")
       .eq("auction_id", id)
@@ -64,7 +64,7 @@ export default function AuctionDetailPage() {
     if (!amt || amt < minBid) { toast.error(`최소 입찰가는 ${won(minBid)} 입니다`); return }
     setSubmitting(true)
     const supabase = createClient()
-    const { data, error } = await supabase.rpc("place_auction_bid", { p_auction: id, p_amount: amt })
+    const { data, error } = await (supabase as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
     setSubmitting(false)
     if (error) { toast.error("입찰 실패: " + error.message); return }
     const res = data as any

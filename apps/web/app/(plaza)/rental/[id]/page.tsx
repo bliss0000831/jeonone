@@ -26,7 +26,7 @@ export default function RentalDetailPage() {
   const load = useCallback(async () => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("rental_listings")
       .select("*, post:secondhand_posts(title, description, images, location)")
       .eq("id", id).maybeSingle()
@@ -48,7 +48,7 @@ export default function RentalDetailPage() {
     if (!start || !end || days <= 0) { toast.error("대여 기간을 선택해주세요"); return }
     setSubmitting(true)
     const supabase = createClient()
-    const { error } = await supabase.from("rental_bookings").insert({
+    const { error } = await (supabase as any).from("rental_bookings").insert({
       rental_id: id,
       renter_id: user.id,
       start_date: start,

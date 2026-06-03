@@ -49,7 +49,7 @@ export default function AuctionPage() {
     const plaza = getCurrentPlazaClient()
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
     try {
-      let q = supabase
+      let q = (supabase as any)
         .from("auction_listings")
         .select("id, start_price, current_price, bid_count, buy_now_price, end_at, status, post:secondhand_posts(title, images, location)")
         .eq("status", "active")

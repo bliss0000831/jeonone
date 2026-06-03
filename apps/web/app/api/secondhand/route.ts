@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "광장이 지정되지 않았습니다" }, { status: 400 })
   }
 
-  let query = supabase
+  let query = (supabase as any)
     .from("secondhand_posts")
     .select("id, user_id, plaza_id, title, description, category, price, is_price_negotiable, images, location, condition, brand, model_name, model_year, usage_hours, horsepower, listing_type, status, effective_at, bumped_at, created_at, views, likes")
     .neq("status", "hidden")
@@ -56,14 +56,14 @@ export async function GET(request: Request) {
 
   // profile join
   if (posts && posts.length > 0) {
-    const userIds = [...new Set(posts.map((p) => p.user_id))]
+    const userIds = Array.from(new Set((posts as any[]).map((p: any) => p.user_id))) as string[]
     const { data: profiles } = await supabase
       .from("profiles")
       .select("id, nickname, avatar_url")
       .in("id", userIds)
     const pmap = new Map(profiles?.map((p) => [p.id, p]) || [])
     return NextResponse.json({
-      posts: posts.map((p) => ({ ...p, profiles: pmap.get(p.user_id) || null })),
+      posts: posts.map((p: any) => ({ ...p, profiles: pmap.get(p.user_id) || null })),
     })
   }
   return NextResponse.json({ posts: posts || [] })
