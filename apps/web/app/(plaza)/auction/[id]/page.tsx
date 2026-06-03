@@ -8,7 +8,7 @@ import { Header } from "@/components/header"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
-import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2 } from "lucide-react"
+import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap } from "lucide-react"
 
 const FALLBACK_IMG = "/images/card-auction.jpg"
 
@@ -73,6 +73,21 @@ export default function AuctionDetailPage() {
     if (!res?.ok) { toast.error(res?.error || "입찰 실패"); return }
     toast.success("입찰 완료!")
     setBidAmount("")
+    load()
+  }
+
+  const buyNow = async () => {
+    if (!user) { toast.error("로그인이 필요합니다"); return }
+    if (!a?.buy_now_price) return
+    if (!confirm(`${won(a.buy_now_price)}에 즉시구매하시겠습니까?`)) return
+    setSubmitting(true)
+    const supabase = createClient()
+    const { data, error } = await (supabase as any).rpc("buy_now_auction", { p_auction: id })
+    setSubmitting(false)
+    if (error) { toast.error("구매 실패: " + error.message); return }
+    const res = data as any
+    if (!res?.ok) { toast.error(res?.error || "구매 실패"); return }
+    toast.success("즉시구매 완료! 🎉")
     load()
   }
 
@@ -147,18 +162,26 @@ export default function AuctionDetailPage() {
       {/* 입찰 바 (하단 고정) */}
       {!ended && (
         <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border p-3 z-40">
-          <div className="max-w-2xl mx-auto flex items-center gap-2">
-            <input
-              value={bidAmount}
-              onChange={(e) => setBidAmount(e.target.value.replace(/[^0-9]/g, ""))}
-              inputMode="numeric"
-              placeholder={`${minBid.toLocaleString()}원 이상`}
-              className="flex-1 px-4 py-3 rounded-xl border-2 border-border bg-background focus:outline-none focus:border-primary"
-            />
-            <button onClick={placeBid} disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold px-6 py-3 disabled:opacity-50">
-              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Gavel className="w-5 h-5" />} 입찰
-            </button>
+          <div className="max-w-2xl mx-auto space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                inputMode="numeric"
+                placeholder={`${minBid.toLocaleString()}원 이상`}
+                className="flex-1 px-4 py-3 rounded-xl border-2 border-border bg-background focus:outline-none focus:border-primary"
+              />
+              <button onClick={placeBid} disabled={submitting}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold px-6 py-3 disabled:opacity-50">
+                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Gavel className="w-5 h-5" />} 입찰
+              </button>
+            </div>
+            {a.buy_now_price && a.seller_id !== user?.id && (
+              <button onClick={buyNow} disabled={submitting}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary text-primary font-bold py-3 hover:bg-primary/5 disabled:opacity-50">
+                <Zap className="w-5 h-5" /> 즉시구매 · {won(a.buy_now_price)}
+              </button>
+            )}
           </div>
         </div>
       )}

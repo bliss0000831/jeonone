@@ -61,6 +61,25 @@ export default function AuctionDetailScreen() {
     load()
   }
 
+  const buyNow = async () => {
+    if (!a?.buy_now_price) return
+    Alert.alert("즉시구매", `${won(a.buy_now_price)}에 즉시구매하시겠습니까?`, [
+      { text: "취소", style: "cancel" },
+      {
+        text: "구매", onPress: async () => {
+          setSubmitting(true)
+          const { data, error } = await (getSupabase() as any).rpc("buy_now_auction", { p_auction: id })
+          setSubmitting(false)
+          if (error) { Alert.alert("구매 실패", error.message); return }
+          const res = data as any
+          if (!res?.ok) { Alert.alert("구매 실패", res?.error || "오류"); return }
+          Alert.alert("즉시구매 완료", "구매가 완료되었습니다! 🎉")
+          load()
+        },
+      },
+    ])
+  }
+
   if (loading) return <SafeAreaView style={styles.safe}><ActivityIndicator color={GREEN} style={{ marginTop: 60 }} /></SafeAreaView>
   if (!a) return <SafeAreaView style={styles.safe}><Text style={{ textAlign: "center", marginTop: 60, color: "#64748b" }}>경매를 찾을 수 없습니다</Text></SafeAreaView>
 
@@ -114,12 +133,20 @@ export default function AuctionDetailScreen() {
       </ScrollView>
 
       {!ended && (
-        <View style={styles.bidBar}>
-          <TextInput value={amount} onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))} inputMode="numeric"
-            placeholder={`${minBid.toLocaleString()}원 이상`} placeholderTextColor="#94a3b8" style={styles.bidInput} />
-          <Pressable style={styles.bidBtn} onPress={placeBid} disabled={submitting}>
-            {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="hammer" size={18} color="#fff" /><Text style={styles.bidBtnText}>입찰</Text></>}
-          </Pressable>
+        <View style={styles.bidBarWrap}>
+          {a.buy_now_price && a.seller_id !== uid ? (
+            <Pressable style={styles.buyNowBtn} onPress={buyNow} disabled={submitting}>
+              <Ionicons name="flash" size={18} color={GREEN} />
+              <Text style={styles.buyNowText}>즉시구매 · {won(a.buy_now_price)}</Text>
+            </Pressable>
+          ) : null}
+          <View style={styles.bidBar}>
+            <TextInput value={amount} onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))} inputMode="numeric"
+              placeholder={`${minBid.toLocaleString()}원 이상`} placeholderTextColor="#94a3b8" style={styles.bidInput} />
+            <Pressable style={styles.bidBtn} onPress={placeBid} disabled={submitting}>
+              {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="hammer" size={18} color="#fff" /><Text style={styles.bidBtnText}>입찰</Text></>}
+            </Pressable>
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -148,7 +175,10 @@ const styles = StyleSheet.create({
   bidRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#f1f5f9" },
   bidAmt: { fontWeight: "800", color: GREEN, fontSize: 15 },
   bidTime: { color: "#94a3b8", fontSize: 12 },
-  bidBar: { position: "absolute", bottom: 0, left: 0, right: 0, flexDirection: "row", gap: 8, padding: 12, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
+  bidBarWrap: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 12, gap: 8, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
+  bidBar: { flexDirection: "row", gap: 8 },
+  buyNowBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, borderWidth: 2, borderColor: GREEN, borderRadius: 12, paddingVertical: 12 },
+  buyNowText: { color: GREEN, fontWeight: "800", fontSize: 15 },
   bidInput: { flex: 1, borderWidth: 2, borderColor: "#e2e8f0", borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12, fontSize: 15 },
   bidBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: GREEN, borderRadius: 12, paddingHorizontal: 22, justifyContent: "center" },
   bidBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
