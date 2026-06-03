@@ -39,7 +39,8 @@ import {
   SECONDHAND_CONDITIONS,
 } from "@gwangjang/features/secondhand"
 import { createSharingPost } from "@gwangjang/features/sharing"
-import { gwangjangFetch, uploadImage } from "@/lib/supabase"
+import { gwangjangFetch, uploadImage, getSupabase } from "@/lib/supabase"
+import { useLocalSearchParams } from "expo-router"
 import { AddressSearch } from "@/components/AddressSearch"
 import { RegionFormField } from "@/components/RegionFormField"
 import { setPostRegion } from "@/lib/set-post-region"
@@ -70,12 +71,24 @@ export default function SecondhandRegisterScreen() {
   const [postAsSharing, setPostAsSharing] = useState(false)
   const [location, setLocation] = useState("")
   const [condition, setCondition] = useState<string>("")
+  // 거래방식 — ?type=auction|rental
+  const params = useLocalSearchParams<{ type?: string }>()
+  const initialType = params.type === "auction" || params.type === "rental" ? params.type : "sale"
+  const [listingType, setListingType] = useState<"sale" | "auction" | "rental">(initialType as any)
+  const [auctionStartPrice, setAuctionStartPrice] = useState("")
+  const [auctionDays, setAuctionDays] = useState("7")
+  const [rentalDaily, setRentalDaily] = useState("")
+  const [rentalDeposit, setRentalDeposit] = useState("")
 
   useEffect(() => {
     if (title.trim() || description.trim() || images.length > 0) setFormDirty(true)
   }, [title, description, images])
 
-  const priceNum = price === "" ? 0 : Number(price)
+  const priceNum = listingType === "auction"
+    ? (auctionStartPrice === "" ? 0 : Number(auctionStartPrice))
+    : listingType === "rental"
+    ? (rentalDaily === "" ? 0 : Number(rentalDaily))
+    : (price === "" ? 0 : Number(price))
 
   // 대표이미지 지정 — idx 를 0번으로 이동 (web 1:1, 모바일 통일)
   function setAsThumbnail(idx: number) {
@@ -159,6 +172,8 @@ export default function SecondhandRegisterScreen() {
     if (!title.trim()) errors.push("제목을 입력해주세요")
     if (!description.trim()) errors.push("설명을 입력해주세요")
     if (Number.isNaN(priceNum) || priceNum < 0) errors.push("올바른 가격을 입력해주세요 (0 이상의 숫자)")
+    if (listingType === "auction" && priceNum <= 0) errors.push("경매 시작가를 입력해주세요")
+    if (listingType === "rental" && priceNum <= 0) errors.push("일 대여료를 입력해주세요")
     if (errors.length > 0) {
       Alert.alert("입력을 확인해주세요", errors.join("\n"))
       return
@@ -223,12 +238,40 @@ export default function SecondhandRegisterScreen() {
         return
       }
       if (r.postId) await setPostRegion("secondhand_posts", r.postId, regionId)
+      setFormDirty(false)
+
+      // 경매/대여 등록 — 거래방식별 부가 테이블 생성
+      if (r.postId && listingType === "auction") {
+        try {
+          const days = Math.max(1, Number(auctionDays) || 7)
+          const { data: au } = await getSupabase().from("auction_listings").insert({
+            post_id: r.postId, seller_id: user?.id, plaza_id: plazaId,
+            start_price: priceNum, current_price: priceNum,
+            bid_increment: Math.max(1000, Math.round((priceNum * 0.05) / 1000) * 1000),
+            end_at: new Date(Date.now() + days * 86400000).toISOString(),
+          }).select("id").single()
+          Alert.alert("등록 완료", "경매가 등록되었습니다 🔨")
+          router.replace((au as any)?.id ? `/auction/${(au as any).id}` : "/auction" as any)
+        } catch { router.replace("/auction" as any) }
+        return
+      }
+      if (r.postId && listingType === "rental") {
+        try {
+          const { data: rl } = await getSupabase().from("rental_listings").insert({
+            post_id: r.postId, owner_id: user?.id, plaza_id: plazaId,
+            daily_price: priceNum, deposit: Number(rentalDeposit) || 0,
+          }).select("id").single()
+          Alert.alert("등록 완료", "대여 상품이 등록되었습니다 🚜")
+          router.replace((rl as any)?.id ? `/rental/${(rl as any).id}` : "/rental" as any)
+        } catch { router.replace("/rental" as any) }
+        return
+      }
+
       if (r.flagged) {
         Alert.alert("등록 완료", "등록되었으나 관리자 검토 중입니다.")
       } else {
         Alert.alert("등록 완료", "중고거래 글이 성공적으로 등록되었습니다")
       }
-      setFormDirty(false)
       if (r.postId && !r.flagged) router.replace(`/secondhand/${r.postId}` as any)
       else router.replace("/(tabs)/mypage" as any)
     } finally {
@@ -307,6 +350,50 @@ export default function SecondhandRegisterScreen() {
             </Text>
           </Field>
 
+          {/* 거래방식 */}
+          <Field label="거래방식">
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              {([["sale", "판매"], ["rental", "대여"], ["auction", "경매"]] as const).map(([v, lbl]) => (
+                <Pressable key={v} onPress={() => setListingType(v)}
+                  style={[styles.chip, { paddingHorizontal: 18 }, listingType === v ? { backgroundColor: "#225a39" } : { backgroundColor: lightColors.muted }]}>
+                  <Text style={[styles.chipText, { color: listingType === v ? "#fff" : lightColors.ink900 }]}>{lbl}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </Field>
+
+          {listingType === "auction" && (
+            <>
+              <Field label="경매 시작가 (원)">
+                <TextInput value={auctionStartPrice} onChangeText={(v) => setAuctionStartPrice(v.replace(/[^0-9]/g, ""))}
+                  keyboardType="number-pad" placeholder="예: 1000000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+              </Field>
+              <Field label="경매 기간 (일)">
+                <View style={{ flexDirection: "row", gap: 6 }}>
+                  {["1", "3", "5", "7", "10", "14"].map((d) => (
+                    <Pressable key={d} onPress={() => setAuctionDays(d)}
+                      style={[styles.chip, auctionDays === d ? { backgroundColor: "#225a39" } : { backgroundColor: lightColors.muted }]}>
+                      <Text style={[styles.chipText, { color: auctionDays === d ? "#fff" : lightColors.ink900 }]}>{d}일</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </Field>
+            </>
+          )}
+
+          {listingType === "rental" && (
+            <>
+              <Field label="일 대여료 (원)">
+                <TextInput value={rentalDaily} onChangeText={(v) => setRentalDaily(v.replace(/[^0-9]/g, ""))}
+                  keyboardType="number-pad" placeholder="예: 50000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+              </Field>
+              <Field label="보증금 (원, 선택)">
+                <TextInput value={rentalDeposit} onChangeText={(v) => setRentalDeposit(v.replace(/[^0-9]/g, ""))}
+                  keyboardType="number-pad" placeholder="예: 200000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+              </Field>
+            </>
+          )}
+
           {/* Category */}
           <Field label="카테고리">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
@@ -361,7 +448,8 @@ export default function SecondhandRegisterScreen() {
             </ScrollView>
           </Field>
 
-          {/* Price */}
+          {/* Price (판매 모드만) */}
+          {listingType === "sale" && (
           <Field label="가격 (원)">
             <TextInput
               value={price}
@@ -407,6 +495,7 @@ export default function SecondhandRegisterScreen() {
               </Pressable>
             )}
           </Field>
+          )}
 
           {/* Description */}
           <Field label="설명 *">
@@ -459,7 +548,7 @@ export default function SecondhandRegisterScreen() {
               </View>
             ) : (
               <Text style={styles.submitBtnText}>
-                {priceNum === 0 && postAsSharing ? "나눔 등록하기" : "중고거래 등록하기"}
+                {listingType === "auction" ? "경매 등록하기" : listingType === "rental" ? "대여 등록하기" : priceNum === 0 && postAsSharing ? "나눔 등록하기" : "중고거래 등록하기"}
               </Text>
             )}
           </Pressable>
