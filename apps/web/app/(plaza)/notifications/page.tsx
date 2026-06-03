@@ -16,6 +16,8 @@ import {
   Megaphone,
   Bell,
   UserCheck,
+  Gavel,
+  CalendarDays,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -82,6 +84,8 @@ function typeMeta(type: string): {
   if (type === "expert_invitation_response") return { bg: "bg-teal-600", Icon: UserCheck }
   if (type === "admin_notice") return { bg: "bg-orange-500", Icon: Megaphone }
   if (type === "system") return { bg: "bg-amber-500", Icon: Bell }
+  if (type.startsWith("rental")) return { bg: "bg-emerald-600", Icon: CalendarDays }
+  if (type.startsWith("auction")) return { bg: "bg-rose-600", Icon: Gavel }
   return { bg: "bg-zinc-500", Icon: Info }
 }
 
