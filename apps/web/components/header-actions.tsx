@@ -39,6 +39,7 @@ import {
   ShoppingBag,
   Gift,
   ShoppingCart,
+  Tractor,
   Leaf,
   Utensils,
   Lightbulb,
@@ -437,6 +438,12 @@ export function HeaderActions({
                 <Link href="/mypage/sales" prefetch={false} className="cursor-pointer flex items-center gap-2 px-2.5 py-2">
                   <Store className="w-4 h-4 text-foreground" />
                   <span className="text-sm font-medium">판매 관리</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/mypage/trades" prefetch={false} className="cursor-pointer flex items-center gap-2 px-2.5 py-2">
+                  <Tractor className="w-4 h-4 text-foreground" />
+                  <span className="text-sm font-medium">내 거래 (농기구·경매·대여)</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="mx-3" />

@@ -65,6 +65,7 @@ const TX_MENU: Array<{
   href: string
   badgeKey?: "orders" | "sales" | "posts" | "notice"
 }> = [
+  { label: "내 거래",    icon: "construct-outline",     href: "/mypage/trades" },
   { label: "판매내역",   icon: "receipt-outline",       href: "/mypage/sales",  badgeKey: "sales" },
   { label: "구매내역",   icon: "bag-outline",           href: "/mypage/orders", badgeKey: "orders" },
   { label: "내 글 관리", icon: "document-text-outline", href: "/mypage/posts",  badgeKey: "posts" },
