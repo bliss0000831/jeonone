@@ -4,10 +4,10 @@ export default function JobsListScreen() {
   return (
     <DomainListScreen
       config={{
-        title: "구인구직",
-        heroIcon: "briefcase-outline",
-        heroColor: "#8b5cf6",
-        heroSub: "동네 일자리 정보",
+        title: "일손 찾기",
+        heroIcon: "people",
+        heroColor: "#225a39",
+        heroSub: "품앗이 · 구인 · 구직",
         table: "jobs_posts",
         statusFilter: { col: "status", val: "active" },
         basePath: "/jobs",

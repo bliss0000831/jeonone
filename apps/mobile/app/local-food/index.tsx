@@ -4,10 +4,10 @@ export default function LocalFoodListScreen() {
   return (
     <DomainListScreen
       config={{
-        title: "로컬푸드",
-        heroIcon: "leaf-outline",
-        heroColor: "#22c55e",
-        heroSub: "우리동네 신선한 농산물 직거래",
+        title: "강원 로컬푸드",
+        heroIcon: "nutrition",
+        heroColor: "#225a39",
+        heroSub: "방금 수확한 신선한 농산물",
         table: "local_food",
         statusFilter: { col: "status", val: "available" },
         basePath: "/local-food",
