@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { getCurrentPlazaClient } from "@/lib/plaza/client"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {ArrowLeft, ShoppingBag, Gift} from "lucide-react"
 import { MediaUploader } from "@/components/media-uploader"
@@ -21,6 +23,14 @@ export default function SecondhandRegisterPage() {
   const [consented, setConsented] = useState(false)
   const [postAsSharing, setPostAsSharing] = useState(false)
   const [subRegion, setSubRegion] = useState("")
+  // 거래방식 — ?type=auction|rental 이면 경매/대여 모드
+  const [listingType, setListingType] = useState<"sale" | "auction" | "rental">("sale")
+  const [auctionStartPrice, setAuctionStartPrice] = useState("")
+  const [auctionDays, setAuctionDays] = useState("7")
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("type")
+    if (t === "auction" || t === "rental") setListingType(t)
+  }, [])
   const titleRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
   const descRef = useRef<HTMLTextAreaElement>(null)
@@ -60,10 +70,16 @@ export default function SecondhandRegisterPage() {
       return
     }
 
-    const priceNum = formData.price === "" ? 0 : parseInt(formData.price, 10)
+    const priceNum = listingType === "auction"
+      ? parseInt(auctionStartPrice || "0", 10)
+      : (formData.price === "" ? 0 : parseInt(formData.price, 10))
     if (Number.isNaN(priceNum) || priceNum < 0) {
       toast("올바른 가격을 입력해주세요 (0 이상의 숫자)")
       focusField(priceRef)
+      return
+    }
+    if (listingType === "auction" && priceNum <= 0) {
+      toast("경매 시작가를 입력해주세요")
       return
     }
 
@@ -95,6 +111,7 @@ export default function SecondhandRegisterPage() {
             model_year: formData.model_year || null,
             horsepower: formData.horsepower || null,
             usage_hours: formData.usage_hours || null,
+            listing_type: listingType,
             sub_region: subRegion || null,
           }
 
@@ -123,6 +140,27 @@ export default function SecondhandRegisterPage() {
         const postId = data.post?.id
         if (shouldPostToSharing) {
           router.push(postId ? `/sharing/${postId}` : "/sharing")
+        } else if (listingType === "auction" && postId) {
+          // 경매 등록 — auction_listings 생성
+          try {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            const days = Math.max(1, parseInt(auctionDays || "7", 10))
+            const endAt = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString()
+            const { data: au } = await supabase.from("auction_listings").insert({
+              post_id: postId,
+              seller_id: user?.id,
+              plaza_id: getCurrentPlazaClient(),
+              start_price: priceNum,
+              current_price: priceNum,
+              bid_increment: Math.max(1000, Math.round(priceNum * 0.05 / 1000) * 1000),
+              end_at: endAt,
+            }).select("id").single()
+            toast.success("경매가 등록되었습니다 🔨")
+            router.push((au as any)?.id ? `/auction/${(au as any).id}` : "/auction")
+          } catch {
+            router.push("/auction")
+          }
         } else {
           router.push(postId ? `/secondhand/${postId}` : "/secondhand")
         }
@@ -201,6 +239,36 @@ export default function SecondhandRegisterPage() {
             ))}
           </select>
         </div>
+
+        {/* 경매 설정 (경매 모드) */}
+        {listingType === "auction" && (
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4">
+            <div className="flex items-center gap-1.5 font-bold text-primary mb-3">🔨 경매 설정</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">시작가(원)</label>
+                <input
+                  value={auctionStartPrice}
+                  onChange={(e) => setAuctionStartPrice(e.target.value.replace(/[^0-9]/g, ""))}
+                  inputMode="numeric"
+                  placeholder="예: 1000000"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">경매 기간(일)</label>
+                <select
+                  value={auctionDays}
+                  onChange={(e) => setAuctionDays(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+                >
+                  {["1", "3", "5", "7", "10", "14"].map((d) => <option key={d} value={d}>{d}일</option>)}
+                </select>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">마감 5분 전 입찰 시 자동 5분 연장됩니다.</p>
+          </div>
+        )}
 
         {/* 농기구 정보 (선택) */}
         <div>
