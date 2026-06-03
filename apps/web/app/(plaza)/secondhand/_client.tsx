@@ -98,6 +98,12 @@ function SecondhandContent() {
       </div>
 
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6">
+        {/* 대여 장터 진입 배너 */}
+        <Link href="/rental" className="flex items-center justify-between gap-3 rounded-2xl bg-primary/10 border border-primary/20 px-4 py-3 mb-5 hover:bg-primary/15 transition-colors">
+          <span className="flex items-center gap-2 font-bold text-primary">🚜 농기구 대여 장터</span>
+          <span className="text-sm font-semibold text-primary inline-flex items-center gap-1">필요할 때 빌려쓰기 <ChevronRight className="w-4 h-4" /></span>
+        </Link>
+
         {/* 검색 + 글쓰기 */}
         <div className="flex flex-col md:flex-row gap-3 mb-5">
           <div className="relative flex-1">

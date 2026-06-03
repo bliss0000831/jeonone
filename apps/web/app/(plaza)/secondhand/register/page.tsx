@@ -27,6 +27,9 @@ export default function SecondhandRegisterPage() {
   const [listingType, setListingType] = useState<"sale" | "auction" | "rental">("sale")
   const [auctionStartPrice, setAuctionStartPrice] = useState("")
   const [auctionDays, setAuctionDays] = useState("7")
+  // 대여 모드
+  const [rentalDaily, setRentalDaily] = useState("")
+  const [rentalDeposit, setRentalDeposit] = useState("")
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get("type")
     if (t === "auction" || t === "rental") setListingType(t)
@@ -72,6 +75,8 @@ export default function SecondhandRegisterPage() {
 
     const priceNum = listingType === "auction"
       ? parseInt(auctionStartPrice || "0", 10)
+      : listingType === "rental"
+      ? parseInt(rentalDaily || "0", 10)
       : (formData.price === "" ? 0 : parseInt(formData.price, 10))
     if (Number.isNaN(priceNum) || priceNum < 0) {
       toast("올바른 가격을 입력해주세요 (0 이상의 숫자)")
@@ -80,6 +85,10 @@ export default function SecondhandRegisterPage() {
     }
     if (listingType === "auction" && priceNum <= 0) {
       toast("경매 시작가를 입력해주세요")
+      return
+    }
+    if (listingType === "rental" && priceNum <= 0) {
+      toast("일 대여료를 입력해주세요")
       return
     }
 
@@ -160,6 +169,23 @@ export default function SecondhandRegisterPage() {
             router.push((au as any)?.id ? `/auction/${(au as any).id}` : "/auction")
           } catch {
             router.push("/auction")
+          }
+        } else if (listingType === "rental" && postId) {
+          // 대여 등록 — rental_listings 생성
+          try {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            const { data: rl } = await supabase.from("rental_listings").insert({
+              post_id: postId,
+              owner_id: user?.id,
+              plaza_id: getCurrentPlazaClient(),
+              daily_price: priceNum,
+              deposit: parseInt(rentalDeposit || "0", 10) || 0,
+            }).select("id").single()
+            toast.success("대여 상품이 등록되었습니다 🚜")
+            router.push((rl as any)?.id ? `/rental/${(rl as any).id}` : "/rental")
+          } catch {
+            router.push("/rental")
           }
         } else {
           router.push(postId ? `/secondhand/${postId}` : "/secondhand")
@@ -267,6 +293,28 @@ export default function SecondhandRegisterPage() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">마감 5분 전 입찰 시 자동 5분 연장됩니다.</p>
+          </div>
+        )}
+
+        {/* 대여 설정 (대여 모드) */}
+        {listingType === "rental" && (
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4">
+            <div className="flex items-center gap-1.5 font-bold text-primary mb-3">🚜 대여 설정</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">일 대여료(원)</label>
+                <input value={rentalDaily} onChange={(e) => setRentalDaily(e.target.value.replace(/[^0-9]/g, ""))}
+                  inputMode="numeric" placeholder="예: 50000"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">보증금(원)</label>
+                <input value={rentalDeposit} onChange={(e) => setRentalDeposit(e.target.value.replace(/[^0-9]/g, ""))}
+                  inputMode="numeric" placeholder="예: 200000"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">대여 신청은 일 단위로 받습니다. 보증금은 반납 후 환급.</p>
           </div>
         )}
 
