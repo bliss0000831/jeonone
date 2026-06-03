@@ -23,6 +23,7 @@ import {
   View,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { Image } from "expo-image"
 import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing } from "@gwangjang/tokens"
@@ -226,7 +227,7 @@ export default function SignUpScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.card}>
             <View style={styles.logoBox}>
-              <Ionicons name="qr-code-outline" size={26} color="#10b981" />
+              <Image source={require("../../assets/images/logo-farmer.jpg")} style={styles.logoImg} contentFit="cover" />
             </View>
             <Text style={styles.title}>{plaza.name} 회원가입</Text>
             <Text style={styles.subtitle}>더 나은 집, 더 가까운 이웃</Text>
@@ -539,11 +540,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   logoBox: {
-    width: 48, height: 48, borderRadius: 12,
-    backgroundColor: "#d1fae5",
+    width: 88, height: 88, borderRadius: 44, overflow: "hidden",
+    borderWidth: 2, borderColor: "rgba(34,90,57,0.2)",
     alignItems: "center", justifyContent: "center",
     alignSelf: "center", marginBottom: 16,
   },
+  logoImg: { width: "100%", height: "100%" },
   title: { fontSize: 22, fontWeight: "800", color: lightColors.ink900, textAlign: "center", letterSpacing: -0.3 },
   subtitle: { fontSize: 13, color: lightColors.ink500, textAlign: "center", marginTop: 6, marginBottom: 20 },
 

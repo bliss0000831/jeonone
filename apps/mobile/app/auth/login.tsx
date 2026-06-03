@@ -24,6 +24,7 @@ import {
   View,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { Image } from "expo-image"
 import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
@@ -105,7 +106,7 @@ export default function LoginScreen() {
           <View style={styles.card}>
             {/* Logo box */}
             <View style={styles.logoBox}>
-              <Ionicons name="qr-code-outline" size={26} color="#10b981" />
+              <Image source={require("../../assets/images/logo-farmer.jpg")} style={styles.logoImg} contentFit="cover" />
             </View>
 
             <Text style={styles.title}>
@@ -273,15 +274,18 @@ function makeStyles(colors: any) {
   },
 
   logoBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: "#d1fae5", // emerald-100
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "rgba(34,90,57,0.2)",
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
     marginBottom: 16,
   },
+  logoImg: { width: "100%", height: "100%" },
   title: {
     fontSize: 22,
     fontWeight: "800",
