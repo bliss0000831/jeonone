@@ -57,6 +57,12 @@ interface SecondhandPost {
   views: number
   likes: number
   created_at: string
+  condition?: string | null
+  brand?: string | null
+  model_name?: string | null
+  model_year?: number | null
+  usage_hours?: number | null
+  horsepower?: number | null
   profiles?: {
     id: string
     nickname: string
@@ -418,6 +424,31 @@ export default function SecondhandDetailPage() {
           likes={post.likes}
           timeAgo={formatDate((post as any).bumped_at ?? post.created_at)}
         />
+
+        {(() => {
+          const specs = [
+            ["카테고리", post.category],
+            ["제조사", post.brand],
+            ["모델", post.model_name],
+            ["연식", post.model_year ? `${post.model_year}년식` : null],
+            ["마력", post.horsepower ? `${post.horsepower}마력` : null],
+            ["사용시간", post.usage_hours ? `${post.usage_hours.toLocaleString()}h` : null],
+            ["상태", post.condition],
+          ].filter(([, v]) => v) as [string, string][]
+          if (specs.length === 0) return null
+          return (
+            <DetailSection title="농기구 정보">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-border bg-card p-4">
+                {specs.map(([k, v]) => (
+                  <div key={k} className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">{k}</span>
+                    <span className="text-sm font-semibold text-foreground">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </DetailSection>
+          )
+        })()}
 
         <DetailSection title="상품 설명">
           <DetailInfoBox>{post.description}</DetailInfoBox>
