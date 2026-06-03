@@ -528,6 +528,20 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         </ImageBackground>
       ) : null}
 
+      {/* 농기구 대여 진입 배너 */}
+      {config.domainKind === "secondhand" ? (
+        <Pressable
+          onPress={() => router.push("/rental" as any)}
+          style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: 12, marginTop: 10, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 14, backgroundColor: "rgba(34,90,57,0.08)", borderWidth: 1, borderColor: "rgba(34,90,57,0.2)" }}
+        >
+          <Text style={{ fontWeight: "800", color: "#225a39" }}>🚜 농기구 대여 장터</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+            <Text style={{ fontWeight: "700", color: "#225a39", fontSize: 13 }}>필요할 때 빌려쓰기</Text>
+            <Ionicons name="chevron-forward" size={16} color="#225a39" />
+          </View>
+        </Pressable>
+      ) : null}
+
       {/* 검색 바 + 지역 칩 (인라인) */}
       {config.domainKind === "jobs" && <JobsInfoNotice />}
       <View style={styles.heroSearchRow}>
