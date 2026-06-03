@@ -55,17 +55,11 @@ const HOMES_KEYS = new Set(HOMES_CHILDREN.map((t) => t.key))
 
 /** 표시 순서 — 홈즈는 placeholder key 로 자리잡음 */
 const DOMAIN_TABS: (DomainTab | { key: "__homes__"; label: string })[] = [
-  { key: "property",         label: "부동산",     path: "/property" },
-  { key: "requests",         label: "구해주세요", path: "/requests" },
-  { key: "__homes__",        label: "홈즈" },
-  { key: "service-requests", label: "도와주세요", path: "/service-requests" },
-  { key: "secondhand",       label: "중고거래",   path: "/secondhand" },
-  { key: "sharing",          label: "나눔",       path: "/sharing" },
-  { key: "group-buying",     label: "공동구매",   path: "/group-buying" },
-  { key: "local-food",       label: "로컬푸드",   path: "/local-food" },
-  { key: "new-store",        label: "신장개업",   path: "/new-store" },
-  { key: "jobs",             label: "구인구직",   path: "/jobs" },
-  { key: "clubs",            label: "모임",       path: "/clubs" },
+  { key: "secondhand", label: "농기구/자재", path: "/secondhand" },
+  { key: "local-food", label: "로컬푸드",    path: "/local-food" },
+  { key: "jobs",       label: "일손찾기",    path: "/jobs" },
+  { key: "board",      label: "마을소식",    path: "/board" },
+  { key: "sharing",    label: "무료나눔",    path: "/sharing" },
 ]
 
 // 탭 전환 시 스크롤 위치 유지 — 리마운트돼도 이전 위치 복원
