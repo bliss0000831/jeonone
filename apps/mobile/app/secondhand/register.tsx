@@ -51,6 +51,8 @@ import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
 const MAX_IMAGES = 10
 const AMBER = "#f59e0b"
+// 농기구/자재 카테고리 (전원일기)
+const FARM_CATEGORIES = ["트랙터", "경운기", "이양기", "수확기", "관리기", "방제기/드론", "운반기", "하우스자재", "부품/소모품", "농자재", "기타"]
 
 export default function SecondhandRegisterScreen() {
   const router = useRouter()
@@ -65,7 +67,7 @@ export default function SecondhandRegisterScreen() {
   const [regionId, setRegionId] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [category, setCategory] = useState<string>(SECONDHAND_CATEGORIES[0])
+  const [category, setCategory] = useState<string>(FARM_CATEGORIES[0])
   const [price, setPrice] = useState("")
   const [isPriceNegotiable, setIsPriceNegotiable] = useState(false)
   const [postAsSharing, setPostAsSharing] = useState(false)
@@ -287,7 +289,7 @@ export default function SecondhandRegisterScreen() {
         </Pressable>
         <View style={styles.headerTitleWrap}>
           <Ionicons name="bag-handle" size={18} color={AMBER} />
-          <Text style={styles.headerTitle}>중고거래 등록</Text>
+          <Text style={styles.headerTitle}>{listingType === "auction" ? "경매 등록" : listingType === "rental" ? "대여 등록" : "농기구/자재 등록"}</Text>
         </View>
         <View style={{ width: 36 }} />
       </View>
@@ -397,7 +399,7 @@ export default function SecondhandRegisterScreen() {
           {/* Category */}
           <Field label="카테고리">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-              {SECONDHAND_CATEGORIES.map((c) => (
+              {FARM_CATEGORIES.map((c) => (
                 <Pressable
                   key={c}
                   onPress={() => setCategory(c)}
