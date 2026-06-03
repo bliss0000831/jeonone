@@ -20,7 +20,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native"
-import { Image } from "expo-image"
+import { Image, ImageBackground } from "expo-image"
 import { SafeImage } from "@/components/SafeImage"
 import { isVideoUrl } from "@/components/MediaItem"
 
@@ -75,6 +75,8 @@ export interface DomainListConfig {
   heroColor: string
   /** Hero 부제 */
   heroSub: string
+  /** Hero 배경 사진 (require) — 있으면 사진 히어로 표시 */
+  heroImage?: any
   /** Supabase 테이블 */
   table: string
   /** 상태 필터 (status 컬럼 + 값) */
@@ -514,6 +516,17 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
 
       {/* 도메인 탭 바 */}
       <DomainTabBar current={config.domainKind} />
+
+      {/* 사진 히어로 (heroImage 있을 때) */}
+      {config.heroImage ? (
+        <ImageBackground source={config.heroImage} style={{ width: "100%", height: 130 }} contentFit="cover">
+          <LinearGradient colors={["rgba(0,0,0,0.45)", "rgba(0,0,0,0.6)"]} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <Ionicons name={config.heroIcon} size={34} color="#fff" />
+            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "900", marginTop: 6 }}>{config.title}</Text>
+            <Text style={{ color: "#fff", fontSize: 13, marginTop: 2 }}>{config.heroSub}</Text>
+          </LinearGradient>
+        </ImageBackground>
+      ) : null}
 
       {/* 검색 바 + 지역 칩 (인라인) */}
       {config.domainKind === "jobs" && <JobsInfoNotice />}

@@ -8,6 +8,7 @@ export default function LocalFoodListScreen() {
         heroIcon: "nutrition",
         heroColor: "#225a39",
         heroSub: "방금 수확한 신선한 농산물",
+        heroImage: require("../../assets/images/card-local-food.jpg"),
         table: "local_food",
         statusFilter: { col: "status", val: "available" },
         basePath: "/local-food",

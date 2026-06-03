@@ -8,6 +8,7 @@ export default function JobsListScreen() {
         heroIcon: "people",
         heroColor: "#225a39",
         heroSub: "품앗이 · 구인 · 구직",
+        heroImage: require("../../assets/images/card-workers.jpg"),
         table: "jobs_posts",
         statusFilter: { col: "status", val: "active" },
         basePath: "/jobs",

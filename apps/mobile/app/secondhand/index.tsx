@@ -8,6 +8,7 @@ export default function SecondhandListScreen() {
         heroIcon: "construct",
         heroColor: "#225a39",
         heroSub: "트랙터, 경운기, 하우스 자재 등",
+        heroImage: require("../../assets/images/card-farm-equipment.jpg"),
         table: "secondhand_posts",
         statusFilter: { col: "status", val: "active" },
         basePath: "/secondhand",
