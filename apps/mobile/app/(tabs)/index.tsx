@@ -102,17 +102,17 @@ export default function HomeTab() {
           {/* 소통과 나눔 */}
           <Text style={styles.sectionTitle}>소통과 나눔</Text>
           <View style={styles.row3}>
-            <BoardTile icon="chatbubble-ellipses" label="자유게시판" onPress={go("/board")} />
-            <BoardTile icon="camera" label="일상 공유" onPress={go("/board")} />
-            <BoardTile icon="gift" label="무료 나눔" onPress={go("/sharing")} />
+            <BoardTile icon="chatbubble-ellipses" label="자유게시판" onPress={go("/board/c/free")} />
+            <BoardTile icon="camera" label="일상 공유" onPress={go("/board/c/daily")} />
+            <BoardTile icon="gift" label="무료 나눔" onPress={go("/board/c/share")} />
           </View>
 
           {/* 정보와 혜택 */}
           <Text style={styles.sectionTitle}>정보와 혜택</Text>
           <View style={styles.row3}>
-            <BoardTile icon="bulb" label="생활 정보" onPress={go("/board")} />
-            <BoardTile icon="cash" label="정부 지원금" onPress={go("/board")} />
-            <BoardTile icon="help-circle" label="질문 답변" onPress={go("/support")} />
+            <BoardTile icon="bulb" label="생활 정보" onPress={go("/board/c/life")} />
+            <BoardTile icon="cash" label="정부 지원금" onPress={go("/board/c/subsidy")} />
+            <BoardTile icon="help-circle" label="질문 답변" onPress={go("/board/c/qna")} />
           </View>
 
           {/* 퀵 액션 */}
