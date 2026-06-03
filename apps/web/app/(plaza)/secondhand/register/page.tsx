@@ -37,6 +37,10 @@ export default function SecondhandRegisterPage() {
     isPriceNegotiable: false,
     location: "",
     condition: "" as string,
+    brand: "",
+    model_year: "",
+    horsepower: "",
+    usage_hours: "",
   })
 
 
@@ -87,6 +91,10 @@ export default function SecondhandRegisterPage() {
             images: images.length > 0 ? images : null,
             location: formData.location,
             condition: formData.condition || null,
+            brand: formData.brand || null,
+            model_year: formData.model_year || null,
+            horsepower: formData.horsepower || null,
+            usage_hours: formData.usage_hours || null,
             sub_region: subRegion || null,
           }
 
@@ -192,6 +200,40 @@ export default function SecondhandRegisterPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* 농기구 정보 (선택) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">농기구 정보 <span className="text-muted-foreground font-normal">(선택)</span></label>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              value={formData.brand}
+              onChange={(e) => setFormData((p) => ({ ...p, brand: e.target.value }))}
+              placeholder="제조사 (예: 대동)"
+              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <input
+              value={formData.model_year}
+              onChange={(e) => setFormData((p) => ({ ...p, model_year: e.target.value.replace(/[^0-9]/g, "") }))}
+              inputMode="numeric"
+              placeholder="연식 (예: 2019)"
+              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <input
+              value={formData.horsepower}
+              onChange={(e) => setFormData((p) => ({ ...p, horsepower: e.target.value.replace(/[^0-9]/g, "") }))}
+              inputMode="numeric"
+              placeholder="마력 (예: 45)"
+              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <input
+              value={formData.usage_hours}
+              onChange={(e) => setFormData((p) => ({ ...p, usage_hours: e.target.value.replace(/[^0-9]/g, "") }))}
+              inputMode="numeric"
+              placeholder="사용시간 (h)"
+              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </div>
         </div>
 
         {/* 상품 상태 */}

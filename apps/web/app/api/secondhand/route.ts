@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("secondhand_posts")
-    .select("id, user_id, plaza_id, title, description, category, price, is_price_negotiable, images, location, condition, status, effective_at, bumped_at, created_at, views, likes")
+    .select("id, user_id, plaza_id, title, description, category, price, is_price_negotiable, images, location, condition, brand, model_name, model_year, usage_hours, horsepower, listing_type, status, effective_at, bumped_at, created_at, views, likes")
     .neq("status", "hidden")
     .order("effective_at", { ascending: false })
     .range(offset, offset + limit - 1)
@@ -100,7 +100,21 @@ export async function POST(request: Request) {
     location,
     condition,
     sub_region,
+    // 농기구 전용 필드
+    brand,
+    model_name,
+    model_year,
+    usage_hours,
+    horsepower,
+    listing_type,
   } = body
+
+  const toInt = (v: any): number | null => {
+    const n = parseInt(v, 10)
+    return Number.isFinite(n) && n >= 0 ? n : null
+  }
+  const toStr = (v: any, max = 40): string | null =>
+    typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null
 
   if (!title || !description) {
     return NextResponse.json(
@@ -175,6 +189,12 @@ export async function POST(request: Request) {
           ? condition.trim().slice(0, 20)
           : null,
       sub_region: sub_region || null,
+      brand: toStr(brand),
+      model_name: toStr(model_name),
+      model_year: toInt(model_year),
+      usage_hours: toInt(usage_hours),
+      horsepower: toInt(horsepower),
+      listing_type: ["sale", "rental", "auction"].includes(listing_type) ? listing_type : "sale",
       status: decision.status,
       hidden_reason: decision.hiddenReason,
     })
