@@ -26,7 +26,7 @@ export default function RentalListScreen() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      let q = getSupabase()
+      let q = (getSupabase() as any)
         .from("rental_listings")
         .select("id, daily_price, deposit, post:secondhand_posts(title, images, location)")
         .order("created_at", { ascending: false }).limit(60)
@@ -44,7 +44,10 @@ export default function RentalListScreen() {
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
         <Text style={styles.barTitle}>농기구 대여</Text>
-        <View style={{ width: 24 }} />
+        <Pressable onPress={() => router.push("/rental/manage" as any)} hitSlop={10} style={styles.manageBtn}>
+          <Ionicons name="calendar-outline" size={15} color={GREEN} />
+          <Text style={styles.manageText}>예약 관리</Text>
+        </Pressable>
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         <ImageBackground source={IMG} style={styles.hero}>
@@ -83,6 +86,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
   bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#eee" },
   barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
+  manageBtn: { flexDirection: "row", alignItems: "center", gap: 3 },
+  manageText: { fontSize: 13, fontWeight: "800", color: GREEN },
   hero: { width: "100%", height: 160 },
   heroOverlay: { flex: 1, alignItems: "center", justifyContent: "center" },
   heroTitle: { color: "#fff", fontSize: 22, fontWeight: "900", marginTop: 6 },
