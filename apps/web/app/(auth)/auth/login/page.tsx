@@ -100,8 +100,8 @@ function LoginPageContent() {
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 rounded-xl overflow-hidden mb-4">
-              <Image src="/logo.png?v=3" alt={plazaName} width={48} height={48} className="w-full h-full object-contain" />
+            <div className="mx-auto w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-primary/20 shadow-sm">
+              <Image src="/images/logo-farmer.jpg" alt={plazaName} width={96} height={96} className="w-full h-full object-cover" priority />
             </div>
             <CardTitle className="text-2xl">{plazaName}에 오신 것을 환영합니다</CardTitle>
             <CardDescription>이메일로 로그인하세요</CardDescription>
