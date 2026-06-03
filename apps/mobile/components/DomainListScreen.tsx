@@ -81,6 +81,8 @@ export interface DomainListConfig {
   table: string
   /** 상태 필터 (status 컬럼 + 값) */
   statusFilter?: { col: string; val: string }
+  /** 추가 OR 필터 (PostgREST or 구문, 예: "listing_type.is.null,listing_type.eq.sale") */
+  extraOr?: string
   /** 카드 라우트 base path (e.g. "/sharing") */
   basePath: string
   /** 카드 그리드 (true=2col grid, false=세로 list) */
@@ -283,6 +285,9 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         if (config.statusFilter) {
           q = q.eq(config.statusFilter.col, config.statusFilter.val)
         }
+        if (config.extraOr) {
+          q = q.or(config.extraOr)
+        }
         if (opts.withRegion && regionOrClause) {
           q = q.or(regionOrClause)
         }
@@ -327,7 +332,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         setHasMore(rows.length === PAGE_SIZE)
       }
     },
-    [config.table, config.statusFilter, config.disableRegionFilter, config.crossPlazaVisibility, DEFAULT_PLAZA, regionSelection, search, titleCol],
+    [config.table, config.statusFilter, config.extraOr, config.disableRegionFilter, config.crossPlazaVisibility, DEFAULT_PLAZA, regionSelection, search, titleCol],
   )
 
   // 초기 로드 / 필터 변경 시 첫 페이지부터 다시 로드

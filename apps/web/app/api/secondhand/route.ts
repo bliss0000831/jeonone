@@ -41,6 +41,8 @@ export async function GET(request: Request) {
     .range(offset, offset + limit - 1)
 
   query = query.eq("plaza_id", plaza)
+  // 직거래 목록은 판매글만 (경매/대여는 전용 페이지에서 노출)
+  query = query.or("listing_type.is.null,listing_type.eq.sale")
   if (status && status !== "all") query = query.eq("status", status)
   if (category && category !== "전체") query = query.eq("category", category)
   if (q) {

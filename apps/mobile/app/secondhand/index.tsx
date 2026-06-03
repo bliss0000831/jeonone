@@ -11,6 +11,7 @@ export default function SecondhandListScreen() {
         heroImage: require("../../assets/images/card-farm-equipment.jpg"),
         table: "secondhand_posts",
         statusFilter: { col: "status", val: "active" },
+        extraOr: "listing_type.is.null,listing_type.eq.sale",
         basePath: "/secondhand",
         domainKind: "secondhand",
         showPrice: true,
