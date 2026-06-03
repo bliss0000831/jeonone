@@ -59,6 +59,20 @@ export default function RentalDetailPage() {
     })
     setSubmitting(false)
     if (error) { toast.error("신청 실패: " + error.message); return }
+    // 소유자에게 알림 (actor_id = 본인 → RLS 교차 INSERT 허용)
+    if (r.owner_id && r.owner_id !== user.id) {
+      try {
+        await (supabase as any).from("notifications").insert({
+          user_id: r.owner_id,
+          type: "rental_request",
+          title: "새 대여 신청",
+          message: `${r.post?.title || "농기구"} · ${start}~${end} (${days}일)`,
+          link: "/rental/manage",
+          actor_id: user.id,
+          ...(r.plaza_id ? { plaza_id: r.plaza_id } : {}),
+        })
+      } catch { /* 알림 실패는 무시 */ }
+    }
     toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.")
     setStart(""); setEnd("")
   }

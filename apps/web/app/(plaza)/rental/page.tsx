@@ -62,9 +62,14 @@ export default function RentalPage() {
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold">대여 가능한 농기구</h2>
           {user && (
-            <Link href="/secondhand/register?type=rental" className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2.5 hover:bg-primary/90">
-              <Plus className="w-4 h-4" /> 대여 등록
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/rental/manage" className="inline-flex items-center gap-2 rounded-xl border-2 border-primary text-primary font-bold px-4 py-2.5 hover:bg-primary/5">
+                <CalendarDays className="w-4 h-4" /> 예약 관리
+              </Link>
+              <Link href="/secondhand/register?type=rental" className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2.5 hover:bg-primary/90">
+                <Plus className="w-4 h-4" /> 대여 등록
+              </Link>
+            </div>
           )}
         </div>
 
