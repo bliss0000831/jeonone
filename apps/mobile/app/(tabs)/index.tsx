@@ -12,7 +12,7 @@ import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
-import { useCurrentPlazaState } from "@/lib/plaza"
+import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
 import PlazaSelector from "@/components/PlazaSelector"
 
 const GREEN = "#225a39"
@@ -29,7 +29,6 @@ const IMG = {
   news: require("../../assets/images/banner-news.jpg"),
 }
 
-const REGION = "홍천군"
 const NOTICES = [
   { type: "공지", title: "홍천군 농업인 수당 신청 안내", date: "2026.04.15", isNew: true },
   { type: "지원금", title: "홍천군 친환경농업 직접지불금 신청", date: "2026.04.14", isNew: true },
@@ -44,6 +43,7 @@ const DIARY = [
 export default function HomeTab() {
   const router = useRouter()
   const plaza = useCurrentPlazaState()
+  const region = useCurrentRegion(plaza.id)
   const [q, setQ] = useState("")
   const [plazaSelectorOpen, setPlazaSelectorOpen] = useState(false)
   const go = (p: string) => () => router.push(p as any)
@@ -60,7 +60,7 @@ export default function HomeTab() {
         </View>
         <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
           <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
-          <Text style={styles.locText}>{REGION}</Text>
+          <Text style={styles.locText}>{region}</Text>
           <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
         </Pressable>
       </View>
@@ -85,7 +85,7 @@ export default function HomeTab() {
           <View style={styles.weatherRow}>
             <View style={styles.weatherChip}>
               <Ionicons name="sunny" size={15} color="#f59e0b" />
-              <Text style={styles.weatherText}>{REGION}</Text>
+              <Text style={styles.weatherText}>{region}</Text>
               <Text style={[styles.weatherText, { color: GREEN, fontWeight: "800" }]}>28°</Text>
               <Text style={styles.weatherMuted}>맑음</Text>
               <Ionicons name="water-outline" size={13} color="#64748b" />
@@ -154,7 +154,7 @@ export default function HomeTab() {
         <View style={styles.card}>
           <View style={styles.cardHead}>
             <View style={styles.cardHeadIcon}><Ionicons name="megaphone" size={16} color={GREEN} /></View>
-            <Text style={styles.cardTitle}>{REGION} 공지사항</Text>
+            <Text style={styles.cardTitle}>{region} 공지사항</Text>
           </View>
           {NOTICES.map((n, i) => (
             <View key={i} style={styles.noticeRow}>

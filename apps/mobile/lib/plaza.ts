@@ -124,6 +124,62 @@ export function useCurrentPlazaState(): PlazaState {
   return state
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 시/군 지역 (plaza=도 내부의 세부 지역) — 헤더 표시 + 글 개인화에 사용
+// 저장 키는 plaza 별로 분리 (도 격리 유지)
+// ════════════════════════════════════════════════════════════════════════════
+export const DEFAULT_REGION = "홍천군"
+let cachedRegion: string | null = null
+const regionListeners = new Set<(r: string) => void>()
+
+const regionKey = (plazaId: string) => `selected.region.${plazaId}`
+const recentRegionKey = (plazaId: string) => `recent_regions.${plazaId}`
+
+export async function loadSelectedRegion(plazaId: string): Promise<string> {
+  try {
+    const r = await AsyncStorage.getItem(regionKey(plazaId))
+    cachedRegion = r && r.length > 0 ? r : DEFAULT_REGION
+  } catch {
+    cachedRegion = DEFAULT_REGION
+  }
+  return cachedRegion
+}
+
+export async function setSelectedRegion(plazaId: string, region: string): Promise<void> {
+  cachedRegion = region
+  try { await AsyncStorage.setItem(regionKey(plazaId), region) } catch {}
+  regionListeners.forEach((fn) => { try { fn(region) } catch {} })
+  // 최근 지역 기록 (최대 4, 중복 제거)
+  try {
+    const raw = await AsyncStorage.getItem(recentRegionKey(plazaId))
+    const prev: string[] = raw ? JSON.parse(raw) : []
+    const updated = [region, ...prev.filter((x) => x !== region)].slice(0, 4)
+    await AsyncStorage.setItem(recentRegionKey(plazaId), JSON.stringify(updated))
+  } catch {}
+}
+
+export async function getRecentRegions(plazaId: string): Promise<string[]> {
+  try {
+    const raw = await AsyncStorage.getItem(recentRegionKey(plazaId))
+    return raw ? (JSON.parse(raw) as string[]).filter(Boolean).slice(0, 4) : []
+  } catch {
+    return []
+  }
+}
+
+/** 현재 plaza 의 선택된 시/군 (헤더 표시용) — 변경 구독 */
+export function useCurrentRegion(plazaId: string): string {
+  const [region, setRegion] = useState<string>(cachedRegion ?? DEFAULT_REGION)
+  useEffect(() => {
+    let mounted = true
+    loadSelectedRegion(plazaId).then((r) => { if (mounted) setRegion(r) })
+    const fn = (r: string) => { if (mounted) setRegion(r) }
+    regionListeners.add(fn)
+    return () => { mounted = false; regionListeners.delete(fn) }
+  }, [plazaId])
+  return region
+}
+
 /**
  * 광장 ID → 도시 이름 (헤더 표시용).
  * "원주광장" → "원주" 처럼 "광장" suffix 제거. fallback 은 id.

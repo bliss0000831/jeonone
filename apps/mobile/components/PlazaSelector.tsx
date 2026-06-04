@@ -24,7 +24,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
 import { getSupabase } from "@/lib/supabase"
-import { setSelectedPlaza, getRecentPlazas, HIDDEN_PLAZA_IDS, HIDDEN_PLAZA_NAMES } from "@/lib/plaza"
+import { setSelectedPlaza, setSelectedRegion, getRecentRegions, HIDDEN_PLAZA_IDS, HIDDEN_PLAZA_NAMES } from "@/lib/plaza"
 import { getFastUserLocation } from "@/lib/location"
 import * as Location from "expo-location"
 
@@ -53,14 +53,15 @@ interface PlazaRow {
 // Region theme (hub.tsx 미러)
 // ---------------------------------------------------------------------------
 
+// 전원일기 농장 톤 — 녹색·올리브·earth 계열
 const REGION_THEME: Record<string, { chip: string; dot: string }> = {
-  서울권: { chip: "#e11d48", dot: "#f43f5e" },
-  경기권: { chip: "#ea580c", dot: "#f97316" },
-  강원권: { chip: "#0369a1", dot: "#0ea5e9" },
-  충청권: { chip: "#047857", dot: "#10b981" },
-  전라권: { chip: "#6d28d9", dot: "#a855f7" },
-  경상권: { chip: "#b45309", dot: "#f59e0b" },
-  제주권: { chip: "#0f766e", dot: "#14b8a6" },
+  서울권: { chip: "#7c8b3e", dot: "#a3b565" },
+  경기권: { chip: "#a16207", dot: "#d99e2b" },
+  강원권: { chip: "#225a39", dot: "#3d8b5f" },
+  충청권: { chip: "#3f7d4e", dot: "#5fa877" },
+  전라권: { chip: "#6d8b3c", dot: "#8fae5c" },
+  경상권: { chip: "#b45309", dot: "#e0823a" },
+  제주권: { chip: "#2f8f6b", dot: "#4fb892" },
 }
 
 const REGION_ORDER = [
@@ -117,7 +118,7 @@ export default function PlazaSelector({
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
   const [toastMsg, setToastMsg] = useState<string | null>(null)
-  const [recent, setRecent] = useState<Array<{ id: string; name: string }>>([])
+  const [recentRegions, setRecentRegions] = useState<string[]>([])
   const fetched = useRef(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -155,13 +156,13 @@ export default function PlazaSelector({
     if (!visible) setSearch("")
   }, [visible])
 
-  // 모달 열릴 때 최근 광장 로드
+  // 모달 열릴 때 현재 plaza 의 최근 시/군 로드
   useEffect(() => {
     if (!visible) return
     let mounted = true
-    getRecentPlazas().then((list) => { if (mounted) setRecent(list) })
+    getRecentRegions(currentPlazaId).then((list) => { if (mounted) setRecentRegions(list) })
     return () => { mounted = false }
-  }, [visible])
+  }, [visible, currentPlazaId])
 
   // ---- toast helper ----
   const showToast = useCallback((msg: string) => {
@@ -208,24 +209,32 @@ export default function PlazaSelector({
     [onClose],
   )
 
-  // 최근 광장 — 현재 광장 제외하고 최대 4개
-  const recentToShow = useMemo(
-    () => recent.filter((r) => r.id !== currentPlazaId).slice(0, 4),
-    [recent, currentPlazaId],
-  )
-
-  const handleSelectRecent = useCallback(
-    async (r: { id: string; name: string }) => {
-      // 목록이 로드돼 있으면 PlazaRow 로 정식 가드(is_active 등) 통과, 아니면 직접 설정
-      const row = plazas.find((p) => p.id === r.id)
-      if (row) {
-        await handleSelectPlaza(row)
+  // 시/군 선택 → 해당 plaza(도) 진입 + 시/군 설정
+  const handleSelectRegion = useCallback(
+    async (plaza: PlazaRow, region: string) => {
+      if (!plaza.is_active) {
+        if (plaza.is_open_soon) {
+          Alert.alert("오픈 예정", `${plaza.name}은(는) 곧 오픈 예정입니다.`)
+        }
         return
       }
-      await setSelectedPlaza(r.id, r.name)
+      await setSelectedPlaza(plaza.id, plaza.name)
+      await setSelectedRegion(plaza.id, region)
       onClose()
     },
-    [plazas, handleSelectPlaza, onClose],
+    [onClose],
+  )
+
+  // 최근 시/군 (현재 plaza 기준, 최대 4개)
+  const handleSelectRecentRegion = useCallback(
+    async (region: string) => {
+      const row = plazas.find((p) => p.id === currentPlazaId)
+      if (row && !row.is_active) return
+      await setSelectedPlaza(currentPlazaId, currentPlazaName)
+      await setSelectedRegion(currentPlazaId, region)
+      onClose()
+    },
+    [plazas, currentPlazaId, currentPlazaName, onClose],
   )
 
   const [locLoading, setLocLoading] = useState(false)
@@ -305,20 +314,33 @@ export default function PlazaSelector({
   }, [plazas, locLoading, showToast, onClose])
 
   // ---- render helpers ----
-  const renderCoverageTags = (coverage: string[] | string | null) => {
+  const renderCoverageTags = (plaza: PlazaRow) => {
+    const coverage = plaza.coverage
     if (!coverage) return null
     const tags = Array.isArray(coverage)
       ? coverage
       : coverage.split(",").map((t) => t.trim())
     const filtered = tags.filter(Boolean)
     if (filtered.length === 0) return null
+    // 활성 plaza 의 시/군은 탭하면 해당 지역으로 진입
     return (
       <View style={styles.tagRow}>
-        {filtered.map((tag) => (
-          <View key={tag} style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
+        {filtered.map((tag) =>
+          plaza.is_active ? (
+            <Pressable
+              key={tag}
+              style={({ pressed }) => [styles.tagActive, pressed && { opacity: 0.6 }]}
+              onPress={() => handleSelectRegion(plaza, tag)}
+              hitSlop={4}
+            >
+              <Text style={styles.tagActiveText}>{tag}</Text>
+            </Pressable>
+          ) : (
+            <View key={tag} style={styles.tag}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ),
+        )}
       </View>
     )
   }
@@ -375,7 +397,7 @@ export default function PlazaSelector({
                 </View>
               )}
             </View>
-            {renderCoverageTags(plaza.coverage)}
+            {renderCoverageTags(plaza)}
           </View>
         </View>
 
@@ -447,19 +469,19 @@ export default function PlazaSelector({
             </Pressable>
           </View>
 
-          {/* ---- 최근 광장 ---- */}
-          {!search.trim() && recentToShow.length > 0 && (
+          {/* ---- 최근 지역 (시/군) ---- */}
+          {!search.trim() && recentRegions.length > 0 && (
             <View style={styles.recentSection}>
               <Text style={styles.recentLabel}>최근 지역</Text>
               <View style={styles.recentRow}>
-                {recentToShow.map((r) => (
+                {recentRegions.map((r) => (
                   <Pressable
-                    key={r.id}
+                    key={r}
                     style={({ pressed }) => [styles.recentChip, pressed && { opacity: 0.7 }]}
-                    onPress={() => handleSelectRecent(r)}
+                    onPress={() => handleSelectRecentRegion(r)}
                   >
                     <Ionicons name="time-outline" size={13} color={lightColors.primary} />
-                    <Text style={styles.recentChipText} numberOfLines={1}>{r.name}</Text>
+                    <Text style={styles.recentChipText} numberOfLines={1}>{r}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -626,9 +648,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 18,
-    backgroundColor: "#f0f9ff",
+    backgroundColor: "#e7f3ec",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#bae6fd",
+    borderColor: "#bbe0c8",
     maxWidth: "48%",
   },
   recentChipText: {
@@ -698,7 +720,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   plazaItemCurrent: {
-    backgroundColor: "#f0f9ff",
+    backgroundColor: "#e7f3ec",
     borderWidth: 1.5,
     borderColor: lightColors.primary + "40",
   },
@@ -774,6 +796,20 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     color: "#6b7280",
     fontWeight: "500",
+  },
+  // 활성 plaza 의 탭 가능한 시/군 — 크고 녹색, 어르신도 누르기 쉽게
+  tagActive: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: lightColors.primary + "12",
+    borderWidth: 1,
+    borderColor: lightColors.primary + "33",
+  },
+  tagActiveText: {
+    fontSize: 13,
+    color: lightColors.primary,
+    fontWeight: "700",
   },
 
   // open soon badge
