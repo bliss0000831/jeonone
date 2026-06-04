@@ -23,6 +23,11 @@ import {
   User,
   TrendingUp,
   ArrowUpDown,
+  Tractor,
+  Gavel,
+  Truck,
+  Briefcase,
+  Newspaper,
 } from "lucide-react"
 import { BottomNav } from "@/components/bottom-nav"
 import { cn } from "@/lib/utils"
@@ -43,21 +48,15 @@ interface TabMeta {
 
 const TABS: TabMeta[] = [
   { key: "all",          label: "전체",     icon: Sparkles,       iconClass: "text-primary" },
-  { key: "properties",   label: "부동산",   icon: HomeIcon,       iconClass: "text-blue-600" },
-  { key: "board",        label: "게시판",   icon: MessageSquare,  iconClass: "text-blue-500" },
-  { key: "sharing",      label: "나눔",     icon: Gift,           iconClass: "text-red-500" },
-  { key: "clubs",        label: "모임",     icon: Users,          iconClass: "text-indigo-500" },
-  { key: "group_buying", label: "공동구매", icon: ShoppingCart,   iconClass: "text-violet-500" },
-  { key: "local_food",   label: "로컬푸드", icon: Leaf,           iconClass: "text-green-500" },
-  { key: "services",     label: "서비스",   icon: Wrench,         iconClass: "text-orange-600" },
-  { key: "new_store",    label: "신장개업", icon: Store,          iconClass: "text-orange-500" },
-  { key: "profiles",     label: "사람",     icon: User,           iconClass: "text-pink-500" },
+  { key: "local_food",   label: "로컬푸드", icon: Leaf,           iconClass: "text-green-600" },
+  { key: "board",        label: "마을소식", icon: MessageSquare,  iconClass: "text-primary" },
+  { key: "sharing",      label: "무료나눔", icon: Gift,           iconClass: "text-red-500" },
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; icon: any; iconClass: string; bgClass: string }> = {
   properties:   { label: "부동산",   icon: HomeIcon,      iconClass: "text-blue-600",    bgClass: "bg-blue-500/10" },
-  board:        { label: "게시판",   icon: MessageSquare, iconClass: "text-blue-500",    bgClass: "bg-blue-500/10" },
-  sharing:      { label: "나눔",     icon: Gift,          iconClass: "text-red-500",     bgClass: "bg-red-500/10" },
+  board:        { label: "마을소식", icon: MessageSquare, iconClass: "text-primary",     bgClass: "bg-primary/10" },
+  sharing:      { label: "무료나눔", icon: Gift,          iconClass: "text-red-500",     bgClass: "bg-red-500/10" },
   clubs:        { label: "모임",     icon: Users,         iconClass: "text-indigo-500",  bgClass: "bg-indigo-500/10" },
   group_buying: { label: "공동구매", icon: ShoppingCart,  iconClass: "text-violet-500",  bgClass: "bg-violet-500/10" },
   local_food:   { label: "로컬푸드", icon: Leaf,          iconClass: "text-green-500",   bgClass: "bg-green-500/10" },
@@ -369,7 +368,7 @@ function SearchPageInner() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="매물, 게시글, 나눔, 모임, 공동구매 검색"
+                placeholder="농기구, 로컬푸드, 경매, 대여, 일손 검색"
                 className="w-full h-10 pl-9 pr-9 rounded-lg bg-secondary/60 border border-transparent focus:border-primary focus:bg-card focus:outline-none text-sm"
                 autoFocus={!initialQ}
               />
@@ -621,22 +620,28 @@ function EmptyState({
 
       <section>
         <h3 className="text-sm font-semibold mb-2">카테고리별 둘러보기</h3>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-          {(["properties", "board", "sharing", "clubs", "group_buying", "local_food", "services", "new_store", "profiles"] as SearchCategory[]).map((cat) => {
-            const m = CATEGORY_META[cat]
-            const CIcon = m.icon
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {[
+            { label: "농기구/자재", icon: Tractor, href: "/secondhand" },
+            { label: "로컬푸드", icon: Leaf, href: "/local-food" },
+            { label: "경매장", icon: Gavel, href: "/auction" },
+            { label: "농기구 대여", icon: Truck, href: "/rental" },
+            { label: "일손찾기", icon: Briefcase, href: "/jobs" },
+            { label: "마을소식", icon: Newspaper, href: "/board" },
+            { label: "무료나눔", icon: Gift, href: "/sharing" },
+          ].map((c) => {
+            const CIcon = c.icon
             return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => onShortcut(cat)}
+              <Link
+                key={c.label}
+                href={c.href}
                 className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:border-primary/50 active:scale-[0.98] transition-all"
               >
-                <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center", m.bgClass)}>
-                  <CIcon className={cn("w-5 h-5", m.iconClass)} />
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-primary/10">
+                  <CIcon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-xs font-medium">{m.label}</span>
-              </button>
+                <span className="text-xs font-medium">{c.label}</span>
+              </Link>
             )
           })}
         </div>
@@ -644,7 +649,7 @@ function EmptyState({
 
       <section className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
         <SearchIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground/50" />
-        궁금한 키워드를 입력해 보세요 — 매물 · 게시글 · 나눔 · 모임 · 공동구매를 한 번에 찾아드립니다.
+        궁금한 키워드를 입력해 보세요 — 농기구 · 로컬푸드 · 경매 · 대여 · 일손을 한 번에 찾아드립니다.
       </section>
     </div>
   )

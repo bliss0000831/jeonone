@@ -54,22 +54,16 @@ interface TabMeta {
 }
 
 const TABS: TabMeta[] = [
-  { key: "all",          label: "전체",     icon: "sparkles",          color: lightColors.primary },
-  { key: "properties",   label: "부동산",   icon: "home",               color: "#2563eb" },
-  { key: "board",        label: "게시판",   icon: "chatbox-outline",    color: "#3b82f6" },
-  { key: "sharing",      label: "나눔",     icon: "gift",               color: "#ef4444" },
-  { key: "clubs",        label: "모임",     icon: "people",             color: "#6366f1" },
-  { key: "group_buying", label: "공동구매", icon: "cart",               color: "#8b5cf6" },
-  { key: "local_food",   label: "로컬푸드", icon: "leaf",               color: "#22c55e" },
-  { key: "services",     label: "서비스",   icon: "construct",          color: "#ea580c" },
-  { key: "new_store",    label: "신장개업", icon: "storefront",         color: "#f97316" },
-  { key: "profiles",     label: "사람",     icon: "person",             color: "#ec4899" },
+  { key: "all",          label: "전체",     icon: "sparkles",        color: lightColors.primary },
+  { key: "local_food",   label: "로컬푸드", icon: "leaf",            color: "#16a34a" },
+  { key: "board",        label: "마을소식", icon: "newspaper",       color: "#225a39" },
+  { key: "sharing",      label: "무료나눔", icon: "gift",            color: "#ef4444" },
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; color: string; bg: string; icon: string }> = {
   properties:   { label: "부동산",   color: "#2563eb", bg: "rgba(59,130,246,0.1)", icon: "home-outline" },
-  board:        { label: "게시판",   color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: "document-text-outline" },
-  sharing:      { label: "나눔",     color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "heart-outline" },
+  board:        { label: "마을소식", color: "#225a39", bg: "rgba(34,90,57,0.1)", icon: "newspaper-outline" },
+  sharing:      { label: "무료나눔", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "gift-outline" },
   clubs:        { label: "모임",     color: "#6366f1", bg: "rgba(99,102,241,0.1)", icon: "people-outline" },
   group_buying: { label: "공동구매", color: "#8b5cf6", bg: "rgba(139,92,246,0.1)", icon: "cart-outline" },
   local_food:   { label: "로컬푸드", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: "leaf-outline" },
@@ -278,7 +272,7 @@ export default function SearchTab() {
             onSubmitEditing={() => {
               if (input.trim()) saveRecent(input.trim())
             }}
-            placeholder="매물·게시판·나눔·모임·공동구매 검색"
+            placeholder="농기구·로컬푸드·경매·대여·일손 검색"
             placeholderTextColor={lightColors.ink500}
             returnKeyType="search"
             accessibilityLabel="통합 검색"
@@ -437,33 +431,29 @@ export default function SearchTab() {
               <Text style={styles.sectionTitle}>카테고리별 둘러보기</Text>
             </View>
             <View style={styles.catGrid}>
-              {(["properties", "board", "sharing", "clubs", "group_buying", "local_food", "services", "new_store", "profiles"] as SearchCategory[]).map((cat) => {
-                const meta = CATEGORY_META[cat]
-                const tabMeta = TABS.find((t) => t.key === cat)
-                return (
-                  <Pressable
-                    key={cat}
-                    onPress={() => setTab(cat)}
-                    style={styles.catShortcut}
-                  >
-                    <View style={[styles.catShortcutIcon, { backgroundColor: meta.bg }]}>
-                      <Ionicons
-                        name={(tabMeta?.icon ?? "folder-outline") as any}
-                        size={20}
-                        color={meta.color}
-                      />
-                    </View>
-                    <Text style={styles.catShortcutLabel}>{meta.label}</Text>
-                  </Pressable>
-                )
-              })}
+              {([
+                { label: "농기구/자재", icon: "construct", color: "#225a39", bg: "rgba(34,90,57,0.1)", href: "/secondhand" },
+                { label: "로컬푸드", icon: "leaf", color: "#16a34a", bg: "rgba(22,163,74,0.1)", href: "/local-food" },
+                { label: "경매장", icon: "hammer", color: "#e11d48", bg: "rgba(225,29,72,0.1)", href: "/auction" },
+                { label: "농기구 대여", icon: "cube", color: "#059669", bg: "rgba(5,150,105,0.1)", href: "/rental" },
+                { label: "일손찾기", icon: "people", color: "#0d9488", bg: "rgba(13,148,136,0.1)", href: "/jobs" },
+                { label: "마을소식", icon: "newspaper", color: "#225a39", bg: "rgba(34,90,57,0.1)", href: "/board" },
+                { label: "무료나눔", icon: "gift", color: "#ef4444", bg: "rgba(239,68,68,0.1)", href: "/sharing" },
+              ] as const).map((c) => (
+                <Pressable key={c.label} onPress={() => router.push(c.href as any)} style={styles.catShortcut}>
+                  <View style={[styles.catShortcutIcon, { backgroundColor: c.bg }]}>
+                    <Ionicons name={c.icon as any} size={20} color={c.color} />
+                  </View>
+                  <Text style={styles.catShortcutLabel}>{c.label}</Text>
+                </Pressable>
+              ))}
             </View>
           </View>
 
           {/* 안내 텍스트 */}
           <View style={{ alignItems: "center", marginTop: spacing[3] }}>
             <Text style={styles.helperText}>
-              궁금한 키워드를 입력해 보세요 — 매물·게시판·나눔·{"\n"}모임·공동구매 등 한 번에 찾아드립니다.
+              궁금한 키워드를 입력해 보세요 — 농기구·로컬푸드·{"\n"}경매·대여·일손 등 한 번에 찾아드립니다.
             </Text>
           </View>
         </ScrollView>
