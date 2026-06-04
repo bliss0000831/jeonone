@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
   Alert,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -426,19 +427,22 @@ export default function MyPageTab() {
         {/* 로그아웃 */}
         {user && (
           <Pressable
-            onPress={() =>
+            onPress={async () => {
+              const doLogout = async () => {
+                await signOut()
+                router.replace("/(tabs)" as any)
+              }
+              // RN Web 에서는 Alert.alert 버튼 콜백이 실행되지 않아 window.confirm 사용
+              if (Platform.OS === "web") {
+                const ok = typeof window !== "undefined" ? window.confirm("정말 로그아웃 하시겠어요?") : true
+                if (ok) await doLogout()
+                return
+              }
               Alert.alert("로그아웃", "정말 로그아웃 하시겠어요?", [
                 { text: "취소", style: "cancel" },
-                {
-                  text: "로그아웃",
-                  style: "destructive",
-                  onPress: async () => {
-                    await signOut()
-                    router.replace("/(tabs)" as any)
-                  },
-                },
+                { text: "로그아웃", style: "destructive", onPress: doLogout },
               ])
-            }
+            }}
             style={({ pressed }) => [
               styles.logoutBtn,
               pressed && { opacity: 0.6 },
