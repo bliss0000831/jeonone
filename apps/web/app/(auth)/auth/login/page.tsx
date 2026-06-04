@@ -87,7 +87,7 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f7f6f0] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="w-4 h-4" /> 홈으로 돌아가기

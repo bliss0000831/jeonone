@@ -238,7 +238,7 @@ export default function LoginScreen() {
 
 function makeStyles(colors: any) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: "#f7f6f0" },
 
   header: {
     flexDirection: "row",

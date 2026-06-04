@@ -25,8 +25,8 @@ export const lightColors = {
   popover: "#ffffff",
   popoverForeground: "#1a263d",
 
-  /* primary — 전원일기 그린 (#16a34a, green-600) */
-  primary: "#16a34a",
+  /* primary — 전원일기 딥그린 (#225a39) */
+  primary: "#225a39",
   primaryForeground: "#ffffff",
 
   /* secondary — 연한 하늘빛 배경 */
