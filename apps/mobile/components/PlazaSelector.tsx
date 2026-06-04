@@ -267,7 +267,7 @@ export default function PlazaSelector({
       const match = plazas.find((p) => {
         if (!p.is_active) return false
         // 광장 이름에 지역명 포함 체크 (예: "춘천광장" ← "춘천시")
-        const nameNorm = p.name.replace(/광장|플라자|\s/g, "")
+        const nameNorm = p.name.replace(/광장|플라자|전원일기|도\b|\s/g, "")
         for (const part of parts) {
           if (part && (nameNorm.includes(part) || part.includes(nameNorm))) return true
         }
@@ -295,7 +295,7 @@ export default function PlazaSelector({
         showToast("주소를 확인할 수 없습니다. 직접 선택해주세요")
       } else {
         const locationStr = geo ? [geo.city, geo.district].filter(Boolean).join(" ") : ""
-        showToast(`${locationStr || "현재 위치"}에 해당하는 광장이 없습니다`)
+        showToast(`${locationStr || "현재 위치"}는 아직 오픈 전이에요 (현재 강원만 운영)`)
       }
     } catch (e) {
       showToast("위치 확인에 실패했습니다")
@@ -406,7 +406,7 @@ export default function PlazaSelector({
             <View style={styles.headerHandle} />
             <View style={styles.headerRow}>
               <View>
-                <Text style={styles.headerTitle}>광장 선택</Text>
+                <Text style={styles.headerTitle}>지역 선택</Text>
                 <Text style={styles.headerSub}>현재: {currentPlazaName}</Text>
               </View>
               <Pressable
@@ -425,7 +425,7 @@ export default function PlazaSelector({
               <Ionicons name="search" size={16} color="#9ca3af" />
               <TextInput
                 style={styles.searchInput}
-                placeholder="광장 이름이나 지역명을 검색해보세요"
+                placeholder="지역명(도·시·군)으로 검색해보세요"
                 placeholderTextColor="#9ca3af"
                 value={search}
                 onChangeText={setSearch}
@@ -450,7 +450,7 @@ export default function PlazaSelector({
           {/* ---- 최근 광장 ---- */}
           {!search.trim() && recentToShow.length > 0 && (
             <View style={styles.recentSection}>
-              <Text style={styles.recentLabel}>최근 광장</Text>
+              <Text style={styles.recentLabel}>최근 지역</Text>
               <View style={styles.recentRow}>
                 {recentToShow.map((r) => (
                   <Pressable
@@ -475,7 +475,7 @@ export default function PlazaSelector({
             <View style={styles.emptyWrap}>
               <Ionicons name="search-outline" size={40} color="#d1d5db" />
               <Text style={styles.emptyText}>
-                {search.trim() ? "검색 결과가 없습니다" : "광장 목록을 불러올 수 없습니다"}
+                {search.trim() ? "검색 결과가 없습니다" : "지역 목록을 불러올 수 없습니다"}
               </Text>
             </View>
           ) : (

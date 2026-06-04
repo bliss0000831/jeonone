@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { useCurrentPlazaState } from "@/lib/plaza"
+import PlazaSelector from "@/components/PlazaSelector"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1c4e31"
@@ -44,6 +45,7 @@ export default function HomeTab() {
   const router = useRouter()
   const plaza = useCurrentPlazaState()
   const [q, setQ] = useState("")
+  const [plazaSelectorOpen, setPlazaSelectorOpen] = useState(false)
   const go = (p: string) => () => router.push(p as any)
   const comingSoon = () => Alert.alert("준비 중", "곧 열립니다. 조금만 기다려 주세요!")
   const search = () => { if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}` as any) }
@@ -56,12 +58,19 @@ export default function HomeTab() {
           <Image source={IMG.logo} style={styles.brandLogo} contentFit="cover" />
           <Text style={styles.brand} numberOfLines={1}>{plaza.name}</Text>
         </View>
-        <Pressable style={styles.locChip} onPress={comingSoon}>
+        <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
           <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
           <Text style={styles.locText}>{REGION}</Text>
           <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
         </Pressable>
       </View>
+
+      <PlazaSelector
+        visible={plazaSelectorOpen}
+        onClose={() => setPlazaSelectorOpen(false)}
+        currentPlazaId={plaza.id}
+        currentPlazaName={plaza.name}
+      />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
         <ImageBackground source={IMG.bg} style={{ width: "100%" }} imageStyle={{ opacity: 0.18 }}>
