@@ -10,7 +10,7 @@ import { RegisterConsentBlock } from "@/components/legal/register-consent-block"
 import { RegionFormField } from "@/components/region-form-field"
 import { toast } from "sonner"
 
-const DEFAULT_CATEGORIES = ["의류", "가전", "가구", "생활용품", "식품", "도서", "유아용품", "기타"]
+const DEFAULT_CATEGORIES = ["농기구/자재", "종자·모종", "농산물", "생활용품", "의류", "기타"]
 
 export default function SharingRegisterPage() {
   const router = useRouter()

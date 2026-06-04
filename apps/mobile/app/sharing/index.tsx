@@ -4,10 +4,10 @@ export default function SharingListScreen() {
   return (
     <DomainListScreen
       config={{
-        title: "나눔",
-        heroIcon: "heart-outline",
-        heroColor: "#ef4444",
-        heroSub: "이웃과 함께 나눠요",
+        title: "무료 나눔",
+        heroIcon: "gift",
+        heroColor: "#225a39",
+        heroSub: "이웃과 정(情)을 나눠요",
         table: "sharing_posts",
         statusFilter: { col: "status", val: "active" },
         basePath: "/sharing",
@@ -15,7 +15,7 @@ export default function SharingListScreen() {
         showCategory: true,
         searchPlaceholder: "나눔 검색",
         registerPath: "/sharing/register",
-        categories: ["의류", "생활", "가전", "도서", "유아", "기타"],
+        categories: ["농기구/자재", "종자·모종", "농산물", "생활용품", "의류", "기타"],
       }}
     />
   )

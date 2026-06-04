@@ -11,15 +11,13 @@ import { RegionFormField } from "@/components/region-form-field"
 import { toast } from "sonner"
 
 const CATEGORIES = [
-  "음식점/카페/매장",
-  "물류/배달",
-  "사무/콜센터",
-  "과외/교육",
-  "행사/이벤트",
-  "단순노무",
-  "전문직/기술직",
-  "IT/디자인",
-  "홍보/마케팅",
+  "농사 일손",
+  "수확/선별",
+  "모내기/이앙",
+  "과수/원예",
+  "축산",
+  "운반/기계",
+  "품앗이",
   "기타",
 ]
 
@@ -39,7 +37,7 @@ export default function JobsRegisterPage() {
     kind: "hiring" as "hiring" | "seeking",
     title: "",
     description: "",
-    category: "음식점/카페/매장",
+    category: "농사 일손",
     workType: "단기",
     hourlyWage: "" as string,
     workDays: "",

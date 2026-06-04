@@ -24,11 +24,11 @@ import { ListingActionsMenu } from "@/components/listing-actions-menu"
 
 const CATEGORY_OPTIONS = [
   { value: "all", label: "전체" },
+  { value: "농기구/자재", label: "농기구/자재" },
+  { value: "종자·모종", label: "종자·모종" },
+  { value: "농산물", label: "농산물" },
+  { value: "생활용품", label: "생활용품" },
   { value: "의류", label: "의류" },
-  { value: "생활", label: "생활" },
-  { value: "가전", label: "가전" },
-  { value: "도서", label: "도서" },
-  { value: "유아", label: "유아" },
   { value: "기타", label: "기타" },
 ]
 

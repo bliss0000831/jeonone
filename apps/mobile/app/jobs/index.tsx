@@ -14,9 +14,9 @@ export default function JobsListScreen() {
         basePath: "/jobs",
         domainKind: "jobs",
         showCategory: true,
-        searchPlaceholder: "구인구직 검색",
+        searchPlaceholder: "일손 검색",
         registerPath: "/jobs/register",
-        categories: ["음식점/카페/매장", "물류/배달", "사무/콜센터", "과외/교육", "행사/이벤트", "단순노무", "전문직/기술직", "IT/디자인", "홍보/마케팅", "기타"],
+        categories: ["농사 일손", "수확/선별", "모내기/이앙", "과수/원예", "축산", "운반/기계", "품앗이", "기타"],
       }}
     />
   )

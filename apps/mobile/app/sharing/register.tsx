@@ -41,7 +41,7 @@ import { useCurrentPlaza } from "@/lib/plaza"
 import { RegisterConsentBlock } from "@/components/legal/RegisterConsentBlock"
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
-const DEFAULT_CATEGORIES = ["의류", "가전", "가구", "생활용품", "식품", "도서", "유아용품", "기타"]
+const DEFAULT_CATEGORIES = ["농기구/자재", "종자·모종", "농산물", "생활용품", "의류", "기타"]
 const MAX_IMAGES = 10
 
 export default function SharingRegisterScreen() {
