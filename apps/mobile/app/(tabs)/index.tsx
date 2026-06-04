@@ -121,7 +121,6 @@ export default function HomeTab() {
             <Quick icon="mic" label={"음성으로\n검색"} onPress={go("/search")} />
             <Quick icon="call" label={"전화\n문의"} tint={BROWN} bg="#f3ede1" onPress={comingSoon} />
           </View>
-        </ImageBackground>
 
         {/* 대형 사진 카드 4개 */}
         <View style={{ paddingHorizontal: 16, marginTop: 20, gap: 16 }}>
@@ -176,6 +175,7 @@ export default function HomeTab() {
             </View>
           ))}
         </View>
+        </ImageBackground>
       </ScrollView>
     </SafeAreaView>
   )
