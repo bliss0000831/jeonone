@@ -14,6 +14,8 @@ import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
 import PlazaSelector from "@/components/PlazaSelector"
+import { HamburgerMenu } from "@/components/HamburgerMenu"
+import { useAuth } from "@/lib/auth-context"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1c4e31"
@@ -44,8 +46,10 @@ export default function HomeTab() {
   const router = useRouter()
   const plaza = useCurrentPlazaState()
   const region = useCurrentRegion(plaza.id)
+  const { user } = useAuth()
   const [q, setQ] = useState("")
   const [plazaSelectorOpen, setPlazaSelectorOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const go = (p: string) => () => router.push(p as any)
   const comingSoon = () => Alert.alert("준비 중", "곧 열립니다. 조금만 기다려 주세요!")
   const search = () => { if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}` as any) }
@@ -58,11 +62,26 @@ export default function HomeTab() {
           <Image source={IMG.logo} style={styles.brandLogo} contentFit="cover" />
           <Text style={styles.brand} numberOfLines={1}>{plaza.name}</Text>
         </View>
-        <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
-          <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
-          <Text style={styles.locText}>{region}</Text>
-          <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
-        </Pressable>
+        <View style={styles.topRight}>
+          <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
+            <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
+            <Text style={styles.locText} numberOfLines={1}>{region}</Text>
+            <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
+          </Pressable>
+          {user ? (
+            <Pressable style={styles.iconBtn} onPress={() => router.push("/(tabs)/mypage-profile" as any)} hitSlop={6}>
+              <Ionicons name="person-circle-outline" size={26} color={GREEN_DARK} />
+            </Pressable>
+          ) : (
+            <Pressable style={styles.loginBtn} onPress={() => router.push("/auth/login" as any)}>
+              <Ionicons name="person-outline" size={14} color="#ffffff" />
+              <Text style={styles.loginBtnText}>로그인</Text>
+            </Pressable>
+          )}
+          <Pressable style={styles.iconBtn} onPress={() => setMenuOpen(true)} hitSlop={6} accessibilityLabel="전체 메뉴">
+            <Ionicons name="menu" size={26} color={GREEN_DARK} />
+          </Pressable>
+        </View>
       </View>
 
       <PlazaSelector
@@ -71,6 +90,7 @@ export default function HomeTab() {
         currentPlazaId={plaza.id}
         currentPlazaName={plaza.name}
       />
+      <HamburgerMenu visible={menuOpen} onClose={() => setMenuOpen(false)} cityName={region} />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
         <ImageBackground source={IMG.bg} style={{ width: "100%" }} imageStyle={{ opacity: 0.18 }}>
@@ -230,11 +250,15 @@ function PhotoCard({ img, icon, title, subtitle, desc, light, onPress }: { img: 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
   topbar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#f7f6f0" },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1 },
-  brandLogo: { width: 30, height: 30, borderRadius: 15 },
-  brand: { fontSize: 18, fontWeight: "900", color: GREEN_DARK },
-  locChip: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 },
-  locText: { fontSize: 13, fontWeight: "700", color: GREEN_DARK },
+  brandRow: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 1 },
+  brandLogo: { width: 28, height: 28, borderRadius: 14 },
+  brand: { fontSize: 16, fontWeight: "900", color: GREEN_DARK, flexShrink: 1 },
+  topRight: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 },
+  locChip: { flexDirection: "row", alignItems: "center", gap: 2, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 6, maxWidth: 110 },
+  locText: { fontSize: 13, fontWeight: "700", color: GREEN_DARK, flexShrink: 1 },
+  iconBtn: { width: 34, height: 34, alignItems: "center", justifyContent: "center" },
+  loginBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
+  loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
 
   hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
   heroLogo: { width: 130, height: 130, borderRadius: 65, marginBottom: 12, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
