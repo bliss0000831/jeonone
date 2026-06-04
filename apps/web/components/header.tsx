@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { PlusCircle, User, Menu, LogOut, Moon, Sun, HelpCircle, FileText, Shield, Settings, Megaphone, Paintbrush, Truck, SprayCan, Wrench, Mail, Edit3, Store, ShoppingCart, Gift, Home as HomeIcon, Building, ChevronDown, Leaf, Users, MessageSquare, Utensils, Lightbulb, Camera, Newspaper, MapPin, Search as SearchIcon, Briefcase, UserCircle2, HandHeart, Sparkles, ShoppingBag, Coins, Heart } from "lucide-react"
+import { PlusCircle, User, Menu, LogOut, Moon, Sun, HelpCircle, FileText, Shield, Settings, Megaphone, Paintbrush, Truck, SprayCan, Wrench, Mail, Edit3, Store, ShoppingCart, Gift, Home as HomeIcon, Building, ChevronDown, Leaf, Users, MessageSquare, Utensils, Lightbulb, Camera, Newspaper, MapPin, Search as SearchIcon, Briefcase, UserCircle2, HandHeart, Sparkles, ShoppingBag, Coins, Heart, Tractor, Gavel } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { User as SupabaseUser } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase/client"
@@ -186,237 +186,40 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
             </div>
           </div>
 
-          {/* Navigation - Desktop */}
+          {/* Navigation - Desktop (전원일기) */}
           <nav className="hidden xl:flex items-center gap-6">
-            <Link href="/properties?sort=newest" className="text-sm text-foreground hover:text-primary transition-colors font-medium">
-              신규매물
+            <Link href="/secondhand" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Tractor className="w-4 h-4 text-primary" />농기구/자재
             </Link>
-            <Link href="/properties?sort=popular" className="text-sm text-foreground hover:text-primary transition-colors font-medium">
-              인기매물
+            <Link href="/local-food" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Leaf className="w-4 h-4 text-primary" />로컬푸드
             </Link>
-            {/* 홈케어 드롭다운 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1 cursor-pointer">
-                홈케어
-                <ChevronDown className="w-3.5 h-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-36">
-                <DropdownMenuItem asChild>
-                  <Link href="/interior" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Paintbrush className="w-4 h-4 text-purple-500" />
-                    인테리어
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/moving" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-yellow-600" />
-                    이사
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/cleaning" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <SprayCan className="w-4 h-4 text-pink-500" />
-                    청소
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/repair" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-orange-500" />
-                    수리
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* 우리동네 드롭다운 — 신장개업·모임 묶음 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1 cursor-pointer">
-                우리동네
-                <ChevronDown className="w-3.5 h-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-40">
-                <DropdownMenuItem asChild>
-                  <Link href="/new-store" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Store className="w-4 h-4 text-amber-500" />
-                    신장개업
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/clubs" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Users className="w-4 h-4 text-indigo-500" />
-                    모임
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* 동네장터 드롭다운 — 중고거래·나눔·구인구직·공동구매·로컬푸드 묶음 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1 cursor-pointer">
-                동네장터
-                <ChevronDown className="w-3.5 h-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-40">
-                <DropdownMenuItem asChild>
-                  <Link href="/secondhand" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-amber-600" />
-                    중고거래
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/sharing" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-red-500" />
-                    나눔
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/jobs" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-teal-600" />
-                    구인구직
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/group-buying" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <ShoppingCart className="w-4 h-4 text-blue-500" />
-                    공동구매
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/local-food" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Leaf className="w-4 h-4 text-green-500" />
-                    로컬푸드
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Link href="/chuncheon" className="text-sm text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1">
-              <Newspaper className="w-3.5 h-3.5" />
-              {plazaCityName(siteBranding.name)} 소식
+            <Link href="/auction" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Gavel className="w-4 h-4 text-primary" />경매장
+            </Link>
+            <Link href="/rental" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-primary" />대여
+            </Link>
+            <Link href="/jobs" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-primary" />일손
+            </Link>
+            <Link href="/board" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Newspaper className="w-4 h-4 text-primary" />전원 소식통
             </Link>
           </nav>
 
           {/* Right Side - Desktop */}
           <div className="hidden xl:flex items-center gap-1">
             {/* 글쓰기 — 매물등록 포함 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-foreground hover:text-primary hover:bg-secondary">
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  글쓰기
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem asChild>
-                  <Link href="/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <PlusCircle className="w-4 h-4 text-primary" />
-                    매물 등록
-                  </Link>
-                </DropdownMenuItem>
-                {effectiveAccountType !== "agent" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/requests/new" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <HandHeart className="w-4 h-4 text-rose-500" />
-                      구해주세요(의뢰)
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem asChild>
-                  <Link href="/service-requests/new" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <HelpCircle className="w-4 h-4 text-emerald-500" />
-                    도와주세요(홈서비스)
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/board/create" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-blue-500" />
-                    게시판 글쓰기
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/sharing/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-red-500" />
-                    나눔 글쓰기
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/secondhand/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-amber-600" />
-                    중고거래 글쓰기
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/jobs/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-teal-600" />
-                    구인구직 글쓰기
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/clubs/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                    <Users className="w-4 h-4 text-indigo-500" />
-                    모임 글쓰기
-                  </Link>
-                </DropdownMenuItem>
-                {userAccountType === "interior" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/interior/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <Paintbrush className="w-4 h-4 text-purple-500" />
-                      인테리어 글쓰기
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {userAccountType === "moving" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/moving/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-yellow-500" />
-                      이사 글쓰기
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {userAccountType === "cleaning" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/cleaning/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <SprayCan className="w-4 h-4 text-pink-500" />
-                      청소 글쓰기
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {userAccountType === "repair" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/repair/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <Wrench className="w-4 h-4 text-orange-500" />
-                      수리 글쓰기
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {userAccountType === "business" && (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/group-buying/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                        <ShoppingCart className="w-4 h-4 text-blue-500" />
-                        공동구매 글쓰기
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/new-store/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                        <Store className="w-4 h-4 text-amber-500" />
-                        신장개업 글쓰기
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                {effectiveAccountType === "producer" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/local-food/register" prefetch={false} className="cursor-pointer flex items-center gap-2">
-                      <Leaf className="w-4 h-4 text-green-500" />
-                      로컬 푸드 등록
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-foreground hover:text-primary hover:bg-secondary"
+              onClick={() => setRegisterSheetOpen(true)}
+            >
+              <Edit3 className="w-4 h-4 mr-1" />
+              글쓰기
+            </Button>
 
             {/* 통합 검색 */}
             <Link
