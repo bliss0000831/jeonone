@@ -31,7 +31,7 @@ import { useThemedStyles } from "@/components/useColorScheme"
 import { getProfileCard, getPointBalance, type ProfileCardData } from "@gwangjang/features/profile"
 
 import { useAuth } from "@/lib/auth-context"
-import { useCurrentPlaza } from "@/lib/plaza"
+import { useCurrentPlaza, useCurrentPlazaState } from "@/lib/plaza"
 import { getSupabase } from "@/lib/supabase"
 import { useUnreadCounts } from "@/lib/use-unread-counts"
 import { getMyPageCache, prefetchMyPage, clearMyPageCache } from "@/lib/mypage-prefetch"
@@ -88,6 +88,7 @@ export default function MyPageTab() {
   const styles = useThemedStyles(makeStyles)
   const { user, signOut } = useAuth()
   const plazaId = useCurrentPlaza()
+  const plaza = useCurrentPlazaState()
   const router = useRouter()
   // 인메모리 프리페치 캐시에서 동기 초기값 — 탭 진입 시 즉시 렌더
   const prefetched = getMyPageCache()
@@ -182,23 +183,44 @@ export default function MyPageTab() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* 헤더 — 우측 설정만 */}
-      <View style={styles.header}>
-        <View style={{ flex: 1 }} />
-        <Pressable
-          onPress={() => router.push("/mypage/settings" as any)}
-          hitSlop={8}
-          style={styles.iconBtn}
-        >
-          <Ionicons name="settings-outline" size={22} color={lightColors.ink900} />
-        </Pressable>
-      </View>
-
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
+        {/* 녹색 프로필 헤더 (레퍼런스) */}
+        <View style={styles.greenHeader}>
+          <Pressable
+            style={({ pressed }) => [styles.greenProfile, pressed && { opacity: 0.9 }]}
+            onPress={() => router.push("/(tabs)/mypage-profile" as any)}
+          >
+            <View style={styles.greenAvatarWrap}>
+              {avatar ? (
+                <Image source={{ uri: avatar }} cachePolicy="memory-disk" style={styles.greenAvatar} />
+              ) : (
+                <View style={[styles.greenAvatar, styles.greenAvatarFallback]}>
+                  <Ionicons name="person" size={36} color="#ffffff" />
+                </View>
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greenNickname} numberOfLines={1}>{nickname || "농부"}님</Text>
+              <Text style={styles.greenSub}>{plaza.name} 회원</Text>
+              {typeof trustScore === "number" && (
+                <View style={styles.greenTrust}>
+                  <Ionicons name="leaf" size={12} color="#ffffff" />
+                  <Text style={styles.greenTrustText}>신뢰도 {trustScore}</Text>
+                </View>
+              )}
+            </View>
+            <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.85)" />
+          </Pressable>
+          <Pressable style={styles.greenSettings} onPress={() => router.push("/mypage/settings" as any)} hitSlop={8}>
+            <Ionicons name="settings-outline" size={22} color="#ffffff" />
+          </Pressable>
+        </View>
+
+        <View style={{ padding: 16, gap: 10, marginTop: -14 }}>
         {/* 지역 미설정 배너 — fresh fetch 완료 후에만 표시 (캐시 기반 깜빡임 방지) */}
         {freshLoaded && (!card?.location || !card.location.trim()) && (
           <Pressable
@@ -215,38 +237,6 @@ export default function MyPageTab() {
             <Ionicons name="chevron-forward" size={18} color="#b45309" />
           </Pressable>
         )}
-
-        {/* 프로필 카드 — 탭 시 기존 mypage 풀뷰로 */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.card,
-            styles.profileCard,
-            pressed && { opacity: 0.85 },
-          ]}
-          onPress={() => router.push("/(tabs)/mypage-profile" as any)}
-        >
-          <View style={styles.avatarWrap}>
-            {avatar ? (
-              <Image source={{ uri: avatar }} cachePolicy="memory-disk" style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, styles.avatarFallback]}>
-                <Ionicons name="person" size={28} color={lightColors.ink500} />
-              </View>
-            )}
-          </View>
-          <View style={{ flex: 1, gap: 4 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <Text style={styles.nickname} numberOfLines={1}>{nickname}</Text>
-              {typeof trustScore === "number" && (
-                <View style={styles.tempBadge}>
-                  <Text style={styles.tempText}>신뢰 {trustScore}</Text>
-                </View>
-              )}
-            </View>
-            <Text style={styles.profileSub}>프로필 / 글 관리</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={lightColors.ink500} />
-        </Pressable>
 
         {/* Quick row — 내 글 / 관심목록 / 최근 본 글 (3분할) */}
         <View style={[styles.card, styles.quickCard]}>
@@ -445,6 +435,7 @@ export default function MyPageTab() {
             <Text style={styles.logoutText}>로그아웃</Text>
           </Pressable>
         )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   )
@@ -452,7 +443,27 @@ export default function MyPageTab() {
 
 function makeStyles(colors: any) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f1f5f9" },
+  container: { flex: 1, backgroundColor: "#f7f6f0" },
+
+  // 녹색 프로필 헤더 (레퍼런스)
+  greenHeader: {
+    backgroundColor: "#225a39",
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 28,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  greenProfile: { flex: 1, flexDirection: "row", alignItems: "center", gap: 14 },
+  greenAvatarWrap: { width: 64, height: 64, borderRadius: 32, overflow: "hidden", borderWidth: 2, borderColor: "rgba(255,255,255,0.35)" },
+  greenAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(255,255,255,0.2)" },
+  greenAvatarFallback: { alignItems: "center", justifyContent: "center" },
+  greenNickname: { fontSize: 22, fontWeight: "900", color: "#ffffff" },
+  greenSub: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 3 },
+  greenTrust: { flexDirection: "row", alignItems: "center", gap: 3, alignSelf: "flex-start", marginTop: 6, backgroundColor: "rgba(255,255,255,0.18)", borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  greenTrustText: { fontSize: 11, fontWeight: "700", color: "#ffffff" },
+  greenSettings: { padding: 4, marginLeft: 6 },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
