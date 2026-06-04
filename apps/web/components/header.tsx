@@ -22,6 +22,7 @@ import { NotificationBell } from "@/components/notification-bell"
 import { HeaderActions } from "@/components/header-actions"
 import { cn } from "@/lib/utils"
 import { RegisterSheet } from "@/components/register-sheet"
+import { MobileNavDrawer } from "@/components/mobile-nav-drawer"
 import { useSiteBranding } from "@/components/site-branding-client"
 import { plazaCityName } from "@/lib/plaza/city-name"
 
@@ -253,6 +254,10 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
               user={user ?? null}
               userRole={effectiveRole}
               userAccountType={effectiveAccountType}
+            />
+            <MobileNavDrawer
+              user={user ? { id: user.id } : null}
+              plazaName={siteBranding.name}
             />
           </div>
         </div>
