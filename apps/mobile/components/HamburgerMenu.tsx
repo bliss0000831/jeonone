@@ -4,7 +4,7 @@
  * 구성:
  *   - 녹색 헤더: 농부 로고 + "강원 전원일기" + 시/군
  *   - 메인 메뉴(원형 녹색 아이콘 + 큰 라벨): 홈 / 농기구·자재 / 로컬푸드 / 경매장 / 일손 / 소식통
- *   - 커뮤니티: 자유게시판 / 무료 나눔 / 일상 공유 / 정부지원금 / 생활 정보 / 질문 답변
+ *   - 커뮤니티: 마을 사랑방 / 무료 나눔 / 농업 일기 / 정부지원금 / 살림 정보 / 궁금해요
  *   - 하단: 로그인·회원가입 (비로그인) 또는 마이페이지 + 로그아웃 (로그인)
  *
  * 어르신 친화: 큰 글씨(17~18px), 큰 터치영역, 단순 구조.
@@ -45,12 +45,12 @@ const MAIN: { icon: any; label: string; route: string }[] = [
 ]
 
 const COMMUNITY: { label: string; route: string }[] = [
-  { label: "자유게시판", route: "/board/c/free" },
+  { label: "마을 사랑방", route: "/board/c/free" },
   { label: "무료 나눔", route: "/board/c/share" },
-  { label: "일상 공유", route: "/board/c/daily" },
+  { label: "농업 일기", route: "/board/c/daily" },
   { label: "정부지원금", route: "/board/c/subsidy" },
-  { label: "생활 정보", route: "/board/c/life" },
-  { label: "질문 답변", route: "/board/c/qna" },
+  { label: "살림 정보", route: "/board/c/life" },
+  { label: "궁금해요", route: "/board/c/qna" },
 ]
 
 export function HamburgerMenu({ visible, onClose, cityName }: Props) {

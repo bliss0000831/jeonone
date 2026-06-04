@@ -27,12 +27,12 @@ const MAIN = [
 ]
 
 const COMMUNITY = [
-  { label: "자유게시판", href: "/board/c/free" },
+  { label: "마을 사랑방", href: "/board/c/free" },
   { label: "무료 나눔", href: "/board/c/share" },
-  { label: "일상 공유", href: "/board/c/daily" },
+  { label: "농업 일기", href: "/board/c/daily" },
   { label: "정부지원금", href: "/board/c/subsidy" },
-  { label: "생활 정보", href: "/board/c/life" },
-  { label: "질문 답변", href: "/board/c/qna" },
+  { label: "살림 정보", href: "/board/c/life" },
+  { label: "궁금해요", href: "/board/c/qna" },
 ]
 
 export function MobileNavDrawer({

@@ -2,7 +2,7 @@
  * 게시판 — 광장 web /board 1:1 미러.
  *
  * 동기화 (web):
- *   - board_categories 테이블 동적 로드 (자유게시판/맛집추천/생활정보/일상공유/질문답변)
+ *   - board_categories 테이블 동적 로드 (마을 사랑방/맛집추천/생활정보/일상공유/질문답변)
  *   - board_posts 테이블에서 plaza_id + category_id + region 필터 (status 필터 X)
  *   - 지역 chips: 사용자 sub_region 우선 (전체광장/춘천/홍천/...)
  *   - is_pinned 우선, created_at desc 정렬
@@ -160,7 +160,7 @@ export default function BoardListScreen() {
       } else {
         // 테이블 없거나 비어있을 때 fallback — web 기본값
         setCategories([
-          { id: "free", slug: "free", name: "자유게시판" },
+          { id: "free", slug: "free", name: "마을 사랑방" },
           { id: "food", slug: "food", name: "맛집추천" },
           { id: "life", slug: "life", name: "생활정보" },
           { id: "daily", slug: "daily", name: "일상공유" },

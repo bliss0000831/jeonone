@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const title = `${cityName} 게시판 — 자유·맛집·생활정보·일상`
-  const description = `${cityName} 주민들의 자유게시판. 맛집 추천, 생활정보, 일상 이야기를 나눠보세요.`
+  const description = `${cityName} 주민들의 마을 사랑방. 맛집 추천, 생활정보, 일상 이야기를 나눠보세요.`
 
   return {
     title,

@@ -10,12 +10,12 @@ import { useCurrentPlazaState } from "@/lib/plaza"
 
 const GREEN = "#225a39"
 const CATS = [
-  { slug: "free", label: "자유게시판", icon: "chatbubble-ellipses" as const },
-  { slug: "daily", label: "일상 공유", icon: "camera" as const },
+  { slug: "free", label: "마을 사랑방", icon: "chatbubble-ellipses" as const },
+  { slug: "daily", label: "농업 일기", icon: "camera" as const },
   { slug: "share", label: "무료 나눔", icon: "gift" as const },
-  { slug: "life", label: "생활 정보", icon: "bulb" as const },
+  { slug: "life", label: "살림 정보", icon: "bulb" as const },
   { slug: "subsidy", label: "정부 지원금", icon: "cash" as const },
-  { slug: "qna", label: "질문 답변", icon: "help-circle" as const },
+  { slug: "qna", label: "궁금해요", icon: "help-circle" as const },
 ]
 
 export default function BoardCategoryScreen() {

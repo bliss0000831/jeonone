@@ -14,12 +14,12 @@ import {
 } from "lucide-react"
 
 const CATEGORIES = [
-  { slug: "free", label: "자유게시판", icon: MessageSquare, desc: "자유롭게 이야기를 나눠요" },
-  { slug: "daily", label: "일상 공유", icon: Camera, desc: "이웃과 일상을 나눠요" },
+  { slug: "free", label: "마을 사랑방", icon: MessageSquare, desc: "자유롭게 이야기를 나눠요" },
+  { slug: "daily", label: "농업 일기", icon: Camera, desc: "이웃과 일상을 나눠요" },
   { slug: "share", label: "무료 나눔", icon: Gift, desc: "필요한 물건을 나눠요" },
-  { slug: "life", label: "생활 정보", icon: Lightbulb, desc: "생활 정보를 나눠요" },
+  { slug: "life", label: "살림 정보", icon: Lightbulb, desc: "살림 정보를 나눠요" },
   { slug: "subsidy", label: "정부 지원금", icon: Coins, desc: "이웃 건의한 정부 지원금 정보를 나눠요" },
-  { slug: "qna", label: "질문 답변", icon: HelpCircle, desc: "궁금한 걸 물어보세요" },
+  { slug: "qna", label: "궁금해요", icon: HelpCircle, desc: "궁금한 걸 물어보세요" },
 ]
 
 interface Post {

@@ -500,18 +500,18 @@ function BoardPageContent() {
       {/* 카테고리 탭 (모바일) + 사이드바 + 그리드/리스트 (PC) */}
       {(() => {
         const categoryOptions = [
-          { value: 'free', label: '자유게시판' },
+          { value: 'free', label: '마을 사랑방' },
           ...categories
             .filter((c) => c.slug !== 'free')
             .map((c) => ({ value: c.slug, label: c.name })),
         ]
         // categories 가 아직 로드되지 않은 경우, 기본 5개 슬러그 사용
         const fallbackOptions = [
-          { value: 'free', label: '자유게시판' },
+          { value: 'free', label: '마을 사랑방' },
           { value: 'restaurant', label: '맛집 추천' },
           { value: 'living', label: '생활정보' },
-          { value: 'daily', label: '일상 공유' },
-          { value: 'qna', label: '질문 답변' },
+          { value: 'daily', label: '농업 일기' },
+          { value: 'qna', label: '궁금해요' },
         ]
         const tabOptions = categories.length > 0 ? categoryOptions : fallbackOptions
 
