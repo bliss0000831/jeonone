@@ -72,10 +72,10 @@ export function ProfileCard({
   }
 
   return (
-    <div className="relative px-4 sm:px-6 pt-9">
+    <div className="relative px-4 sm:px-6 pt-5">
       {/* Avatar + 닉네임/뱃지/위치 — 가로 배치
-          아바타가 커버에 절반 걸치도록 -mt 조정 (커버↔텍스트 여백은 pt-9 로 유지) */}
-      <div className="flex items-end gap-5 -mt-[84px] sm:-mt-[92px] pb-1">
+          배너(커버) 제거 — 어르신 가독성. 상단 호흡은 pt-5 로 확보. */}
+      <div className="flex items-end gap-5 pb-1">
       <div
         className={cn(
           "relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0",

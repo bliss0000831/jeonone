@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils"
 
 import { MyPointsBalance } from "@/components/my-points-balance"
 
-import { ProfileCover } from "./profile-cover"
 import { ProfileCard, type ProfileCardData } from "./profile-card"
 import { ProfileHighlights, type Highlight } from "./profile-highlights"
 import { StoryViewer } from "./story-viewer"
@@ -116,7 +115,12 @@ const POSTS_SOURCES: Array<{
   /** 상세 페이지 링크 prefix (`${prefix}${id}`) */
   hrefPrefix: string
   imageField?: string
+  /** select 컬럼 오버라이드 (해당 테이블에 content 컬럼이 없는 경우 등) */
+  cols?: string
 }> = [
+  // 전원일기 핵심 도메인 — 농기구(중고거래) · 일손(구인구직). content 컬럼 없음 → description 만 select.
+  { table: "secondhand_posts",   kind: "secondhand",   kindLabel: "농기구",   hrefPrefix: "/secondhand/",   imageField: "images", cols: "id, title, description, images, created_at, status" },
+  { table: "jobs_posts",         kind: "jobs",         kindLabel: "일손",     hrefPrefix: "/jobs/",         imageField: "images", cols: "id, title, description, images, created_at, status" },
   { table: "board_posts",        kind: "board",        kindLabel: "게시판",   hrefPrefix: "/board/",        imageField: "images" },
   { table: "sharing_posts",      kind: "sharing",      kindLabel: "나눔",     hrefPrefix: "/sharing/",      imageField: "images" },
   { table: "group_buying_posts", kind: "group-buying", kindLabel: "공동구매", hrefPrefix: "/group-buying/", imageField: "images" },
@@ -403,7 +407,9 @@ export function ProfileShell({
               POSTS_SOURCES.map(async (src) => {
                 try {
                   const isBumpable = BUMPABLE_TABLES.has(src.table)
-                  const cols = isBumpable
+                  const cols = src.cols
+                    ? src.cols
+                    : isBumpable
                     ? "id, title, content, description, images, created_at, bumped_at, effective_at, status"
                     : "id, title, content, description, images, created_at, status"
                   let q: any = (supabase as any)
@@ -915,16 +921,6 @@ export function ProfileShell({
     const { url } = await res.json()
     return url as string
   }
-  const handleCoverUpload = async (file: File) => {
-    try {
-      const url = await uploadToMedia(file)
-      const { error } = await supabase.from("profiles").update({ cover_url: url }).eq("id", userId)
-      if (error) throw error
-      setProfile((p) => (p ? { ...p, cover_url: url } : p))
-    } catch (e: any) {
-      toast.error(e?.message || "커버 이미지 업로드 실패")
-    }
-  }
   const handleAvatarUpload = async (file: File) => {
     try {
       const url = await uploadToMedia(file)
@@ -939,7 +935,7 @@ export function ProfileShell({
   // ─── Render ───────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7f6f0] flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     )
@@ -947,7 +943,7 @@ export function ProfileShell({
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-[#f7f6f0] flex flex-col items-center justify-center">
         <p className="text-muted-foreground">사용자를 찾을 수 없습니다</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>돌아가기</Button>
       </div>
@@ -986,7 +982,7 @@ export function ProfileShell({
     mode === "other" && profile.posts_public === false
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-[#f7f6f0] pb-20">
       {/* 마이페이지 전용 단일 헤더
           [← 포인트 (admin)]   마이페이지   [🔔 👤 ☰] */}
       <header className="safe-top sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border">
@@ -1033,14 +1029,7 @@ export function ProfileShell({
 
       {/* 단일 컬럼 컨테이너 (모바일과 동일 비율 · PC에서도 모바일 폭 유지) */}
       <div className="max-w-3xl mx-auto">
-        {/* Cover (컨테이너 폭에 맞춤) */}
-        <ProfileCover
-          coverUrl={profile.cover_url}
-          role={role}
-          editable={mode === "self"}
-          onUpload={handleCoverUpload}
-        />
-
+        {/* 커버(배너) 제거 — 어르신 가독성 우선 (전원일기) */}
         <ProfileCard
           data={cardData}
           role={role}
@@ -1408,12 +1397,12 @@ function renderTabContent(args: RenderArgs) {
 type PostsCategory = { key: string; label: string }
 
 const BASE_POSTS_CATEGORIES: PostsCategory[] = [
-  { key: "all",       label: "전체" },
-  { key: "property",  label: "매물" },
-  { key: "board",     label: "게시판" },
-  { key: "sharing",   label: "나눔" },
-  { key: "club",      label: "모임" },
-  { key: "new-store", label: "신장개업" },
+  { key: "all",        label: "전체" },
+  { key: "secondhand", label: "농기구" },
+  { key: "local-food", label: "로컬푸드" },
+  { key: "jobs",       label: "일손" },
+  { key: "board",      label: "마을소식" },
+  { key: "sharing",    label: "나눔" },
 ]
 
 const POSTS_CATEGORIES_BY_ROLE: Record<AccountType, PostsCategory[]> = {

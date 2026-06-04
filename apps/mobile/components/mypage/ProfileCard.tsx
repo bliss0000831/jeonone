@@ -185,17 +185,16 @@ const AVATAR_RING = 4 // ring-4
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing[4], // px-4
-    paddingTop: 0,
+    paddingTop: spacing[5],
     paddingBottom: spacing[3],
-    backgroundColor: lightColors.background,
+    backgroundColor: "#f7f6f0",
   },
   topRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 20,
-    // 배너에서 아바타가 살짝만 걸침 — 닉네임 영역 위 호흡 확보.
-    // 가이드 값(20) 은 counters 간격과 동일하게 맞춰 위/아래 균형.
-    marginTop: -16,
+    // 배너 제거(어르신 가독성) — 상단 호흡은 container paddingTop 으로 확보.
+    marginTop: 0,
     paddingBottom: 4,
   },
   avatarWrap: {

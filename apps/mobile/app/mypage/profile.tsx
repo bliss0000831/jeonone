@@ -51,7 +51,6 @@ import { useAuth } from "@/lib/auth-context"
 import { getSupabase, gwangjangFetch } from "@/lib/supabase"
 import { buildShareUrl, useCurrentPlaza } from "@/lib/plaza"
 import { ProfileCard } from "@/components/mypage/ProfileCard"
-import { ProfileCover } from "@/components/mypage/ProfileCover"
 import { ProfileTabs } from "@/components/mypage/ProfileTabs"
 import { HamburgerSheet } from "@/components/mypage/HamburgerSheet"
 import { RegisterSheet } from "@/components/RegisterSheet"
@@ -578,13 +577,6 @@ export default function MyPageTab() {
           />
         }
       >
-        <ProfileCover
-          coverUrl={profile.cover_url}
-          role={role}
-          editable
-          onPressEdit={() => pickAndUpload("cover")}
-        />
-
         <ProfileCard
           data={cardWithLive}
           role={role}
@@ -963,10 +955,10 @@ function openExternalRoute(router: ReturnType<typeof useRouter>, href: string) {
 
 function makeStyles(colors: any) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: "#f7f6f0" },
   loading: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "#f7f6f0",
     alignItems: "center",
     justifyContent: "center",
   },

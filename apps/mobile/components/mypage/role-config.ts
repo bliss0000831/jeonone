@@ -184,11 +184,11 @@ export type PostsCategory = { key: string; label: string }
 
 export const BASE_POSTS_CATEGORIES: PostsCategory[] = [
   { key: "all",          label: "전체" },
-  { key: "property",     label: "매물" },
-  { key: "board",        label: "게시판" },
+  { key: "secondhand",   label: "농기구" },
+  { key: "local_food",   label: "로컬푸드" },
+  { key: "jobs",         label: "일손" },
+  { key: "board",        label: "마을소식" },
   { key: "sharing",      label: "나눔" },
-  { key: "club",         label: "모임" },
-  { key: "new_store",    label: "신장개업" },
 ]
 
 export const POSTS_CATEGORIES_BY_ROLE: Record<AccountType, PostsCategory[]> = {
