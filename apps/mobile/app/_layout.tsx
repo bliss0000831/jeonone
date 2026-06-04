@@ -90,8 +90,10 @@ export default function RootLayout() {
   const fadeAnim = useRef(new Animated.Value(1)).current
   const dismissed = useRef(false)
 
+  // 폰트 로딩 실패(특히 Expo 웹은 6000ms 타임아웃 잦음)해도 앱을 크래시시키지 않음.
+  // 시스템 폰트로 폴백하고 정상 진행. (이전엔 throw error → 전체 ErrorBoundary 크래시)
   useEffect(() => {
-    if (error) throw error
+    if (error) console.warn("[fonts] 폰트 로딩 실패 — 시스템 폰트로 진행:", error?.message ?? error)
   }, [error])
 
   // 마운트 즉시: 네이티브 스플래시 숨기고 스마일 오버레이가 이어받음
@@ -100,12 +102,12 @@ export default function RootLayout() {
     loadPlazaLabels()
   }, [])
 
-  // 폰트 + prefetch 완료 → 앱 준비
+  // 폰트 로드 완료 OR 실패(error) → prefetch 후 앱 준비 (폰트 실패해도 멈추지 않음)
   useEffect(() => {
-    if (!loaded) return
+    if (!loaded && !error) return
     applyGlobalFontDefaults()
     startPrefetch().then(() => setAppReady(true)).catch(() => setAppReady(true))
-  }, [loaded])
+  }, [loaded, error])
 
   // 1초 후 dismiss 시도 (스마일 애니메이션 보여준 뒤)
   // appReady 는 설정하지 않음 — 폰트+prefetch useEffect 가 담당
