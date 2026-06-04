@@ -273,13 +273,13 @@ const tabStyles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: "#0284c7",     // 살짝 진한 블루 (sky-600) — 흰 + 아이콘 대비↑
+    backgroundColor: "#225a39",     // 전원일기 그린 — 흰 + 아이콘 대비↑
     alignItems: "center",
     justifyContent: "center",
     marginTop: -22,                 // 탭바 위로 떠오르게
     borderWidth: 2,
     borderColor: "#ffffff",         // 흰 링 — 노치 느낌 (얇게)
-    shadowColor: "#0284c7",
+    shadowColor: "#225a39",
     shadowOpacity: 0.45,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
