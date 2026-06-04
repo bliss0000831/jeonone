@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Loader2, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 
 // 카카오 로고 SVG 컴포넌트
 function KakaoLogo({ className }: { className?: string }) {
@@ -87,23 +87,18 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-card border-b border-border">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/" className="p-2 -ml-2 hover:bg-secondary rounded-lg">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="font-semibold">로그인</h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground mb-4">
+          <ArrowLeft className="w-4 h-4" /> 홈으로 돌아가기
+        </Link>
 
-      <main className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-primary/20 shadow-sm">
-              <Image src="/images/logo-farmer.jpg" alt={plazaName} width={96} height={96} className="w-full h-full object-cover" priority />
+        <Card className="w-full shadow-sm">
+          <CardHeader className="text-center pb-3">
+            <div className="mx-auto w-16 h-16 rounded-full overflow-hidden mb-3 ring-2 ring-primary/20 shadow-sm">
+              <Image src="/images/logo-farmer.jpg" alt={plazaName} width={64} height={64} className="w-full h-full object-cover" priority />
             </div>
-            <CardTitle className="text-2xl">{plazaName}에 오신 것을 환영합니다</CardTitle>
+            <CardTitle className="text-2xl text-primary">로그인</CardTitle>
             <CardDescription>이메일로 로그인하세요</CardDescription>
           </CardHeader>
           <CardContent>
@@ -117,8 +112,10 @@ function LoginPageContent() {
                   {error}
                 </div>
               )}
-              <div className="space-y-2">
-                <Label htmlFor="identifier">이메일</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="identifier" className="flex items-center gap-1.5 font-semibold">
+                  <Mail className="w-4 h-4 text-primary" />이메일
+                </Label>
                 <Input
                   id="identifier"
                   type="email"
@@ -129,14 +126,16 @@ function LoginPageContent() {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">비밀번호</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="flex items-center gap-1.5 font-semibold">
+                  <Lock className="w-4 h-4 text-primary" />비밀번호
+                </Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
-                    placeholder="••••••••"
+                    placeholder="비밀번호를 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -152,7 +151,7 @@ function LoginPageContent() {
                   </button>
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full font-bold" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -165,11 +164,11 @@ function LoginPageContent() {
             </form>
 
             {/* 소셜 로그인 구분선 */}
-            <div className="relative my-6">
+            <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
+              <div className="relative flex justify-center text-xs">
                 <span className="bg-card px-2 text-muted-foreground">또는</span>
               </div>
             </div>
@@ -179,7 +178,7 @@ function LoginPageContent() {
               type="button"
               onClick={handleKakaoLogin}
               disabled={kakaoLoading}
-              className="w-full bg-[#FEE500] hover:bg-[#FDD800] text-[#191919] font-medium"
+              className="w-full bg-[#FEE500] hover:bg-[#FDD800] text-[#191919] font-bold"
             >
               {kakaoLoading ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -189,20 +188,20 @@ function LoginPageContent() {
               카카오로 로그인
             </Button>
 
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-5 text-center text-sm">
               <Link href="/auth/reset-password" className="text-muted-foreground hover:text-primary hover:underline">
                 비밀번호를 잊으셨나요?
               </Link>
             </div>
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              계정이 없으신가요?{' '}
-              <Link href="/auth/sign-up" className="text-primary font-medium hover:underline">
+            <div className="mt-3 text-center text-sm text-muted-foreground">
+              아직 회원이 아니신가요?{' '}
+              <Link href="/auth/sign-up" className="text-primary font-bold hover:underline">
                 회원가입
               </Link>
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   )
 }

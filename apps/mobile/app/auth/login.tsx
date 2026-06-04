@@ -30,7 +30,6 @@ import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
 import { useThemedStyles } from "@/components/useColorScheme"
 import { useAuth } from "@/lib/auth-context"
-import { useCurrentPlazaState } from "@/lib/plaza"
 
 function KakaoLogo({ size = 18 }: { size?: number }) {
   return <Ionicons name="chatbubble" size={size} color="#191919" />
@@ -40,7 +39,6 @@ export default function LoginScreen() {
   const styles = useThemedStyles(makeStyles)
   const router = useRouter()
   const { signIn, signInWithKakao } = useAuth()
-  const plaza = useCurrentPlazaState()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -87,12 +85,12 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Header */}
+      {/* Header — 홈으로 돌아가기 */}
       <View style={styles.header}>
-        <Pressable onPress={handleBack} hitSlop={8} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
+        <Pressable onPress={handleBack} hitSlop={8} style={styles.backLink}>
+          <Ionicons name="chevron-back" size={18} color={lightColors.ink500} />
+          <Text style={styles.backLinkText}>홈으로 돌아가기</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>로그인</Text>
       </View>
 
       <KeyboardAvoidingView
@@ -109,9 +107,7 @@ export default function LoginScreen() {
               <Image source={require("../../assets/images/logo-farmer.jpg")} style={styles.logoImg} contentFit="cover" />
             </View>
 
-            <Text style={styles.title}>
-              {plaza.name}에 오신 것을 환영합니다
-            </Text>
+            <Text style={styles.title}>로그인</Text>
             <Text style={styles.subtitle}>이메일로 로그인하세요</Text>
 
             {error && (
@@ -122,7 +118,10 @@ export default function LoginScreen() {
 
             {/* 이메일 */}
             <View style={styles.field}>
-              <Text style={styles.label}>이메일</Text>
+              <View style={styles.labelRow}>
+                <Ionicons name="mail-outline" size={15} color={lightColors.primary} />
+                <Text style={styles.label}>이메일</Text>
+              </View>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
@@ -139,7 +138,10 @@ export default function LoginScreen() {
 
             {/* 비밀번호 */}
             <View style={styles.field}>
-              <Text style={styles.label}>비밀번호</Text>
+              <View style={styles.labelRow}>
+                <Ionicons name="lock-closed-outline" size={15} color={lightColors.primary} />
+                <Text style={styles.label}>비밀번호</Text>
+              </View>
               <View style={styles.passwordWrap}>
                 <TextInput
                   style={[styles.input, { paddingRight: 40, flex: 1 }]}
@@ -147,7 +149,7 @@ export default function LoginScreen() {
                   autoComplete="password"
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="••••••••"
+                  placeholder="비밀번호를 입력하세요"
                   placeholderTextColor="#94a3b8"
                   editable={!loading}
                   onSubmitEditing={handleLogin}
@@ -222,7 +224,7 @@ export default function LoginScreen() {
 
             {/* 회원가입 링크 */}
             <View style={styles.signUpRow}>
-              <Text style={styles.signUpText}>계정이 없으신가요? </Text>
+              <Text style={styles.signUpText}>아직 회원이 아니신가요? </Text>
               <Pressable onPress={() => router.push("/auth/sign-up" as any)}>
                 <Text style={styles.signUpLink}>회원가입</Text>
               </Pressable>
@@ -241,15 +243,11 @@ function makeStyles(colors: any) {
   header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
     paddingHorizontal: 12,
-    height: 56,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(15,23,42,0.06)",
-    backgroundColor: "#ffffff",
+    height: 52,
   },
-  backBtn: { padding: 6 },
-  headerTitle: { fontSize: 16, fontWeight: "600", color: colors.ink900 },
+  backLink: { flexDirection: "row", alignItems: "center", gap: 2, padding: 6 },
+  backLinkText: { fontSize: 14, fontWeight: "700", color: colors.ink500 },
 
   scrollContent: {
     flexGrow: 1,
@@ -274,22 +272,22 @@ function makeStyles(colors: any) {
   },
 
   logoBox: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     overflow: "hidden",
     borderWidth: 2,
     borderColor: "rgba(34,90,57,0.2)",
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
-    marginBottom: 16,
+    marginBottom: 12,
   },
   logoImg: { width: "100%", height: "100%" },
   title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: colors.ink900,
+    fontSize: 24,
+    fontWeight: "900",
+    color: colors.primary,
     textAlign: "center",
     letterSpacing: -0.3,
   },
@@ -310,11 +308,11 @@ function makeStyles(colors: any) {
   errorText: { fontSize: 13, color: "#dc2626" },
 
   field: { marginBottom: 16 },
+  labelRow: { flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 6 },
   label: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "700",
     color: colors.ink900,
-    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
@@ -351,8 +349,8 @@ function makeStyles(colors: any) {
   },
   loginBtnText: {
     color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "800",
   },
 
   divider: {
