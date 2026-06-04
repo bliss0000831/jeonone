@@ -58,13 +58,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) return { error: error.message }
     if (!data.user) return { error: "로그인에 실패했습니다" }
 
-    // 광장 통합 인증 — plaza_profiles 자동 생성 (account_type: 'user')
-    const { getCachedPlaza } = await import("./plaza")
-    const plaza = getCachedPlaza().id
-    if (plaza) {
-      const { ensurePlazaProfile } = await import("@gwangjang/features/profile/ensure-plaza-profile")
-      await ensurePlazaProfile(supabase, data.user.id, plaza)
-    }
+    // 광장 통합 인증(plaza_profiles 생성)은 백그라운드로 — 로그인 즉시 반환(지연 방지)
+    const userId = data.user.id
+    void (async () => {
+      try {
+        const { getCachedPlaza } = await import("./plaza")
+        const plaza = getCachedPlaza().id
+        if (plaza) {
+          const { ensurePlazaProfile } = await import("@gwangjang/features/profile/ensure-plaza-profile")
+          await ensurePlazaProfile(supabase, userId, plaza)
+        }
+      } catch { /* noop */ }
+    })()
     return {}
   }, [])
 

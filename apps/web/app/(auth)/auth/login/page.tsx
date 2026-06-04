@@ -58,10 +58,12 @@ function LoginPageContent() {
       return
     }
 
-    // 광장 통합 인증 — plaza_profiles 자동 생성 (account_type: 'user')
+    // 광장 통합 인증(plaza_profiles 생성)은 백그라운드로 — 로그인 즉시 이동(지연 방지)
     if (plaza) {
-      const { ensurePlazaProfile } = await import("@gwangjang/features/profile/ensure-plaza-profile")
-      await ensurePlazaProfile(supabase, signInData.user.id, plaza)
+      const uid = signInData.user.id
+      void import("@gwangjang/features/profile/ensure-plaza-profile")
+        .then(({ ensurePlazaProfile }) => ensurePlazaProfile(supabase, uid, plaza))
+        .catch(() => {})
     }
 
     // H3: 로그인 후 redirect 파라미터가 있으면 해당 페이지로 이동
