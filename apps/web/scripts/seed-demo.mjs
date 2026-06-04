@@ -80,9 +80,9 @@ async function run() {
 
   // ── 로컬푸드 ──
   await sb.from("local_food").insert([
-    { user_id: uid, plaza_id: PLAZA, title: "홍천 햇사과 5kg", description: "당도 높은 부사. 산지 직송.", price: 25000, unit: "5kg", category: "과일", images: [], location: "홍천군", status: "active" },
-    { user_id: uid, plaza_id: PLAZA, title: "강원 감자 10kg", description: "포슬포슬한 수미감자.", price: 18000, unit: "10kg", category: "채소", images: [], location: "홍천군", status: "active" },
-    { user_id: uid, plaza_id: PLAZA, title: "유기농 대추방울토마토 2kg", description: "무농약 재배.", price: 22000, unit: "2kg", category: "채소", images: [], location: "홍천군", status: "active" },
+    { user_id: uid, plaza_id: PLAZA, title: "홍천 햇사과 5kg", description: "당도 높은 부사. 산지 직송.", price: 25000, unit: "5kg", category: "과일", images: [], location: "홍천군", status: "available" },
+    { user_id: uid, plaza_id: PLAZA, title: "강원 감자 10kg", description: "포슬포슬한 수미감자.", price: 18000, unit: "10kg", category: "채소", images: [], location: "홍천군", status: "available" },
+    { user_id: uid, plaza_id: PLAZA, title: "유기농 대추방울토마토 2kg", description: "무농약 재배.", price: 22000, unit: "2kg", category: "채소", images: [], location: "홍천군", status: "available" },
   ])
   console.log("로컬푸드 3건 등록")
 
