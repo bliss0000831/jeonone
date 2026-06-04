@@ -50,13 +50,28 @@ export default function OAuthCallback() {
         const code = url.searchParams.get("code")
         const isSignup = url.searchParams.get("signup") === "1"
         if (code) {
+          // web 은 detectSessionInUrl:true 라 supabase-js 가 code 를 자동 교환할 수 있음.
+          // 수동 교환과 충돌(=이미 사용된 code) 시, 자동 교환된 세션을 사용.
+          let sessionUser: any = null
           const { error: exErr, data } = await supabase.auth.exchangeCodeForSession(code)
           if (cancelled) return
-          if (exErr) {
-            setError(exErr.message)
+          if (data?.user) {
+            sessionUser = data.user
+          } else {
+            // 자동 교환이 먼저 일어났을 수 있음 → 약간 대기 후 세션 확인
+            for (let i = 0; i < 5 && !sessionUser; i++) {
+              const { data: { session } } = await supabase.auth.getSession()
+              if (session?.user) { sessionUser = session.user; break }
+              await new Promise((r) => setTimeout(r, 300))
+            }
+          }
+          if (cancelled) return
+          if (!sessionUser) {
+            setError(exErr?.message ?? "로그인 처리에 실패했습니다")
             return
           }
-          if (data.user) {
+          {
+            const data = { user: sessionUser } as any
             const meta = data.user.user_metadata || {}
             const kakaoAccount = meta.kakao_account || {}
             const kakaoProfile = kakaoAccount.profile || {}
