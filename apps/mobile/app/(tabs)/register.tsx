@@ -35,27 +35,12 @@ interface RegisterAction {
   roles?: string[]
 }
 
-const NON_AGENT_ROLES = ["user", "producer", "business", "interior", "moving", "cleaning", "repair"]
-
 const ALL_ACTIONS: RegisterAction[] = [
-  // 매물 등록 — agent 와 그 외 분기
-  { icon: "home-outline",          label: "매물 등록",        desc: "전세·월세·매매 등록", route: "/property/register",  color: "#2563eb", roles: NON_AGENT_ROLES },
-  { icon: "home",                  label: "공인중개사 매물 등록", desc: "검증된 매물 등록",   route: "/property/register",  color: "#1d4ed8", roles: ["agent"] },
-  { icon: "hand-left-outline",     label: "구해주세요(의뢰)",  desc: "원하는 집 요청",      route: "/requests/new",       color: "#e11d48", roles: NON_AGENT_ROLES },
-  // 공통
-  { icon: "document-text-outline", label: "게시판 글쓰기",    desc: "동네 이야기 / 질문",   route: "/board/create",       color: "#0284c7" },
-  { icon: "gift-outline",          label: "나눔 글쓰기",      desc: "이웃과 무료 나눔",     route: "/sharing/register",   color: "#10b981" },
-  { icon: "bag-handle-outline",    label: "중고거래 글쓰기",  desc: "안 쓰는 물건 판매",    route: "/secondhand/register", color: "#f59e0b" },
-  { icon: "briefcase-outline",     label: "구인구직 글쓰기",  desc: "알바·일자리 공고",     route: "/jobs/register",      color: "#0d9488" },
-  { icon: "people-outline",        label: "모임 글쓰기",      desc: "취미·운동·동호회",     route: "/clubs/register",     color: "#6366f1" },
-  { icon: "storefront-outline",    label: "신장개업 등록",    desc: "오픈 알림",            route: "/new-store/register", color: "#f97316", roles: ["business"] },
-  // 역할 전용
-  { icon: "leaf-outline",          label: "로컬푸드 등록",    desc: "지역 농산물 판매",     route: "/local-food/register", color: "#22c55e", roles: ["producer"] },
-  { icon: "cart-outline",          label: "공동구매 글쓰기",  desc: "함께 사면 더 저렴",    route: "/group-buying/register", color: "#8b5cf6", roles: ["business"] },
-  { icon: "construct-outline",     label: "인테리어 등록",    desc: "시공·리모델링",        route: "/interior/register",  color: "#a855f7", roles: ["interior"] },
-  { icon: "car-outline",           label: "이사 등록",        desc: "이사 서비스",          route: "/moving/register",    color: "#eab308", roles: ["moving"] },
-  { icon: "sparkles-outline",      label: "청소 등록",        desc: "청소 서비스",          route: "/cleaning/register",  color: "#ec4899", roles: ["cleaning"] },
-  { icon: "build-outline",         label: "수리 등록",        desc: "수리 서비스",          route: "/repair/register",    color: "#ea580c", roles: ["repair"] },
+  { icon: "construct-outline",     label: "농기구/자재 등록", desc: "판매·경매·대여",       route: "/secondhand/register", color: "#225a39" },
+  { icon: "leaf-outline",          label: "로컬푸드 등록",    desc: "지역 농산물 판매",     route: "/local-food/register", color: "#16a34a" },
+  { icon: "briefcase-outline",     label: "일손 등록",        desc: "구인·구직·품앗이",     route: "/jobs/register",       color: "#0d9488" },
+  { icon: "document-text-outline", label: "마을소식 글쓰기",  desc: "동네 이야기 / 질문",   route: "/board/create",        color: "#225a39" },
+  { icon: "gift-outline",          label: "무료나눔 글쓰기",  desc: "이웃과 무료 나눔",     route: "/sharing/register",    color: "#10b981" },
 ]
 
 export default function RegisterTab() {
@@ -115,21 +100,6 @@ export default function RegisterTab() {
     return a.roles.includes(accountType)
   })
 
-  // 잠긴 액션 — 일반인 (user) 에게만 보이는 전문가 권한 카테고리 안내
-  // (web register-sheet.tsx line 256+ 정독)
-  const isUser = accountType === "user" || accountType === "individual"
-  const lockedActions = isUser
-    ? [
-        { icon: "leaf-outline",        label: "로컬 푸드 등록",      color: "#22c55e" },
-        { icon: "cart-outline",        label: "공동구매",            color: "#8b5cf6" },
-        { icon: "storefront-outline",  label: "신장개업 등록",       color: "#f97316" },
-        { icon: "construct-outline",   label: "인테리어 등록",       color: "#a855f7" },
-        { icon: "car-outline",         label: "이사 서비스 등록",    color: "#eab308" },
-        { icon: "sparkles-outline",    label: "청소 서비스 등록",    color: "#ec4899" },
-        { icon: "build-outline",       label: "수리 서비스 등록",    color: "#ea580c" },
-      ]
-    : []
-
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* 헤더 — web RegisterSheet 1:1: "무엇을 등록할까요?" + X */}
@@ -157,39 +127,6 @@ export default function RegisterTab() {
           ))}
         </View>
 
-        {/* 잠긴 카테고리 CTA — 일반인 전용 (web 1:1) */}
-        {lockedActions.length > 0 && (
-          <Pressable
-            onPress={() => router.push("/mypage/account-upgrade" as any)}
-            style={styles.lockedCta}
-          >
-            <View style={styles.lockedIcons}>
-              {lockedActions.slice(0, 4).map((a, i) => (
-                <View
-                  key={a.label}
-                  style={[
-                    styles.lockedIcon,
-                    { backgroundColor: a.color + "1A", marginLeft: i === 0 ? 0 : -6 },
-                  ]}
-                >
-                  <Ionicons name={a.icon as any} size={11} color={a.color} />
-                </View>
-              ))}
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Ionicons name="lock-closed" size={11} color={lightColors.ink900} />
-                <Text style={styles.lockedTitle}>
-                  전문가 · 사업자 계정 전환 시 더 많은 등록 가능
-                </Text>
-              </View>
-              <Text style={styles.lockedSub} numberOfLines={1}>
-                로컬푸드 · 공동구매 · 인테리어 · 이사 · 청소 · 수리
-              </Text>
-            </View>
-            <Text style={styles.lockedArrow}>신청 →</Text>
-          </Pressable>
-        )}
       </ScrollView>
     </SafeAreaView>
   )

@@ -37,26 +37,19 @@ import { useUnreadCounts } from "@/lib/use-unread-counts"
 import { getMyPageCache, prefetchMyPage, clearMyPageCache } from "@/lib/mypage-prefetch"
 
 // 서비스 그리드 — 홈 화면과 동일한 3D 이모지 아이콘 사용
-// Row 1: 부동산 / 로컬푸드 / 공동구매 / 신장개업
-// Row 2: 인테리어 / 청소 / 수리 / 이사
-// Row 3: 중고거래 / 모임 / 구인구직 / 게시판
+// 전원일기 카테고리: 농기구 / 로컬푸드 / 경매 / 대여 / 일손 / 마을소식 / 무료나눔
 const SERVICES: Array<{
   label: string
   img: any
   href: string
 }> = [
-  { label: "부동산",   img: require("@/assets/icons/category/house.png"),           href: "/property" },
-  { label: "로컬푸드", img: require("@/assets/icons/category/leafy-green.png"),     href: "/local-food" },
-  { label: "공동구매", img: require("@/assets/icons/category/handshake.png"),       href: "/group-buying" },
-  { label: "신장개업", img: require("@/assets/icons/category/party-popper.png"),    href: "/new-store" },
-  { label: "인테리어", img: require("@/assets/icons/category/artist-palette.png"),  href: "/interior" },
-  { label: "청소",     img: require("@/assets/icons/category/broom.png"),           href: "/cleaning" },
-  { label: "수리",     img: require("@/assets/icons/category/wrench.png"),          href: "/repair" },
-  { label: "이사",     img: require("@/assets/icons/category/delivery-truck.png"),  href: "/moving" },
-  { label: "중고거래", img: require("@/assets/icons/category/shopping-cart.png"),   href: "/secondhand" },
-  { label: "모임",     img: require("@/assets/icons/category/people-hugging.png"), href: "/clubs" },
-  { label: "구인구직", img: require("@/assets/icons/category/briefcase.png"),       href: "/jobs" },
-  { label: "게시판",   img: require("@/assets/icons/category/speech-balloon.png"), href: "/board" },
+  { label: "농기구/자재", img: require("@/assets/icons/category/shopping-cart.png"),   href: "/secondhand" },
+  { label: "로컬푸드",    img: require("@/assets/icons/category/leafy-green.png"),     href: "/local-food" },
+  { label: "경매장",      img: require("@/assets/icons/category/handshake.png"),       href: "/auction" },
+  { label: "농기구 대여", img: require("@/assets/icons/category/delivery-truck.png"),  href: "/rental" },
+  { label: "일손찾기",    img: require("@/assets/icons/category/briefcase.png"),       href: "/jobs" },
+  { label: "마을소식",    img: require("@/assets/icons/category/speech-balloon.png"), href: "/board" },
+  { label: "무료나눔",    img: require("@/assets/icons/category/party-popper.png"),    href: "/sharing" },
 ]
 
 // 거래 메뉴 — badgeKey 는 useUnreadCounts 의 카테고리와 매핑 (없으면 점 없음)

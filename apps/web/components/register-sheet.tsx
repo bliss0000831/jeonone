@@ -63,143 +63,41 @@ interface RegisterAction {
  *
  * 일반인(user) 에게는 정확히 일반 권한 5개만 노출.
  */
-const NON_AGENT_ROLES = [
-  "user",
-  "producer",
-  "business",
-  "interior",
-  "moving",
-  "cleaning",
-  "repair",
-] as const
-
 const REGISTER_ACTIONS: RegisterAction[] = [
-  // ── 매물 등록 (계정별로 라벨/대상 분기) ─────────────────────
-  {
-    href: "/register",
-    label: "매물 등록",
-    icon: PlusCircle,
-    iconClass: "text-primary",
-    bgClass: "bg-primary/10",
-    roles: [...NON_AGENT_ROLES], // 공인중개사 제외 전원
-  },
-  {
-    href: "/register",
-    label: "공인중개사 매물 등록",
-    icon: PlusCircle,
-    iconClass: "text-blue-600",
-    bgClass: "bg-blue-600/10",
-    roles: ["agent"],
-  },
-  {
-    href: "/requests/new",
-    label: "구해주세요(의뢰)",
-    icon: HandHeart,
-    iconClass: "text-rose-500",
-    bgClass: "bg-rose-500/10",
-    roles: [...NON_AGENT_ROLES], // 공인중개사 제외 전원
-  },
-  {
-    href: "/service-requests/new",
-    label: "도와주세요(홈서비스)",
-    icon: HelpCircle,
-    iconClass: "text-emerald-500",
-    bgClass: "bg-emerald-500/10",
-    // 모든 계정 가능 — roles 생략
-  },
-
-  // ── 역할 전용 플러스 카드 ─────────────────────────────
-  {
-    href: "/local-food/register",
-    label: "로컬 푸드 등록",
-    icon: Leaf,
-    iconClass: "text-green-500",
-    bgClass: "bg-green-500/10",
-    roles: ["producer"],
-  },
-  {
-    href: "/group-buying/register",
-    label: "공동구매",
-    icon: ShoppingCart,
-    iconClass: "text-violet-500",
-    bgClass: "bg-violet-500/10",
-    roles: ["business"],
-  },
-  {
-    href: "/interior/register",
-    label: "인테리어 등록",
-    icon: Paintbrush,
-    iconClass: "text-purple-500",
-    bgClass: "bg-purple-500/10",
-    roles: ["interior"],
-  },
-  {
-    href: "/moving/register",
-    label: "이사 서비스 등록",
-    icon: Truck,
-    iconClass: "text-yellow-500",
-    bgClass: "bg-yellow-500/10",
-    roles: ["moving"],
-  },
-  {
-    href: "/cleaning/register",
-    label: "청소 서비스 등록",
-    icon: SprayCan,
-    iconClass: "text-pink-500",
-    bgClass: "bg-pink-500/10",
-    roles: ["cleaning"],
-  },
-  {
-    href: "/repair/register",
-    label: "수리 서비스 등록",
-    icon: Wrench,
-    iconClass: "text-orange-600",
-    bgClass: "bg-orange-600/10",
-    roles: ["repair"],
-  },
-
-  // ── 공통 (모든 계정) ─────────────────────────────────
-  {
-    href: "/board/create",
-    label: "게시판",
-    icon: MessageSquare,
-    iconClass: "text-blue-500",
-    bgClass: "bg-blue-500/10",
-  },
-  {
-    href: "/sharing/register",
-    label: "나눔",
-    icon: Gift,
-    iconClass: "text-red-500",
-    bgClass: "bg-red-500/10",
-  },
   {
     href: "/secondhand/register",
-    label: "중고거래",
+    label: "농기구/자재 등록",
     icon: ShoppingBag,
-    iconClass: "text-amber-600",
-    bgClass: "bg-amber-500/10",
+    iconClass: "text-primary",
+    bgClass: "bg-primary/10",
+  },
+  {
+    href: "/local-food/register",
+    label: "로컬푸드 등록",
+    icon: Leaf,
+    iconClass: "text-green-600",
+    bgClass: "bg-green-500/10",
   },
   {
     href: "/jobs/register",
-    label: "구인구직",
+    label: "일손 등록",
     icon: Briefcase,
     iconClass: "text-teal-600",
     bgClass: "bg-teal-500/10",
   },
   {
-    href: "/clubs/register",
-    label: "모임",
-    icon: Users,
-    iconClass: "text-indigo-500",
-    bgClass: "bg-indigo-500/10",
+    href: "/board/create",
+    label: "마을소식 글쓰기",
+    icon: MessageSquare,
+    iconClass: "text-primary",
+    bgClass: "bg-primary/10",
   },
   {
-    href: "/new-store/register",
-    label: "신장개업 등록",
-    icon: Store,
-    iconClass: "text-orange-500",
-    bgClass: "bg-orange-500/10",
+    href: "/sharing/register",
+    label: "무료나눔 글쓰기",
+    icon: Gift,
+    iconClass: "text-emerald-600",
+    bgClass: "bg-emerald-500/10",
   },
 ]
 
@@ -248,35 +146,10 @@ export function RegisterSheet({ open, onClose, accountType }: RegisterSheetProps
 
   if (!mounted || !open) return null
 
-  // 권한 필터: roles 가 명시된 항목은 해당 계정에만 노출
-  // 알 수 없는 role 은 "user" 로 폴백(일반 권한 5개 노출)
-  const rawRole = (accountType || fetchedType || "user").toLowerCase()
-  // DB에 일반인이 "individual"로 저장된 경우가 있어 "user"로 정규화
-  const normalizedRole = rawRole === "individual" ? "user" : rawRole
-  const KNOWN_ROLES = new Set<string>([
-    "user",
-    "agent",
-    ...NON_AGENT_ROLES,
-  ])
-  const role = KNOWN_ROLES.has(normalizedRole) ? normalizedRole : "user"
-  const actions = REGISTER_ACTIONS.filter(
-    (a) => !a.roles || a.roles.includes(role),
-  )
-
-  // 일반인(user) 에게만 잠긴 카드들을 함께 노출 — 클릭 시 계정 유형 신청 페이지로 유도.
-  // 이미 다른 계정인 사용자에겐 잠금 카드 숨김 (유형 변경은 고객센터 문의).
-  // "공인중개사 매물 등록"은 일반 "매물 등록" 과 기능상 중복이므로 잠금 카드에서도 제외.
-  const lockedActions: Array<RegisterAction & { requiredRole: string; requiredRoleLabel: string }> =
-    role === "user"
-      ? [
-          { href: "/local-food/register",    label: "로컬 푸드 등록",    icon: Leaf,         iconClass: "text-green-500",   bgClass: "bg-green-500/10",   roles: ["producer"], requiredRole: "producer", requiredRoleLabel: "생산자" },
-          { href: "/group-buying/register",  label: "공동구매",           icon: ShoppingCart, iconClass: "text-violet-500",  bgClass: "bg-violet-500/10",  roles: ["business"], requiredRole: "business", requiredRoleLabel: "사장님" },
-          { href: "/interior/register",      label: "인테리어 등록",     icon: Paintbrush,   iconClass: "text-purple-500",  bgClass: "bg-purple-500/10",  roles: ["interior"], requiredRole: "interior", requiredRoleLabel: "인테리어" },
-          { href: "/moving/register",        label: "이사 서비스 등록",  icon: Truck,        iconClass: "text-yellow-500",  bgClass: "bg-yellow-500/10",  roles: ["moving"],   requiredRole: "moving",   requiredRoleLabel: "이사" },
-          { href: "/cleaning/register",      label: "청소 서비스 등록",  icon: SprayCan,     iconClass: "text-pink-500",    bgClass: "bg-pink-500/10",    roles: ["cleaning"], requiredRole: "cleaning", requiredRoleLabel: "청소" },
-          { href: "/repair/register",        label: "수리 서비스 등록",  icon: Wrench,       iconClass: "text-orange-600",  bgClass: "bg-orange-600/10",  roles: ["repair"],   requiredRole: "repair",   requiredRoleLabel: "수리" },
-        ]
-      : []
+  // 전원일기: 모든 등록 항목을 모든 계정에 노출 (역할 제한·잠금 카드 없음)
+  void accountType; void fetchedType
+  const actions = REGISTER_ACTIONS
+  const lockedActions: Array<RegisterAction & { requiredRole: string; requiredRoleLabel: string }> = []
 
   return createPortal(
     <div
