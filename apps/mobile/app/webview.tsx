@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize } from "@gwangjang/tokens"
 
 // WebView 가 열 수 있는 호스트 화이트리스트 — 외부 phishing 사이트가
-// deep link (gwangjang://webview?url=https://evil.com) 로 흘러들지 않도록.
+// deep link (jeonwondiary://webview?url=https://evil.com) 로 흘러들지 않도록.
 // 운영 도메인 + 광장 서브도메인 + 토스/카카오 결제 호스트만 허용.
 const ALLOWED_HOSTS = [
   "gwangjang.app",

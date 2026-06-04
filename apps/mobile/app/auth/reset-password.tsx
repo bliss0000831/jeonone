@@ -20,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
 import { getSupabase } from "@/lib/supabase"
 
-const REDIRECT_URL = "gwangjang://auth/change-password"
+const REDIRECT_URL = "jeonwondiary://auth/change-password"
 
 export default function ResetPasswordScreen() {
   const router = useRouter()

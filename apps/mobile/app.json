@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gwangjang",
+    "scheme": "jeonwondiary",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "androidStatusBar": {
@@ -28,7 +28,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#2BA6FF"
+        "backgroundColor": "#ffffff"
       },
       "backgroundColor": "#ffffff",
       "edgeToEdgeEnabled": true,

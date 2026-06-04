@@ -151,7 +151,7 @@ export default function SignUpScreen() {
     if (Platform.OS === "web" && typeof window !== "undefined") {
       emailRedirectTo = `${window.location.origin}/auth/callback`
     }
-    // native: gwangjang://auth/callback (Supabase 화이트리스트 등록되어 있으면)
+    // native: jeonwondiary://auth/callback (Supabase 화이트리스트 등록되어 있으면)
 
     const { data, error: signUpErr } = await supabase.auth.signUp({
       email: email.trim(),
