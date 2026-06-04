@@ -69,7 +69,7 @@ export function plazaFromHost(host: string | null | undefined): PlazaId | null {
  * 광장이 활성화된 상태인지 (KNOWN_PLAZAS 의 첫 N 개) 빠른 체크용.
  * 정확한 활성 여부는 DB 의 plazas.is_active 가 source of truth.
  */
-export const ACTIVE_PLAZAS: readonly PlazaId[] = ['gangwon']
+export const ACTIVE_PLAZAS: readonly PlazaId[] = [...KNOWN_PLAZAS]
 
 export function isActivePlaza(id: string | null | undefined): id is PlazaId {
   if (!id) return false
