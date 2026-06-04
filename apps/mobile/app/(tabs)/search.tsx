@@ -261,7 +261,7 @@ export default function SearchTab() {
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
         <View style={styles.searchInputWrap}>
-          <Ionicons name="search" size={16} color={lightColors.ink500} />
+          <Ionicons name="search" size={19} color={lightColors.ink500} />
           <TextInput
             style={styles.searchInput}
             value={input}
@@ -442,7 +442,7 @@ export default function SearchTab() {
               ] as const).map((c) => (
                 <Pressable key={c.label} onPress={() => router.push(c.href as any)} style={styles.catShortcut}>
                   <View style={[styles.catShortcutIcon, { backgroundColor: c.bg }]}>
-                    <Ionicons name={c.icon as any} size={20} color={c.color} />
+                    <Ionicons name={c.icon as any} size={26} color={c.color} />
                   </View>
                   <Text style={styles.catShortcutLabel}>{c.label}</Text>
                 </Pressable>
@@ -700,7 +700,7 @@ const HitCard = memo(function HitCard({ hit, onPress }: { hit: SearchHit; onPres
 
 function makeStyles(colors: any) {
   return StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: "#f7f6f0" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -713,14 +713,16 @@ function makeStyles(colors: any) {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 12,
-    height: 40,
+    paddingHorizontal: 14,
+    height: 48,
     borderRadius: 999,
-    backgroundColor: colors.muted,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e2e0d6",
   },
   searchInput: {
     flex: 1,
-    fontSize: fontSize.sm,
+    fontSize: 16,
     color: colors.ink900,
     padding: 0,
   },
@@ -769,31 +771,31 @@ function makeStyles(colors: any) {
   },
 
   tabWrap: {
-    backgroundColor: colors.background,
+    backgroundColor: "#f7f6f0",
   },
   tabRow: {
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
-    gap: 6,
+    gap: 8,
   },
   tab: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: "#ffffff",
   },
   tabActive: {
-    backgroundColor: "#1f2937",
-    borderColor: "#1f2937",
+    backgroundColor: "#225a39",
+    borderColor: "#225a39",
   },
   tabLabel: {
-    fontSize: 12.5,
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "700",
     color: colors.ink900,
   },
   tabCount: {
@@ -819,8 +821,8 @@ function makeStyles(colors: any) {
   },
   sectionTitleRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   sectionTitle: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "800",
     color: colors.ink900,
   },
   clearLink: {
@@ -829,14 +831,14 @@ function makeStyles(colors: any) {
   },
   chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   recentChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.background,
+    backgroundColor: "#ffffff",
   },
-  recentChipText: { fontSize: 12, color: colors.ink700 },
+  recentChipText: { fontSize: 14, color: colors.ink700, fontWeight: "600" },
   trendingChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -877,27 +879,27 @@ function makeStyles(colors: any) {
   },
   catShortcut: {
     width: "31%",
-    paddingVertical: 14,
+    paddingVertical: 18,
     alignItems: "center",
-    gap: 6,
-    backgroundColor: colors.background,
+    gap: 9,
+    backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: "#e2e0d6",
+    borderRadius: 16,
   },
   catShortcutIcon: {
-    width: 40, height: 40, borderRadius: 8,
+    width: 54, height: 54, borderRadius: 16,
     alignItems: "center", justifyContent: "center",
   },
   catShortcutLabel: {
-    fontSize: 12, fontWeight: "500", color: colors.ink900,
+    fontSize: 15, fontWeight: "700", color: colors.ink900,
   },
 
   helperText: {
-    fontSize: 12,
+    fontSize: 15,
     color: colors.ink500,
     textAlign: "center",
-    lineHeight: 18,
+    lineHeight: 23,
   },
 
   center: {

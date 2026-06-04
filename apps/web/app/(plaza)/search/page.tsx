@@ -353,7 +353,7 @@ function SearchPageInner() {
     counts.local_food + counts.services + counts.new_store + counts.profiles
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-[#f7f6f0] pb-20">
       {/* 헤더 */}
       <header className="safe-top sticky top-0 z-50 bg-card border-b border-border">
         <div className="flex items-center gap-2 px-4 h-14">
@@ -362,14 +362,14 @@ function SearchPageInner() {
           </Link>
           <form onSubmit={handleSubmit} className="flex-1 flex items-center">
             <div className="relative flex-1">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="농기구, 로컬푸드, 경매, 대여, 일손 검색"
-                className="w-full h-10 pl-9 pr-9 rounded-lg bg-secondary/60 border border-transparent focus:border-primary focus:bg-card focus:outline-none text-sm"
+                className="w-full h-12 pl-10 pr-9 rounded-xl bg-card border border-border focus:border-primary focus:outline-none text-base"
                 autoFocus={!initialQ}
               />
               {input && (
@@ -422,13 +422,13 @@ function SearchPageInner() {
                   type="button"
                   onClick={() => handleTabChange(t.key)}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
+                    "flex items-center gap-1.5 px-4 h-10 rounded-full text-sm font-bold transition-colors whitespace-nowrap",
                     active
                       ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/60 text-muted-foreground hover:text-foreground",
+                      : "bg-card border border-border text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <TIcon className={cn("w-3.5 h-3.5", active ? "" : t.iconClass)} />
+                  <TIcon className={cn("w-4 h-4", active ? "" : t.iconClass)} />
                   {t.label}
                   {q && cnt > 0 && (
                     <span className={cn(
@@ -565,8 +565,8 @@ function EmptyState({
       {recent.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold flex items-center gap-1.5">
-              <Clock className="w-4 h-4" /> 최근 검색어
+            <h3 className="text-base font-bold flex items-center gap-1.5">
+              <Clock className="w-5 h-5" /> 최근 검색어
             </h3>
             <button onClick={onClearAll} className="text-xs text-muted-foreground hover:text-foreground">
               전체 삭제
@@ -619,7 +619,7 @@ function EmptyState({
       )}
 
       <section>
-        <h3 className="text-sm font-semibold mb-2">카테고리별 둘러보기</h3>
+        <h3 className="text-lg font-extrabold mb-3">카테고리별 둘러보기</h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {[
             { label: "농기구/자재", icon: Tractor, href: "/secondhand" },
@@ -635,12 +635,12 @@ function EmptyState({
               <Link
                 key={c.label}
                 href={c.href}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:border-primary/50 active:scale-[0.98] transition-all"
+                className="flex flex-col items-center gap-2.5 p-5 rounded-2xl border border-border bg-card hover:border-primary/50 active:scale-[0.98] transition-all"
               >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-primary/10">
-                  <CIcon className="w-5 h-5 text-primary" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/10">
+                  <CIcon className="w-7 h-7 text-primary" />
                 </div>
-                <span className="text-xs font-medium">{c.label}</span>
+                <span className="text-base font-bold">{c.label}</span>
               </Link>
             )
           })}
