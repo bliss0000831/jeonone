@@ -188,13 +188,16 @@ export function plazaCityName(plazaIdOrName: string): string {
   return plazaIdOrName.replace(/광장$/, "")
 }
 
+/** 전원일기 웹 도메인 (단일 도메인 — 지역 구분은 ?plaza= 쿼리). env 로 오버라이드 가능. */
+const WEB_BASE = (process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app").replace(/\/$/, "")
+
 /**
- * 공유 URL 빌더 — 게시글의 광장 서브도메인으로 생성.
- *   buildShareUrl("property", "abc", "chuncheon")
- *     → "https://chuncheon.gwangjang.app/property/abc"
+ * 공유 URL 빌더 — 단일 도메인 + ?plaza= 쿼리 (웹 buildPlazaUrl 의 vercel.app 분기와 동일).
+ *   buildShareUrl("secondhand", "abc", "gangwon")
+ *     → "https://jeonwondiary.vercel.app/secondhand/abc?plaza=gangwon"
  *
- * postPlazaId 우선 (게시글이 속한 광장), 없으면 현재 viewer 광장.
- * 게시글 plaza 와 viewer plaza 가 다를 때(cross-plaza 공유 링크 노출 방지) 중요.
+ * postPlazaId 우선 (게시글이 속한 지역), 없으면 현재 viewer 지역.
+ * 다른 지역(cross-plaza) 공유 시에도 받는 사람이 올바른 지역으로 진입하도록 ?plaza= 부착.
  */
 export function buildShareUrl(
   kind: string,
@@ -202,8 +205,8 @@ export function buildShareUrl(
   postPlazaId?: string | null,
 ): string {
   const plaza = postPlazaId || getCachedPlaza().id
-  // 차단된 광장으로 링크 생성 금지
+  // 차단된 지역으로 링크 생성 금지
   const safePlaza = plaza && !HIDDEN_PLAZA_IDS.has(plaza) ? plaza : null
-  const host = safePlaza ? `${safePlaza}.gwangjang.app` : "www.gwangjang.app"
-  return `https://${host}/${kind}/${id}`
+  const query = safePlaza ? `?plaza=${safePlaza}` : ""
+  return `${WEB_BASE}/${kind}/${id}${query}`
 }

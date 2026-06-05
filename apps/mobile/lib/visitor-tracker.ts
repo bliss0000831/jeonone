@@ -2,7 +2,7 @@
  * 모바일 앱 방문자 트래커.
  *
  * 웹의 VisitorTracker 와 동일한 /api/visitor-track 엔드포인트를 사용.
- * 앱 식별을 위해 user_agent 에 "gwangjang-app" 태그 포함.
+ * 앱 식별을 위해 user_agent 에 "jeonwondiary-app" 태그 포함.
  *
  * 세션 중복 방지: AsyncStorage 에 마지막 기록 시각 저장 → 5분 이내 재호출 무시.
  */
@@ -46,7 +46,7 @@ function getOS(): string {
 
 function getBrowser(): string {
   // 앱 내장 WebView — 브라우저 대신 앱 식별자 사용
-  return "gwangjang-app"
+  return "jeonwondiary-app"
 }
 
 /**
@@ -70,7 +70,7 @@ export async function trackVisit(pageUrl: string = "/app"): Promise<void> {
     const payload = {
       session_id: sessionId,
       page_url: pageUrl,
-      user_agent: `gwangjang-app/${Platform.OS} ${Device.modelName || "unknown"}`,
+      user_agent: `jeonwondiary-app/${Platform.OS} ${Device.modelName || "unknown"}`,
       referer: null,
       device_type: getDeviceType(),
       browser: getBrowser(),

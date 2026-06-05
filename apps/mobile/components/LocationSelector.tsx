@@ -131,7 +131,7 @@ export function LocationSelector({
         setLocating(false)
         return
       }
-      // 역지오코딩 — gwangjang.app /api/geocode/reverse (cross-origin / 앱은 직접 호출)
+      // 역지오코딩 — jeonwondiary.vercel.app /api/geocode/reverse (cross-origin / 앱은 직접 호출)
       let resolvedDong: string | null = null
       try {
         const res = await gwangjangFetch(

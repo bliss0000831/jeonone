@@ -55,8 +55,8 @@ function toYouTubeId(raw: string): string | null {
 }
 
 // YouTube iframe HTML — 웹(apps/web/components/youtube-embed.tsx) 과 동일한 전략.
-// nocookie 도메인 + 단순 파라미터 + referrer 가 gwangjang.app 으로 가도록 메타 추가.
-// WebView 의 baseUrl 을 https://gwangjang.app 으로 설정해 Referer 헤더가 gwangjang.app 으로 가게 함.
+// nocookie 도메인 + 단순 파라미터 + referrer 가 jeonwondiary.vercel.app 으로 가도록 메타 추가.
+// WebView 의 baseUrl 을 https://jeonwondiary.vercel.app 으로 설정해 Referer 헤더가 jeonwondiary.vercel.app 으로 가게 함.
 function buildYouTubeHtml(id: string): string {
   const src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&autoplay=1`
   return `<!doctype html>
@@ -118,8 +118,8 @@ export function EmbedModal({ visible, onClose, kind, url }: Props) {
             kind === "youtube"
               ? {
                   html: buildYouTubeHtml(youtubeId as string),
-                  // 웹과 동일한 전략 — Referer 가 gwangjang.app 으로 전송돼야 YouTube 임베드 허용.
-                  baseUrl: "https://gwangjang.app",
+                  // 웹과 동일한 전략 — Referer 가 jeonwondiary.vercel.app 으로 전송돼야 YouTube 임베드 허용.
+                  baseUrl: "https://jeonwondiary.vercel.app",
                 }
               : { uri: instagramUrl as string }
           }

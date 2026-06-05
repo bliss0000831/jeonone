@@ -11,8 +11,9 @@ export default function BumpTicketsScreen() {
   const router = useRouter()
 
   useEffect(() => {
-    const plaza = getCachedPlaza().id || "www"
-    const url = `https://${plaza}.gwangjang.app/bump-tickets`
+    const plaza = getCachedPlaza().id
+    const base = (process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app").replace(/\/$/, "")
+    const url = `${base}/bump-tickets${plaza ? `?plaza=${plaza}` : ""}`
     // replace 로 진입 — 뒤로가기 누르면 이전 화면으로 직행 (webview 중간 단계 X)
     router.replace({
       pathname: "/webview",

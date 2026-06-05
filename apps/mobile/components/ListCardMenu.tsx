@@ -39,7 +39,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { lightColors, spacing } from "@gwangjang/tokens"
 import { useAuth } from "@/lib/auth-context"
 import { getSupabase, gwangjangFetch } from "@/lib/supabase"
-import { getCachedPlaza } from "@/lib/plaza"
+import { getCachedPlaza, buildShareUrl } from "@/lib/plaza"
 import { useHiddenPosts } from "@/lib/hidden-posts"
 import { BumpDialog } from "@/components/BumpDialog"
 
@@ -267,12 +267,11 @@ export function ListCardMenu({
 
   async function handleShare() {
     try {
-      const plaza = getCachedPlaza().id || "www"
       const path = KIND_PATH[kind]
-      const url = `https://${plaza}.gwangjang.app/${path}/${postId}`
+      const url = buildShareUrl(path, postId)
       share.open({ message: title ? `${title}\n${url}` : url,
         url,
-        title: title ?? "광장" })
+        title: title ?? "전원일기" })
     } catch {}
   }
 

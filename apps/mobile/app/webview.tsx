@@ -2,7 +2,7 @@
  * 웹뷰 화면 — RN 으로 아직 마이그레이션 안 된 web 화면 (관리자 페이지 등) 용.
  *
  * 사용:
- *   router.push(`/webview?url=${encodeURIComponent('https://www.gwangjang.app/admin')}&title=관리자`)
+ *   router.push(`/webview?url=${encodeURIComponent('https://jeonwondiary.vercel.app/admin')}&title=관리자`)
  *
  * native (APK): react-native-webview 로 embed
  * web (Expo web): 새 탭 열고 즉시 닫기
@@ -17,12 +17,12 @@ import { lightColors, fontSize } from "@gwangjang/tokens"
 
 // WebView 가 열 수 있는 호스트 화이트리스트 — 외부 phishing 사이트가
 // deep link (jeonwondiary://webview?url=https://evil.com) 로 흘러들지 않도록.
-// 운영 도메인 + 광장 서브도메인 + 토스/카카오 결제 호스트만 허용.
+// 운영 도메인(전원일기) + 토스/카카오 결제 호스트만 허용.
 const ALLOWED_HOSTS = [
-  "gwangjang.app",
-  "www.gwangjang.app",
-  ".gwangjang.app",            // 광장 서브도메인 (chuncheon.gwangjang.app 등)
-  "gwangjang.vercel.app",      // Vercel 기본 도메인
+  "jeonwondiary.vercel.app",   // 운영 도메인 (단일)
+  "jeonwondiary.app",          // 커스텀 도메인 (예정)
+  "www.jeonwondiary.app",
+  ".jeonwondiary.app",         // 향후 서브도메인 대비
   "accounts.kakao.com",
   "kauth.kakao.com",
   "tosspayments.com",
@@ -30,9 +30,9 @@ const ALLOWED_HOSTS = [
   "toss.im",
   ".toss.im",
 ]
-/** Vercel 미리보기 배포: gwangjang-<hash>.vercel.app 만 허용 (임의 .vercel.app 차단) */
-function isGwangjangVercelPreview(host: string): boolean {
-  return host.startsWith("gwangjang-") && host.endsWith(".vercel.app")
+/** Vercel 미리보기 배포: jeonwondiary-<hash>.vercel.app 만 허용 (임의 .vercel.app 차단) */
+function isJeonwonVercelPreview(host: string): boolean {
+  return host.startsWith("jeonwondiary-") && host.endsWith(".vercel.app")
 }
 function isAllowedWebViewUrl(raw: string): boolean {
   try {
@@ -42,7 +42,7 @@ function isAllowedWebViewUrl(raw: string): boolean {
     return (
       ALLOWED_HOSTS.some((h) =>
         h.startsWith(".") ? host.endsWith(h) : host === h,
-      ) || isGwangjangVercelPreview(host)
+      ) || isJeonwonVercelPreview(host)
     )
   } catch {
     return false
@@ -54,7 +54,7 @@ export default function WebViewScreen() {
   const { url, title } = useLocalSearchParams<{ url?: string; title?: string }>()
   const rawUrl = typeof url === "string" ? url : ""
   const targetUrl = isAllowedWebViewUrl(rawUrl) ? rawUrl : ""
-  const headerTitle = typeof title === "string" && title ? title : "광장 웹"
+  const headerTitle = typeof title === "string" && title ? title : "전원일기 웹"
 
   // web 환경: WebView 대신 새 탭 (CORS / iframe 제약 회피)
   useEffect(() => {
