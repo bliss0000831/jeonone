@@ -10,7 +10,7 @@
  *     - 자기소개 (textarea, 5 rows)
  *     - 내 지역 / 서비스 지역 — 강원특별자치도 춘천시 (고정) + 동 선택
  *     - 영업시간 — business 전용
- *     - 전문분야 — agent/interior/moving/cleaning/repair/producer 전용
+ *     - 전문분야 — agent/producer 전용
  *     - 추가 서비스 지역 — 서비스 제공자 전용
  *     - 웹사이트
  *     - 카카오톡 ID
@@ -44,7 +44,7 @@ import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 import { useCurrentPlaza } from "@/lib/plaza"
 import { listPlazaRegions, listChildDongs, type Region } from "@/lib/region-utils"
 
-const SERVICE_TYPES = ["agent", "interior", "moving", "cleaning", "repair"]
+const SERVICE_TYPES = ["agent"]
 
 // 광장별 시/도 prefix — 가입 지역 시/군 앞에 붙는 행정구역 상위.
 const PLAZA_PROVINCE: Record<string, string> = {

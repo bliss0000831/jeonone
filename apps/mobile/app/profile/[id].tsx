@@ -41,7 +41,6 @@ import {
   isUserBlocked,
   listHighlights,
   listMyPosts,
-  listMyProperties,
   listReviews,
   type ProfileHighlight,
   PUBLIC_PROFILE_COLUMNS,
@@ -68,18 +67,9 @@ import type { ListCardKind } from "@/components/ListCardMenu"
 
 // UnifiedPost.kind → ListCardKind 매핑 (snake/short → URL slug)
 const UNIFIED_TO_CARD_KIND: Record<string, ListCardKind> = {
-  property: "properties",
   secondhand: "secondhand",
   sharing: "sharing",
-  group_buying: "group-buying",
-  new_store: "new-store",
   local_food: "local-food",
-  club: "clubs",
-  clubs: "clubs",
-  interior: "interior",
-  moving: "moving",
-  cleaning: "cleaning",
-  repair: "repair",
   jobs: "jobs",
   board: "board",
 }
@@ -120,8 +110,6 @@ export default function PublicProfileScreen() {
   const [activeTab, setActiveTab] = useState<ProfileTabId>("posts")
   const [posts, setPosts] = useState<UnifiedPost[]>([])
   const [postsLoading, setPostsLoading] = useState(false)
-  const [properties, setProperties] = useState<UnifiedPost[]>([])
-  const [propsLoading, setPropsLoading] = useState(false)
 
   const [reviewsOpen, setReviewsOpen] = useState(false)
   const [reviews, setReviews] = useState<ReviewEntry[]>([])
@@ -268,7 +256,6 @@ export default function PublicProfileScreen() {
     setPostsLoading(true)
     try {
       const data = await listMyPosts(supabase, id, {
-        includeProperties: true,
         plazaId: DEFAULT_PLAZA,
       })
       setPosts(data)
@@ -276,28 +263,6 @@ export default function PublicProfileScreen() {
       setPostsLoading(false)
     }
   }, [id, role.type, DEFAULT_PLAZA])
-
-  const loadProperties = useCallback(async () => {
-    if (!id) return
-    const supabase = getSupabase()
-    setPropsLoading(true)
-    try {
-      const raw = await listMyProperties(supabase, id, DEFAULT_PLAZA)
-      const items: UnifiedPost[] = (raw as any[]).map((p) => ({
-        id: String(p.id),
-        kind: "property",
-        kindLabel: "매물",
-        title: p.title || "(제목 없음)",
-        excerpt: p.description || p.district || null,
-        created_at: p.created_at,
-        href: `/property/${p.id}`,
-        image: Array.isArray(p.images) ? p.images[0] ?? null : null,
-      }))
-      setProperties(items)
-    } finally {
-      setPropsLoading(false)
-    }
-  }, [id, DEFAULT_PLAZA])
 
   useEffect(() => {
     if (!id || !activeTab) return

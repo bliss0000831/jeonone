@@ -7,7 +7,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Header } from "@/components/header"
 import { BottomNav } from "@/components/bottom-nav"
-import { ArrowLeft, Loader2, Store, Truck, Banknote, ChevronRight } from "lucide-react"
+import { ArrowLeft, Loader2, Store, Truck, Banknote } from "lucide-react"
 import { User } from "@supabase/supabase-js"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,55 +18,9 @@ import {
   type LocalFoodOrder,
   type LocalFoodOrderItem,
 } from "@/lib/local-food-orders"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 type OrderWithItems = LocalFoodOrder & { items: LocalFoodOrderItem[] }
-type GBOrder = {
-  id: string
-  post_id: string
-  buyer_id: string
-  status: string
-  unit_price: number
-  quantity: number
-  amount: number
-  settlement_amount?: number
-  receive_method: "pickup" | "delivery"
-  delivery_addr: any
-  buyer_memo: string | null
-  tracking_company: string | null
-  tracking_number: string | null
-  created_at: string
-  post?: {
-    id: string
-    title: string
-    product_name: string
-    images: string[] | null
-    min_participants: number
-    current_participants: number
-  } | null
-}
-
-const GB_STATUS_LABEL: Record<string, string> = {
-  pending: "결제 대기",
-  paid: "모집 진행 중",
-  group_confirmed: "모집 성공 (발송 대기)",
-  shipped: "배송 중",
-  confirmed: "구매 확정",
-  refunded: "환불 완료",
-  cancelled: "취소됨",
-  settled: "정산 완료",
-}
-const GB_STATUS_TONE: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  paid: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  group_confirmed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  shipped: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
-  confirmed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  refunded: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  cancelled: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
-  settled: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-}
 
 export default function MySalesPage() {
   const router = useRouter()
@@ -75,8 +29,6 @@ export default function MySalesPage() {
   const [loading, setLoading] = useState(true)
   const [shippingFor, setShippingFor] = useState<string | null>(null)
   const [trackForm, setTrackForm] = useState({ company: "CJ대한통운", number: "" })
-  const [tab, setTab] = useState<"lf" | "gb">("lf")
-  const [gbOrders, setGbOrders] = useState<GBOrder[]>([])
 
   useEffect(() => {
     const init = async () => {
@@ -97,12 +49,10 @@ export default function MySalesPage() {
 
   const reload = async () => {
     setLoading(true)
-    const [lfRes, gbRes] = await Promise.all([
-      fetch("/api/local-food-orders?role=seller", { cache: "no-store" }).then((r) => r.json()).catch(() => ({})),
-      fetch("/api/group-buying-orders?role=seller", { cache: "no-store" }).then((r) => r.json()).catch(() => ({})),
-    ])
+    const lfRes = await fetch("/api/local-food-orders?role=seller", { cache: "no-store" })
+      .then((r) => r.json())
+      .catch(() => ({}))
     setOrders(lfRes?.orders || [])
-    setGbOrders(gbRes?.orders || [])
     setLoading(false)
   }
 
@@ -198,106 +148,6 @@ export default function MySalesPage() {
           </p>
         </Link>
 
-        {/* 탭 — 로컬푸드 / 공동구매 */}
-        <div className="flex items-center gap-2 mb-5 border-b border-border">
-          <button
-            onClick={() => setTab("lf")}
-            className={cn(
-              "px-3 py-2 text-sm font-semibold border-b-2 -mb-px transition-colors",
-              tab === "lf"
-                ? "border-emerald-500 text-emerald-700 dark:text-emerald-400"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            🥬 로컬푸드 <span className="ml-1 text-xs tabular-nums">({orders.length})</span>
-          </button>
-          <button
-            onClick={() => setTab("gb")}
-            className={cn(
-              "px-3 py-2 text-sm font-semibold border-b-2 -mb-px transition-colors",
-              tab === "gb"
-                ? "border-rose-500 text-rose-700 dark:text-rose-400"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            🛒 공동구매 <span className="ml-1 text-xs tabular-nums">({gbOrders.length})</span>
-          </button>
-        </div>
-
-        {/* 공동구매 탭 */}
-        {tab === "gb" && !loading && (
-          gbOrders.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Store className="w-10 h-10 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">아직 주최한 공동구매 주문이 없습니다</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {gbOrders.map((o) => (
-                <div key={o.id} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${GB_STATUS_TONE[o.status] || "bg-gray-100 text-gray-700"}`}>
-                      {GB_STATUS_LABEL[o.status] || o.status}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {new Date(o.created_at).toLocaleString("ko-KR")}
-                    </span>
-                  </div>
-                  {o.post && (
-                    <Link
-                      href={`/group-buying/${o.post_id}`}
-                      className="flex gap-3 hover:bg-secondary/30 -mx-2 px-2 py-1.5 rounded transition-colors mb-3"
-                    >
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                        {o.post.images?.[0] ? (
-                          <Image src={o.post.images[0]} alt="" fill className="object-cover" unoptimized />
-                        ) : null}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium line-clamp-1">
-                          {o.post.product_name || o.post.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {o.unit_price.toLocaleString()}원 × {o.quantity}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground self-center" />
-                    </Link>
-                  )}
-
-                  {/* 받는 사람·주소 (delivery 인 경우) */}
-                  {o.receive_method === "delivery" && o.delivery_addr && (
-                    <div className="text-xs bg-secondary/40 rounded-lg px-3 py-2 mb-3 leading-relaxed">
-                      <p>
-                        <strong>받는 사람</strong> {o.delivery_addr.recipient_name} · {o.delivery_addr.phone}
-                      </p>
-                      <p>
-                        <strong>주소</strong> {o.delivery_addr.addr1} {o.delivery_addr.addr2}
-                      </p>
-                      {o.buyer_memo && (
-                        <p className="mt-1"><strong>메모</strong> {o.buyer_memo}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* 운송장 */}
-                  {o.tracking_number && (
-                    <div className="text-xs bg-indigo-50 dark:bg-indigo-950/30 rounded-lg px-3 py-2 mb-3">
-                      🚚 <strong>{o.tracking_company}</strong> · 운송장{" "}
-                      <span className="font-mono">{o.tracking_number}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-2 border-t border-border text-sm">
-                    <span className="text-muted-foreground">정산 예정액</span>
-                    <strong>{(o.settlement_amount ?? o.amount).toLocaleString()}원</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        )}
-
         {/* 로딩 (공통) */}
         {loading && (
           <div className="flex items-center justify-center py-16">
@@ -305,7 +155,7 @@ export default function MySalesPage() {
           </div>
         )}
 
-        {tab === "lf" && !loading && (
+        {!loading && (
           orders.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <Store className="w-10 h-10 mx-auto mb-3 opacity-50" />

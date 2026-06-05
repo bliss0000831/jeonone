@@ -296,22 +296,11 @@ export default function NotificationsScreen() {
         // ".." 또는 url-encoded traversal 차단
         if (raw.includes("..") || /%2e%2e/i.test(raw)) return
         const ALLOWED_PREFIXES = [
-          "/property/",
           "/secondhand/",
           "/board/",
-          "/clubs/",
-          "/group-buying/",
           "/local-food/",
           "/jobs/",
-          "/interior/",
-          "/moving/",
-          "/cleaning/",
-          "/repair/",
           "/sharing/",
-          "/new-store/",
-          "/services/",
-          "/service-requests/",
-          "/requests/",
           "/profile/",
           "/chat/",
           "/notifications",

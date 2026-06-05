@@ -21,8 +21,7 @@ import { View } from "react-native"
 import { NaverMapView, hasNativeNaverMap } from "@/lib/naver-map-loader"
 import { useCurrentPlaza } from "@/lib/plaza"
 
-// 광장 중심 좌표 (PropertyMapView.PLAZA_CENTER 와 동일 — single source of truth
-// 화 하려면 packages/tokens 등으로 옮길 수 있으나 일단 hardcode 유지)
+// 광장 중심 좌표 — 워밍업용 카메라 초기 위치.
 // TODO: packages/tokens 등으로 옮겨서 single source of truth 로 관리
 const PLAZA_CENTER: Record<string, { lat: number; lng: number; zoom: number }> = {
   chuncheon: { lat: 37.881, lng: 127.73, zoom: 12 },

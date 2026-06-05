@@ -239,8 +239,7 @@ export default function RegisterPage() {
         }
       } else {
         toast.success("등록되었습니다")
-        const propertyId = data.property?.id
-        router.push(propertyId ? `/property/${propertyId}` : "/")
+        router.push("/")
       }
     } catch (err) {
       console.error("Error:", err)

@@ -420,9 +420,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Home className="w-3 h-3" />
             <span>홈</span>
           </Link>
-          <Link href="/properties" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-colors">
+          <Link href="/local-food" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-colors">
             <Store className="w-3 h-3" />
-            <span>매물</span>
+            <span>로컬푸드</span>
           </Link>
           {isSuperAdmin && (
             <Link href="/super-admin" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-colors">
