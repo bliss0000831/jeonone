@@ -268,23 +268,23 @@ export default function LocalFoodCheckoutPage({
             <p className="text-sm text-muted-foreground mt-1">
               {post.price.toLocaleString()}원{post.unit ? ` / ${post.unit}` : ""}
             </p>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-3 mt-2">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-7 h-7 rounded border border-border flex items-center justify-center hover:bg-secondary"
+                className="w-11 h-11 rounded-lg border border-border flex items-center justify-center hover:bg-secondary active:scale-95"
                 aria-label="수량 감소"
               >
-                <Minus className="w-3.5 h-3.5" />
+                <Minus className="w-5 h-5" />
               </button>
-              <span className="text-sm font-medium w-6 text-center">{quantity}</span>
+              <span className="text-lg font-bold w-8 text-center">{quantity}</span>
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(99, q + 1))}
-                className="w-7 h-7 rounded border border-border flex items-center justify-center hover:bg-secondary"
+                className="w-11 h-11 rounded-lg border border-border flex items-center justify-center hover:bg-secondary active:scale-95"
                 aria-label="수량 증가"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -500,12 +500,12 @@ export default function LocalFoodCheckoutPage({
         </div>
 
         {/* H7: 구매 동의 */}
-        <label className="flex items-start gap-2.5 mb-5 cursor-pointer select-none">
+        <label className="flex items-start gap-3 mb-5 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={agreedPurchase}
             onChange={(e) => setAgreedPurchase(e.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-border accent-primary"
+            className="mt-0.5 w-6 h-6 rounded border-border accent-primary flex-shrink-0"
           />
           <span className="text-sm leading-relaxed text-muted-foreground">
             주문 내용을 확인하였으며,{" "}

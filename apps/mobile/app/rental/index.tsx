@@ -1,6 +1,6 @@
 /** 농기구 대여 — 목록 (RN). 웹 /rental 과 동일. */
 import { useState, useCallback } from "react"
-import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from "react-native"
+import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, RefreshControl } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter, useFocusEffect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
@@ -22,20 +22,30 @@ export default function RentalListScreen() {
   const plaza = useCurrentPlazaState()
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true)
+    setLoadError(false)
     try {
       let q = (getSupabase() as any)
         .from("rental_listings")
         .select("id, daily_price, deposit, post:secondhand_posts(title, images, location)")
         .order("created_at", { ascending: false }).limit(60)
       if (plaza.id) q = q.eq("plaza_id", plaza.id)
-      const { data } = await q
+      const { data, error } = await q
+      if (error) throw error
       setItems((data as any[]) || [])
-    } catch { setItems([]) }
+    } catch { setLoadError(true) }
     setLoading(false)
   }, [plaza.id])
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await load(true)
+    setRefreshing(false)
+  }, [load])
 
   useFocusEffect(useCallback(() => { load() }, [load]))
 
@@ -49,7 +59,10 @@ export default function RentalListScreen() {
           <Text style={styles.manageText}>예약 관리</Text>
         </Pressable>
       </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 32 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GREEN} colors={[GREEN]} />}
+      >
         <ImageBackground source={IMG} style={styles.hero}>
           <LinearGradient colors={["rgba(0,0,0,0.45)", "rgba(0,0,0,0.6)"]} style={styles.heroOverlay}>
             <Ionicons name="construct" size={40} color="#fff" />
@@ -59,8 +72,14 @@ export default function RentalListScreen() {
         </ImageBackground>
         <View style={{ padding: 16 }}>
           <Text style={styles.section}>대여 가능한 농기구</Text>
-          {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : items.length === 0 ? (
-            <View style={styles.empty}><Ionicons name="construct-outline" size={48} color="#cbd5e1" /><Text style={styles.emptyText}>대여 상품이 없습니다</Text></View>
+          {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : loadError ? (
+            <View style={styles.empty}>
+              <Ionicons name="cloud-offline-outline" size={48} color="#cbd5e1" />
+              <Text style={styles.emptyText}>대여 정보를 불러오지 못했어요</Text>
+              <Pressable onPress={() => load()} style={styles.retryBtn}><Text style={styles.retryText}>다시 시도</Text></Pressable>
+            </View>
+          ) : items.length === 0 ? (
+            <View style={styles.empty}><Ionicons name="construct-outline" size={48} color="#cbd5e1" /><Text style={styles.emptyText}>대여 상품이 없어요</Text></View>
           ) : (
             <View style={{ gap: 12 }}>
               {items.map((r) => (
@@ -95,6 +114,8 @@ const styles = StyleSheet.create({
   section: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 12 },
   empty: { alignItems: "center", paddingVertical: 48, gap: 8 },
   emptyText: { color: "#94a3b8", fontSize: 15, fontWeight: "600" },
+  retryBtn: { marginTop: 12, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: GREEN },
+  retryText: { color: "#fff", fontSize: 14, fontWeight: "800" },
   card: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#eee" },
   cardImg: { width: 110, height: 110 },
   badge: { flexDirection: "row", alignItems: "center", gap: 3, alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, marginBottom: 4 },

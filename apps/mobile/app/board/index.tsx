@@ -901,9 +901,9 @@ function makeStyles(colors: any) {
   } as any,
   chipTextActive: { color: "#ffffff", fontWeight: "700" },
 
-  // 지역 chips wrap — 고정 height (chip 28 + 6*2 = 40)
+  // 지역 chips wrap — 고정 height (chip 36 + 6*2 = 48)
   chipRowSmallWrap: {
-    height: 40,
+    height: 48,
     backgroundColor: colors.background,
   },
   chipRowSmall: {
@@ -913,9 +913,9 @@ function makeStyles(colors: any) {
     alignItems: "center",
   },
   chipSmall: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 0,
-    height: 28,
+    height: 36,
     borderRadius: 999,
     backgroundColor: "#ffffff",
     borderWidth: 1, borderColor: colors.border,
