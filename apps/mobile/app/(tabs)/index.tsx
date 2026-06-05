@@ -61,13 +61,13 @@ export default function HomeTab() {
         <View style={styles.brandRow}>
           <Image source={IMG.logo} style={styles.brandLogo} contentFit="cover" />
           <Text style={styles.brand} numberOfLines={1}>{plaza.name}</Text>
-        </View>
-        <View style={styles.topRight}>
           <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
             <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
             <Text style={styles.locText} numberOfLines={1}>{region}</Text>
             <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
           </Pressable>
+        </View>
+        <View style={styles.topRight}>
           {user ? (
             <Pressable style={styles.iconBtn} onPress={() => router.push("/(tabs)/mypage-profile" as any)} hitSlop={6}>
               <Ionicons name="person-circle-outline" size={26} color={GREEN_DARK} />
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   brand: { fontSize: 16, fontWeight: "900", color: GREEN_DARK, flexShrink: 1 },
   topRight: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 },
   // 속초 칩 = 로그인 버튼: 동일 paddingVertical(9) 로 높이 일치 (고정 height 대신 — RN Web 호환)
-  locChip: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9, maxWidth: 130 },
+  locChip: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 9, maxWidth: 120, flexShrink: 0 },
   locText: { fontSize: 13, fontWeight: "700", color: GREEN_DARK, flexShrink: 1 },
   iconBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
