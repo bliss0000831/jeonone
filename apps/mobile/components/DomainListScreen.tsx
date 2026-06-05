@@ -719,8 +719,20 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
             </View>
           ) : (
             <View style={styles.empty}>
-              <Ionicons name={config.heroIcon} size={32} color={lightColors.ink500} />
-              <Text style={styles.emptyText}>등록된 게시물이 없습니다</Text>
+              <View style={[styles.emptyIcon, { backgroundColor: config.heroColor + "1A" }]}>
+                <Ionicons name={config.heroIcon} size={40} color={config.heroColor} />
+              </View>
+              <Text style={styles.emptyTitle}>아직 {config.title} 글이 없어요</Text>
+              <Text style={styles.emptySub}>우리 동네 첫 이웃이 되어{"\n"}글을 올려보세요!</Text>
+              {config.registerPath && canRegister ? (
+                <Pressable
+                  style={[styles.emptyCta, { backgroundColor: config.heroColor }]}
+                  onPress={() => router.push(config.registerPath as any)}
+                >
+                  <Ionicons name="add-circle" size={22} color="#fff" />
+                  <Text style={styles.emptyCtaText}>첫 글 올리기</Text>
+                </Pressable>
+              ) : null}
             </View>
           )
         }
@@ -1222,8 +1234,13 @@ function makeStyles(colors: any) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   center: { padding: spacing[8], alignItems: "center" },
-  empty: { paddingVertical: 40, paddingHorizontal: spacing[6], alignItems: "center", gap: 8 },
+  empty: { paddingVertical: 48, paddingHorizontal: spacing[6], alignItems: "center", gap: 6 },
   emptyText: { color: colors.ink500, fontSize: fontSize.sm },
+  emptyIcon: { width: 80, height: 80, borderRadius: 40, alignItems: "center", justifyContent: "center", marginBottom: 6 },
+  emptyTitle: { color: colors.ink900, fontSize: fontSize.lg, fontWeight: "800", textAlign: "center" },
+  emptySub: { color: colors.ink500, fontSize: fontSize.md, textAlign: "center", lineHeight: 22, marginTop: 2 },
+  emptyCta: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 22, paddingVertical: 13, borderRadius: 999, marginTop: 16 },
+  emptyCtaText: { color: "#fff", fontSize: fontSize.md, fontWeight: "800" },
   loadMoreSpinner: { paddingVertical: spacing[4], alignItems: "center" },
 
   header: {

@@ -115,8 +115,16 @@ function JobsContent() {
           <div className="py-20 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
-            <Users className="w-16 h-16 mx-auto text-muted-foreground mb-3" />
-            <p className="text-lg text-muted-foreground">등록된 일손 정보가 없습니다</p>
+            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Users className="w-10 h-10 text-primary" />
+            </div>
+            <p className="text-xl font-bold text-foreground">아직 등록된 일손 글이 없어요</p>
+            <p className="text-base text-muted-foreground mt-1">우리 동네 첫 이웃이 되어 올려보세요!</p>
+            {user && (
+              <Link href="/jobs/register" className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-6 py-3 text-base">
+                <Plus className="w-5 h-5" /> 첫 일손 글 올리기
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

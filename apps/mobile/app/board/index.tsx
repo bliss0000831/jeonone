@@ -669,8 +669,17 @@ export default function BoardListScreen() {
             </View>
           ) : (
             <View style={styles.empty}>
-              <Ionicons name="chatbubbles-outline" size={32} color={lightColors.ink500} />
-              <Text style={styles.emptyText}>게시글이 없습니다</Text>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="chatbubbles-outline" size={40} color={lightColors.primary} />
+              </View>
+              <Text style={styles.emptyTitle}>아직 마을 소식이 없어요</Text>
+              <Text style={styles.emptySub}>첫 이웃이 되어{"\n"}우리 동네 이야기를 남겨보세요!</Text>
+              {user ? (
+                <Pressable style={styles.emptyCta} onPress={() => router.push("/board/create" as any)}>
+                  <Ionicons name="add-circle" size={22} color="#fff" />
+                  <Text style={styles.emptyCtaText}>첫 글 쓰기</Text>
+                </Pressable>
+              ) : null}
             </View>
           )
         }
@@ -924,8 +933,13 @@ function makeStyles(colors: any) {
   chipSmallTextActive: { color: colors.primary, fontWeight: "700" },
 
   center: { paddingVertical: 60, alignItems: "center" },
-  empty: { paddingVertical: 60, alignItems: "center", gap: 8 },
+  empty: { paddingVertical: 56, alignItems: "center", gap: 6 },
   emptyText: { fontSize: 13, color: colors.ink500 },
+  emptyIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary + "1A", alignItems: "center", justifyContent: "center", marginBottom: 6 },
+  emptyTitle: { fontSize: 18, fontWeight: "800", color: colors.ink900, textAlign: "center" },
+  emptySub: { fontSize: 14, color: colors.ink500, textAlign: "center", lineHeight: 21, marginTop: 2 },
+  emptyCta: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.primary, paddingHorizontal: 22, paddingVertical: 13, borderRadius: 999, marginTop: 16 },
+  emptyCtaText: { color: "#fff", fontSize: 15, fontWeight: "800" },
 
   postRow: {
     flexDirection: "row",
