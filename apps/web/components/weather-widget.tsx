@@ -62,16 +62,20 @@ export function WeatherWidget() {
     fetch(`/api/weather?region=${encodeURIComponent(selectedRegion)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (!alive || !d) return
+        if (!alive || !d || !d.ok) return
+        // API 응답 구조: { ok, location, current:{temp,humidity,windSpeed}, forecast:[{min,max,rainProb,text}] }
+        const cur = d.current ?? {}
+        const today = Array.isArray(d.forecast) ? d.forecast[0] : null
+        const tmrw = Array.isArray(d.forecast) ? d.forecast[1] : null
+        const num = (v: any, fb: number) => (typeof v === "number" && !Number.isNaN(v) ? v : fb)
         const w: WeatherData = {
-          ...fallback,
-          temp: d.temp ?? d.temperature ?? d.tmp ?? fallback.temp,
-          condition: d.condition ?? d.sky ?? d.weather ?? fallback.condition,
-          humidity: d.humidity ?? d.reh ?? fallback.humidity,
-          minTemp: d.minTemp ?? d.tmn ?? fallback.minTemp,
-          maxTemp: d.maxTemp ?? d.tmx ?? fallback.maxTemp,
-          rainProbability: d.rainProbability ?? d.pop ?? fallback.rainProbability,
-          windSpeed: d.windSpeed ?? d.wsd ?? fallback.windSpeed,
+          temp: num(cur.temp, num(today?.max, fallback.temp)),
+          humidity: num(cur.humidity, fallback.humidity),
+          windSpeed: num(cur.windSpeed, fallback.windSpeed),
+          condition: today?.text && today.text !== "-" ? today.text : fallback.condition,
+          minTemp: num(tmrw?.min, num(today?.min, fallback.minTemp)),
+          maxTemp: num(today?.max, fallback.maxTemp),
+          rainProbability: num(today?.rainProb, fallback.rainProbability),
         }
         setWeather(w)
         setFarmingTips(generateFarmingTips(w))

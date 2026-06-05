@@ -208,7 +208,7 @@ export default function SearchTab() {
 
   const isEmpty = !q
   const totalCount =
-    counts.board + counts.sharing + counts.local_food + counts.profiles
+    counts.secondhand + counts.local_food + counts.sharing + counts.jobs + counts.board + counts.profiles
 
   const handleHitPress = useCallback((hit: SearchHit) => {
     // 모든 도메인이 RN 라우트로 마이그레이션 완료.

@@ -325,7 +325,7 @@ function SearchPageInner() {
 
   const isEmptyState = !q
   const totalCount =
-    counts.board + counts.sharing + counts.local_food + counts.profiles
+    counts.secondhand + counts.local_food + counts.sharing + counts.jobs + counts.board + counts.profiles
 
   return (
     <div className="min-h-screen bg-[#f7f6f0] pb-20">
