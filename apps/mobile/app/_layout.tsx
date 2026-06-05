@@ -203,6 +203,9 @@ function RootLayoutNav() {
   // 매번 ActivityIndicator 200~500ms 보는 것보다 ROI 가 큼.
   const [maintenance, setMaintenance] = useState<boolean>(false)
 
+  // 앱 cold start 때 1회만 허브(지역 선택)로 보내기 위한 가드
+  const didColdStartRef = useRef(false)
+
   // H13: Android 뒤로가기 — 홈 탭에서 뒤로가면 2번 탭 시 종료, 그 외엔 뒤로 이동
   const backPressRef = useRef(false)
   useEffect(() => {
@@ -326,6 +329,19 @@ function RootLayoutNav() {
   // 자동 로그인 강제 redirect 는 제거 (web 처럼 비로그인 브라우징 허용).
   useEffect(() => {
     if (loading) return
+
+    // 앱 첫 진입(cold start): 항상 허브(지역 선택) 화면으로.
+    // 단, 로그인 흐름/딥링크(특정 화면 직접 진입)는 예외.
+    if (!didColdStartRef.current) {
+      didColdStartRef.current = true
+      const onAuthCold = segments[0] === "auth"
+      const isLandingRoute = !segments[0] || segments[0] === "(tabs)"
+      if (!onAuthCold && isLandingRoute) {
+        router.replace("/hub")
+        return
+      }
+    }
+
     let cancelled = false
     const cleanupTimers: ReturnType<typeof setTimeout>[] = []
     ;(async () => {
