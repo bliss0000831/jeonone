@@ -31,7 +31,7 @@ interface FarmHomeProps {
 
 const LOCATION_STORAGE_KEY = "user-location"
 
-export function FarmHome({ user, userRole, userAccountType, plazaName }: FarmHomeProps) {
+export function FarmHome({ user, userRole, userAccountType, plazaName, notices = [] }: FarmHomeProps) {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export function FarmHome({ user, userRole, userAccountType, plazaName }: FarmHom
           <div className="relative z-10"><MainNavButtons /></div>
           {/* 소통과 나눔 · 정보와 혜택 */}
           <div className="relative z-10 max-w-4xl mx-auto w-full px-4 mb-8"><BoardNavButtons /></div>
-          <div className="relative z-10"><NoticeSection /></div>
+          <div className="relative z-10"><NoticeSection notices={notices} /></div>
         </main>
 
         <BottomNav />

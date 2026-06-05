@@ -1,43 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { Megaphone, BookOpen, Sprout, Calendar } from "lucide-react"
+import { Megaphone, Sprout } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useRegion } from "@/lib/region-context"
+import type { NoticeItem } from "@/components/farm-home"
 
-const noticesByRegion: Record<string, Array<{ id: number; type: string; title: string; date: string; isNew: boolean }>> = {
-  "홍천군": [
-    { id: 1, type: "공지", title: "홍천군 농업인 수당 신청 안내", date: "2026.04.15", isNew: true },
-    { id: 2, type: "지원금", title: "홍천군 친환경농업 직접지불금 신청", date: "2026.04.14", isNew: true },
-    { id: 3, type: "교육", title: "홍천 스마트팜 교육 수강생 모집", date: "2026.04.12", isNew: false },
-  ],
-  "춘천시": [
-    { id: 1, type: "공지", title: "춘천시 농기계 임대사업소 운영 안내", date: "2026.04.15", isNew: true },
-    { id: 2, type: "지원금", title: "춘천시 청년농업인 정착지원금 신청", date: "2026.04.14", isNew: true },
-    { id: 3, type: "교육", title: "춘천 도시농업 교육 프로그램", date: "2026.04.11", isNew: false },
-  ],
-  "원주시": [
-    { id: 1, type: "공지", title: "원주시 로컬푸드 직매장 입점 안내", date: "2026.04.15", isNew: true },
-    { id: 2, type: "지원금", title: "원주시 농업인 면세유 신청 기간", date: "2026.04.13", isNew: true },
-    { id: 3, type: "교육", title: "원주 유기농 인증 교육 안내", date: "2026.04.10", isNew: false },
-  ],
-  "강릉시": [
-    { id: 1, type: "공지", title: "강릉시 해양수산 축제 참가 농가 모집", date: "2026.04.15", isNew: true },
-    { id: 2, type: "지원금", title: "강릉시 농어촌민박 지원사업 신청", date: "2026.04.14", isNew: true },
-    { id: 3, type: "교육", title: "강릉 커피농장 체험 프로그램", date: "2026.04.12", isNew: false },
-  ],
-}
-
-const farmDiary = [
-  { id: 1, icon: Sprout, title: "감자 심기 적기", description: "이번 주가 감자 파종 최적기입니다. 토양 온도 10도 이상 확인하세요." },
-  { id: 2, icon: Calendar, title: "4월 농사 일정", description: "고추 모종 정식, 마늘 웃거름, 사과나무 적과 작업" },
-  { id: 3, icon: BookOpen, title: "이번 달 교육", description: "4/20 스마트팜 기초반, 4/25 친환경 인증 교육" },
+const farmTips = [
+  { id: 1, title: "흙 살리기", description: "퇴비와 유기물을 꾸준히 넣어 땅심을 키워 주세요." },
+  { id: 2, title: "물 주기", description: "한낮은 피하고 아침이나 해질녘에 충분히 주는 게 좋아요." },
+  { id: 3, title: "병해충 살피기", description: "잎의 앞뒤를 자주 들여다보면 일찍 발견할 수 있어요." },
 ]
 
-export function NoticeSection() {
+export function NoticeSection({ notices = [] }: { notices?: NoticeItem[] }) {
   const { selectedRegion } = useRegion()
-  const notices = noticesByRegion[selectedRegion] || noticesByRegion["홍천군"]
 
   return (
     <section className="py-8 px-4 bg-muted/50 overflow-hidden">
@@ -50,16 +27,28 @@ export function NoticeSection() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 md:space-y-3 px-4 md:px-6">
-            {notices.map((notice) => (
-              <div key={notice.id} className="flex items-start gap-2 md:gap-3 p-2 md:p-3 rounded-xl bg-background hover:bg-primary/5 cursor-pointer transition-colors">
-                <Badge variant={notice.type === "공지" ? "default" : "secondary"} className="text-xs md:text-sm font-bold shrink-0">{notice.type}</Badge>
-                <div className="flex-1 min-w-0 overflow-hidden">
-                  <p className="text-sm md:text-lg font-semibold text-foreground truncate">{notice.title}</p>
-                  <p className="text-xs md:text-base text-muted-foreground">{notice.date}</p>
-                </div>
-                {notice.isNew && <Badge variant="destructive" className="shrink-0 text-xs">NEW</Badge>}
-              </div>
-            ))}
+            {notices.length === 0 ? (
+              <div className="py-6 text-center text-sm md:text-lg text-muted-foreground">아직 등록된 공지가 없어요.</div>
+            ) : (
+              notices.map((notice) => (
+                <Link
+                  key={notice.id}
+                  href="/notice"
+                  className="flex items-start gap-2 md:gap-3 p-2 md:p-3 rounded-xl bg-background hover:bg-primary/5 cursor-pointer transition-colors"
+                >
+                  {notice.category && (
+                    <Badge variant="secondary" className="text-xs md:text-sm font-bold shrink-0">{notice.category}</Badge>
+                  )}
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="text-sm md:text-lg font-semibold text-foreground truncate">{notice.title}</p>
+                    {notice.created_at && (
+                      <p className="text-xs md:text-base text-muted-foreground">{new Date(notice.created_at).toLocaleDateString("ko-KR")}</p>
+                    )}
+                  </div>
+                  {notice.is_new && <Badge variant="destructive" className="shrink-0 text-xs">NEW</Badge>}
+                </Link>
+              ))
+            )}
             <Link href="/notice" className="block w-full py-2 md:py-3 text-center text-base md:text-lg font-bold text-primary hover:underline">더보기 →</Link>
           </CardContent>
         </Card>
@@ -68,19 +57,16 @@ export function NoticeSection() {
           <CardHeader className="pb-3 px-4 md:px-6">
             <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-foreground">
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0"><Sprout className="w-4 h-4 md:w-6 md:h-6 text-secondary" /></div>
-              <span className="truncate">오늘의 농사 일지</span>
+              <span className="truncate">농사 꿀팁</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 md:space-y-4 px-4 md:px-6">
-            {farmDiary.map((item) => {
-              const Icon = item.icon
-              return (
-                <div key={item.id} className="p-3 md:p-4 rounded-xl bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-colors">
-                  <div className="flex items-center gap-2 mb-1 md:mb-2"><Icon className="w-4 h-4 md:w-5 md:h-5 text-secondary flex-shrink-0" /><p className="text-sm md:text-lg font-bold text-secondary truncate">{item.title}</p></div>
-                  <p className="text-xs md:text-base text-foreground line-clamp-2">{item.description}</p>
-                </div>
-              )
-            })}
+            {farmTips.map((item) => (
+              <div key={item.id} className="p-3 md:p-4 rounded-xl bg-secondary/5">
+                <div className="flex items-center gap-2 mb-1 md:mb-2"><Sprout className="w-4 h-4 md:w-5 md:h-5 text-secondary flex-shrink-0" /><p className="text-sm md:text-lg font-bold text-secondary truncate">{item.title}</p></div>
+                <p className="text-xs md:text-base text-foreground line-clamp-2">{item.description}</p>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>

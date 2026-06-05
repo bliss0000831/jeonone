@@ -5,7 +5,7 @@
  * 전원 소식통 배너, 공지사항·오늘의 농사 일지.
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, ScrollView, Pressable, StyleSheet, Alert, TextInput } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter } from "expo-router"
@@ -16,6 +16,7 @@ import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
 import PlazaSelector from "@/components/PlazaSelector"
 import { HamburgerMenu } from "@/components/HamburgerMenu"
 import { useAuth } from "@/lib/auth-context"
+import { getSupabase, gwangjangFetch } from "@/lib/supabase"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1c4e31"
@@ -31,15 +32,10 @@ const IMG = {
   news: require("../../assets/images/banner-news.jpg"),
 }
 
-const NOTICES = [
-  { type: "공지", title: "홍천군 농업인 수당 신청 안내", date: "2026.04.15", isNew: true },
-  { type: "지원금", title: "홍천군 친환경농업 직접지불금 신청", date: "2026.04.14", isNew: true },
-  { type: "교육", title: "홍천 스마트팜 교육 수강생 모집", date: "2026.04.12", isNew: false },
-]
 const DIARY = [
-  { icon: "leaf" as const, title: "감자 심기 적기", desc: "이번 주가 감자 파종 최적기입니다. 토양 온도 10도 이상 확인하세요." },
-  { icon: "calendar" as const, title: "4월 농사 일정", desc: "고추 모종 정식, 마늘 웃거름, 사과나무 적과 작업" },
-  { icon: "book" as const, title: "이번 달 교육", desc: "4/20 스마트팜 기초반, 4/25 친환경 인증 교육" },
+  { icon: "leaf" as const, title: "흙 살리기", desc: "퇴비·유기물을 꾸준히 넣으면 땅심이 좋아져요." },
+  { icon: "rainy" as const, title: "물 주기", desc: "아침 일찍이나 해 질 무렵에 주면 물이 덜 마릅니다." },
+  { icon: "book" as const, title: "병해충 살피기", desc: "잎 앞뒤를 자주 살펴 일찍 발견하면 피해가 적어요." },
 ]
 
 export default function HomeTab() {
@@ -50,6 +46,60 @@ export default function HomeTab() {
   const [q, setQ] = useState("")
   const [plazaSelectorOpen, setPlazaSelectorOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [weather, setWeather] = useState<{ temp: number; condition: string; humidity: number } | null>(null)
+  const [notices, setNotices] = useState<{ id: string; title: string; date: string; isNew: boolean }[]>([])
+
+  // 날씨 — 실데이터 시도, 실패 시 숨김 (가짜 표시 금지)
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const r = await gwangjangFetch("/api/weather?region=" + encodeURIComponent(region))
+        if (!r.ok) return
+        const d = await r.json()
+        if (cancelled || !d?.ok) return
+        const temp = d.current?.temp
+        const condition = d.forecast?.[0]?.text
+        const humidity = d.current?.humidity
+        if (typeof temp === "number" && typeof condition === "string" && condition && typeof humidity === "number") {
+          setWeather({ temp, condition, humidity })
+        }
+      } catch {
+        // 실패/CORS — 가짜 값 넣지 않고 숨김
+      }
+    })()
+    return () => { cancelled = true }
+  }, [region])
+
+  // 공지 — supabase notices 실데이터
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data, error } = await getSupabase()
+          .from("notices")
+          .select("id, title, created_at, is_pinned")
+          .eq("is_published", true)
+          .eq("plaza_id", plaza.id)
+          .order("is_pinned", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(5)
+        if (cancelled || error || !data) return
+        setNotices(
+          data.map((n: any) => ({
+            id: String(n.id),
+            title: n.title,
+            date: n.created_at ? new Date(n.created_at).toLocaleDateString("ko-KR") : "",
+            isNew: n.created_at ? Date.now() - new Date(n.created_at).getTime() < 14 * 24 * 60 * 60 * 1000 : false,
+          })),
+        )
+      } catch {
+        if (!cancelled) setNotices([])
+      }
+    })()
+    return () => { cancelled = true }
+  }, [plaza.id])
+
   const go = (p: string) => () => router.push(p as any)
   const comingSoon = () => Alert.alert("준비 중", "곧 열립니다. 조금만 기다려 주세요!")
   const search = () => { if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}` as any) }
@@ -101,21 +151,19 @@ export default function HomeTab() {
             <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
           </View>
 
-          {/* 날씨 */}
-          <View style={styles.weatherRow}>
-            <View style={styles.weatherChip}>
-              <Ionicons name="sunny" size={15} color="#f59e0b" />
-              <Text style={styles.weatherText}>{region}</Text>
-              <Text style={[styles.weatherText, { color: GREEN, fontWeight: "800" }]}>28°</Text>
-              <Text style={styles.weatherMuted}>맑음</Text>
-              <Ionicons name="water-outline" size={13} color="#64748b" />
-              <Text style={styles.weatherMuted}>45%</Text>
+          {/* 날씨 — 실데이터가 있을 때만 표시 (없으면 행 자체를 렌더하지 않음) */}
+          {weather && (
+            <View style={styles.weatherRow}>
+              <View style={styles.weatherChip}>
+                <Ionicons name="sunny" size={15} color="#f59e0b" />
+                <Text style={styles.weatherText}>{region}</Text>
+                <Text style={[styles.weatherText, { color: GREEN, fontWeight: "800" }]}>{weather.temp}°</Text>
+                <Text style={styles.weatherMuted}>{weather.condition}</Text>
+                <Ionicons name="water-outline" size={13} color="#64748b" />
+                <Text style={styles.weatherMuted}>{weather.humidity}%</Text>
+              </View>
             </View>
-            <View style={[styles.weatherChip, { backgroundColor: "#dcfce7" }]}>
-              <Ionicons name="leaf" size={14} color={GREEN_DARK} />
-              <Text style={[styles.weatherText, { color: GREEN_DARK }]}>하우스 환기 좋은 날</Text>
-            </View>
-          </View>
+          )}
 
           {/* 검색 */}
           <View style={styles.search}>
@@ -178,26 +226,30 @@ export default function HomeTab() {
             <View style={styles.cardHeadIcon}><Ionicons name="megaphone" size={16} color={GREEN} /></View>
             <Text style={styles.cardTitle}>{region} 공지사항</Text>
           </View>
-          {NOTICES.map((n, i) => (
-            <View key={i} style={styles.noticeRow}>
-              <View style={[styles.tag, { backgroundColor: n.type === "공지" ? GREEN_DARK : n.type === "지원금" ? "#b45309" : "#a16207" }]}>
-                <Text style={styles.tagText}>{n.type}</Text>
+          {notices.length === 0 ? (
+            <Text style={styles.emptyNotice}>아직 등록된 공지가 없어요</Text>
+          ) : (
+            notices.map((n) => (
+              <View key={n.id} style={styles.noticeRow}>
+                <View style={[styles.tag, { backgroundColor: GREEN_DARK }]}>
+                  <Text style={styles.tagText}>공지</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.noticeTitle} numberOfLines={1}>{n.title}</Text>
+                  <Text style={styles.noticeDate}>{n.date}</Text>
+                </View>
+                {n.isNew && <Text style={styles.newBadge}>NEW</Text>}
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.noticeTitle} numberOfLines={1}>{n.title}</Text>
-                <Text style={styles.noticeDate}>{n.date}</Text>
-              </View>
-              {n.isNew && <Text style={styles.newBadge}>NEW</Text>}
-            </View>
-          ))}
+            ))
+          )}
           <Pressable onPress={go("/notice")}><Text style={styles.more}>더보기 →</Text></Pressable>
         </View>
 
-        {/* 오늘의 농사 일지 */}
+        {/* 농사 꿀팁 */}
         <View style={[styles.card, { borderColor: "rgba(138,109,59,0.25)" }]}>
           <View style={styles.cardHead}>
             <View style={[styles.cardHeadIcon, { backgroundColor: "rgba(138,109,59,0.12)" }]}><Ionicons name="leaf" size={16} color={BROWN} /></View>
-            <Text style={styles.cardTitle}>오늘의 농사 일지</Text>
+            <Text style={styles.cardTitle}>농사 꿀팁</Text>
           </View>
           {DIARY.map((d, i) => (
             <View key={i} style={styles.diary}>
@@ -339,6 +391,7 @@ const styles = StyleSheet.create({
   noticeTitle: { fontSize: 15, fontWeight: "600", color: "#1e293b" },
   noticeDate: { fontSize: 12, color: "#94a3b8", marginTop: 2 },
   newBadge: { color: "#dc2626", fontSize: 10, fontWeight: "800" },
+  emptyNotice: { textAlign: "center", fontSize: 14, color: "#94a3b8", paddingVertical: 12 },
   more: { textAlign: "center", color: GREEN, fontWeight: "800", marginTop: 8, fontSize: 15 },
 
   diary: { backgroundColor: "rgba(138,109,59,0.06)", borderRadius: 12, padding: 13, marginTop: 8 },

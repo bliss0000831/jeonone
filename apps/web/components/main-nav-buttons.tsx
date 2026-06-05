@@ -13,10 +13,10 @@ const mainMenus = [
 ]
 
 const newsBannerItems = [
-  { icon: Megaphone, label: "지역 공지", desc: "농업인 수당 신청 안내" },
-  { icon: Cloud, label: "내일 날씨", desc: "맑음 · 최고 22°C" },
-  { icon: Sprout, label: "농사 달력", desc: "감자 심기 적기" },
-  { icon: HandCoins, label: "지원금 정보", desc: "농기계 구입 지원 50%" },
+  { icon: Megaphone, label: "지역 공지", desc: "마을 게시판에서 확인" },
+  { icon: Cloud, label: "오늘 날씨", desc: "홈 상단에서 확인" },
+  { icon: Sprout, label: "농사 달력", desc: "제철 작물 정보" },
+  { icon: HandCoins, label: "지원금 정보", desc: "농업 지원 안내" },
 ]
 
 export function MainNavButtons() {
