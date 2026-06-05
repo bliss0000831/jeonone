@@ -21,16 +21,18 @@ import { lightColors, fontSize, radius } from "@gwangjang/tokens"
 export type CounterKind = "posts" | "followers" | "following" | "trust"
 
 interface Props {
+  posts?: number
   followers: number
-  following: number
+  following?: number
   trustScore?: number | null
   reviewCount?: number | null
   onClick?: (kind: CounterKind) => void
 }
 
+// 어르신용: SNS식 팔로워/팔로잉 대신 "올린 글 · 이웃 · 받은 후기" 로 구성.
 export function ProfileCounters({
+  posts,
   followers,
-  following,
   trustScore,
   reviewCount,
   onClick,
@@ -43,29 +45,29 @@ export function ProfileCounters({
 
   return (
     <View style={styles.wrap}>
-      {/* 팔로워 */}
+      {/* 올린 글 */}
+      <Pressable
+        onPress={() => onClick?.("posts")}
+        style={({ pressed }) => [styles.cell, pressed && styles.cellPressed]}
+      >
+        <Text style={styles.value}>{formatCount(posts ?? 0)}</Text>
+        <Text style={styles.label}>올린 글</Text>
+      </Pressable>
+
+      <View style={styles.divider} />
+
+      {/* 이웃 (팔로워) */}
       <Pressable
         onPress={() => onClick?.("followers")}
         style={({ pressed }) => [styles.cell, pressed && styles.cellPressed]}
       >
         <Text style={styles.value}>{formatCount(followers)}</Text>
-        <Text style={styles.label}>팔로워</Text>
+        <Text style={styles.label}>이웃</Text>
       </Pressable>
 
       <View style={styles.divider} />
 
-      {/* 팔로잉 */}
-      <Pressable
-        onPress={() => onClick?.("following")}
-        style={({ pressed }) => [styles.cell, pressed && styles.cellPressed]}
-      >
-        <Text style={styles.value}>{formatCount(following)}</Text>
-        <Text style={styles.label}>팔로잉</Text>
-      </Pressable>
-
-      <View style={styles.divider} />
-
-      {/* 이웃 별 */}
+      {/* 받은 후기 (별점) */}
       <Pressable
         onPress={() => onClick?.("trust")}
         style={({ pressed }) => [
@@ -77,7 +79,7 @@ export function ProfileCounters({
         <View style={styles.starRow}>
           <Ionicons
             name={validScore != null ? "star" : "star-outline"}
-            size={14}
+            size={16}
             color={validScore != null ? "#fbbf24" : "rgba(217,119,6,0.6)"}
             style={{ marginRight: 2 }}
           />
@@ -86,7 +88,7 @@ export function ProfileCounters({
           </Text>
         </View>
         <Text style={styles.label}>
-          별 · 후기{rc > 0 ? ` (${rc})` : ""}
+          받은 후기{rc > 0 ? ` (${rc})` : ""}
         </Text>
       </Pressable>
     </View>
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 14,
     paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
@@ -129,21 +131,22 @@ const styles = StyleSheet.create({
     backgroundColor: lightColors.border,
   },
   value: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 19,
+    fontWeight: "800",
     color: lightColors.ink900,
-    lineHeight: 18,
+    lineHeight: 22,
   },
   amberValue: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 19,
+    fontWeight: "800",
     color: "#b45309", // amber-700
-    lineHeight: 18,
+    lineHeight: 22,
   },
   label: {
-    fontSize: fontSize.xs,
+    fontSize: 13,
+    fontWeight: "600",
     color: lightColors.ink500,
-    marginTop: 2,
+    marginTop: 3,
   },
   starRow: {
     flexDirection: "row",

@@ -553,20 +553,15 @@ export default function MyPageTab() {
           data={cardWithLive}
           role={role}
           isAdmin={isAdmin}
+          postsCount={posts.length}
           onCounterPress={(kind) => {
-            if (kind === "followers") setFollowModal("followers")
-            else if (kind === "following") setFollowModal("following")
+            if (kind === "posts") setActiveTab("posts")
+            else if (kind === "followers") setFollowModal("followers")
             else if (kind === "trust") openReviews()
           }}
           onEditProfile={() => router.push("/mypage/edit")}
           onShare={handleShare}
           onAvatarPress={() => pickAndUpload("avatar")}
-        />
-
-        <HighlightsRow
-          items={highlights}
-          onAdd={() => router.push("/mypage/highlights")}
-          onOpen={(_h, i) => setStoryIndex(i)}
         />
 
         {activeTab && (

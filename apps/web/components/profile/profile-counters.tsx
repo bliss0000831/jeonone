@@ -16,15 +16,15 @@ interface ProfileCountersProps {
   onClick?: (kind: CounterKind) => void
 }
 
+// 어르신용: SNS식 팔로워/팔로잉 대신 "올린 글 · 이웃 · 받은 후기" 로 구성.
 export function ProfileCounters({
+  posts,
   followers,
-  following,
   trustScore,
   reviewCount,
   onClick,
 }: ProfileCountersProps) {
   const rc = reviewCount ?? 0
-  // 0~5 범위 밖이거나 후기 0 이면 'NEW' 처리
   const validScore =
     trustScore != null && trustScore >= 0 && trustScore <= 5 && rc > 0
       ? trustScore
@@ -32,58 +32,58 @@ export function ProfileCounters({
 
   return (
     <div className="grid grid-cols-3 divide-x divide-border bg-card rounded-xl border border-border overflow-hidden">
-      {/* 팔로워 */}
+      {/* 올린 글 */}
+      <button
+        type="button"
+        onClick={() => onClick?.("posts")}
+        className={cn(
+          "py-3.5 px-1 text-center transition-colors",
+          onClick && "hover:bg-secondary/60 active:bg-secondary",
+        )}
+      >
+        <div className="font-extrabold text-xl leading-tight">{formatCount(posts)}</div>
+        <div className="text-sm text-muted-foreground mt-0.5 font-medium">올린 글</div>
+      </button>
+
+      {/* 이웃 (팔로워) */}
       <button
         type="button"
         onClick={() => onClick?.("followers")}
         className={cn(
-          "py-2.5 px-1 text-center transition-colors",
+          "py-3.5 px-1 text-center transition-colors",
           onClick && "hover:bg-secondary/60 active:bg-secondary",
         )}
       >
-        <div className="font-bold text-[15px] leading-tight">{formatCount(followers)}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">팔로워</div>
+        <div className="font-extrabold text-xl leading-tight">{formatCount(followers)}</div>
+        <div className="text-sm text-muted-foreground mt-0.5 font-medium">이웃</div>
       </button>
 
-      {/* 팔로잉 */}
-      <button
-        type="button"
-        onClick={() => onClick?.("following")}
-        className={cn(
-          "py-2.5 px-1 text-center transition-colors",
-          onClick && "hover:bg-secondary/60 active:bg-secondary",
-        )}
-      >
-        <div className="font-bold text-[15px] leading-tight">{formatCount(following)}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">팔로잉</div>
-      </button>
-
-      {/* 이웃 별 */}
+      {/* 받은 후기 (별점) */}
       <button
         type="button"
         onClick={() => onClick?.("trust")}
         className={cn(
-          "py-2.5 px-1 text-center transition-colors",
+          "py-3.5 px-1 text-center transition-colors",
           "bg-amber-50/60 dark:bg-amber-950/20",
           onClick && "hover:bg-amber-100/70 dark:hover:bg-amber-900/30 active:bg-amber-100",
         )}
         aria-label={
           validScore != null
-            ? `이웃 별 ${validScore.toFixed(1)}, 후기 ${rc}개 — 보기`
-            : "아직 후기 없음 — 후기 보기"
+            ? `받은 후기 별점 ${validScore.toFixed(1)}, 후기 ${rc}개 — 보기`
+            : "아직 받은 후기 없음 — 후기 보기"
         }
       >
-        <div className="flex items-center justify-center gap-0.5 font-bold text-[15px] leading-tight text-amber-700 dark:text-amber-400 tabular-nums">
+        <div className="flex items-center justify-center gap-0.5 font-extrabold text-xl leading-tight text-amber-700 dark:text-amber-400 tabular-nums">
           <Star
             className={cn(
-              "w-3.5 h-3.5",
+              "w-4 h-4",
               validScore != null ? "fill-amber-400 stroke-amber-400" : "stroke-amber-500/60",
             )}
           />
           {validScore != null ? validScore.toFixed(1) : "0"}
         </div>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          이웃 별 {rc > 0 ? `(${rc})` : ""}
+        <div className="text-sm text-muted-foreground mt-0.5 font-medium">
+          받은 후기 {rc > 0 ? `(${rc})` : ""}
         </div>
       </button>
     </div>

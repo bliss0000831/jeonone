@@ -39,6 +39,7 @@ interface Props {
   role: RoleConfig
   isAdmin?: boolean
   isSuperAdmin?: boolean
+  postsCount?: number
   onCounterPress?: (kind: CounterKind) => void
   onEditProfile?: () => void
   onShare?: () => void
@@ -50,6 +51,7 @@ export function ProfileCard({
   role,
   isAdmin,
   isSuperAdmin,
+  postsCount,
   onCounterPress,
   onEditProfile,
   onShare,
@@ -145,8 +147,8 @@ export function ProfileCard({
       {/* Counters — 카드 paddingTop 10 합산하여 시각상 배너↔닉네임 과 비슷 (~22) */}
       <View style={{ marginTop: 12 }}>
         <ProfileCounters
+          posts={postsCount}
           followers={data.followersCount}
-          following={data.followingCount}
           trustScore={data.trustScore}
           reviewCount={data.reviewCount}
           onClick={onCounterPress}
@@ -299,9 +301,9 @@ const styles = StyleSheet.create({
     marginTop: spacing[4], // mt-4
   },
   btnPrimary: {
-    flex: 1,
-    minWidth: 120,
-    height: 40,
+    flex: 2,
+    minWidth: 160,
+    height: 50,
     backgroundColor: lightColors.primary,
     borderRadius: radius.md,
     alignItems: "center",
@@ -309,13 +311,13 @@ const styles = StyleSheet.create({
   },
   btnPrimaryText: {
     color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "800",
   },
   btnOutlined: {
     flex: 1,
-    minWidth: 120,
-    height: 40,
+    minWidth: 90,
+    height: 50,
     borderWidth: 1,
     borderColor: lightColors.border,
     borderRadius: radius.md,
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
   },
   btnOutlinedText: {
     color: lightColors.ink900,
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 16,
+    fontWeight: "600",
   },
 })

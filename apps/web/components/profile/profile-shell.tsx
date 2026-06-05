@@ -713,13 +713,6 @@ export function ProfileShell({
           }}
         />
 
-        <ProfileHighlights
-          items={highlights}
-          mode={mode}
-          onAdd={() => router.push("/mypage/highlights")}
-          onOpen={(_h, i) => setStoryIndex(i)}
-        />
-
         {activeTab && (
           <div id="profile-tabs" className="scroll-mt-14">
             <ProfileTabs

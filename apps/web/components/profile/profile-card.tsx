@@ -181,12 +181,12 @@ export function ProfileCard({
       <div className="mt-4 flex gap-2 flex-wrap">
         {mode === "self" ? (
           <>
-            <Button asChild className="flex-1 min-w-[120px]">
+            <Button asChild className="flex-[2] min-w-[160px] h-12 text-base font-bold">
               <Link href="/mypage/edit">프로필 편집</Link>
             </Button>
             <Button
               variant="outline"
-              className="flex-1 min-w-[120px]"
+              className="flex-1 min-w-[90px] h-12 text-base font-semibold"
               onClick={onShare}
             >
               공유
