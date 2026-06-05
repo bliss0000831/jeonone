@@ -1,5 +1,5 @@
 /**
- * 채팅 목록 상단 필터 탭 — 광장 web 9개 카테고리 그대로.
+ * 채팅 목록 상단 필터 탭 — 전원일기 농촌 플랫폼 유지 도메인.
  * 카운트 0 인 탭은 자동 숨김 (전체 제외).
  */
 
@@ -7,8 +7,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { lightColors, fontSize, spacing } from "@gwangjang/tokens"
 
 export type ChatFilterKey =
-  | "all" | "property" | "sharing" | "new_store" | "local_food"
-  | "service" | "group_buying" | "club" | "notice" | "direct"
+  | "all" | "sharing" | "local_food" | "secondhand"
+  | "jobs" | "notice" | "direct"
 
 interface Props {
   active: ChatFilterKey
@@ -18,14 +18,11 @@ interface Props {
 
 const TABS: Array<{ key: ChatFilterKey; label: string }> = [
   { key: "all", label: "전체" },
-  { key: "property", label: "부동산" },
   { key: "sharing", label: "나눔" },
-  { key: "new_store", label: "신장개업" },
   { key: "local_food", label: "로컬푸드" },
-  { key: "service", label: "서비스" },
-  { key: "group_buying", label: "공동구매" },
+  { key: "secondhand", label: "농기구" },
+  { key: "jobs", label: "일손" },
   { key: "direct", label: "DM" },
-  { key: "club", label: "모임" },
   { key: "notice", label: "공지" },
 ]
 

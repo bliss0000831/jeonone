@@ -246,46 +246,8 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
     const postType = room.post_type || "property"
     const postId = room.property_id
 
-    const formatManwon = (price: number) => {
-      if (!price && price !== 0) return ""
-      if (price >= 10000) {
-        const uk = Math.floor(price / 10000)
-        const man = price % 10000
-        return man > 0 ? `${uk}억 ${man.toLocaleString()}만원` : `${uk}억`
-      }
-      return `${price.toLocaleString()}만원`
-    }
-
-    const formatRange = (min: number | null, max: number | null, unit?: string) => {
-      const u = unit || "만원"
-      if (!min && !max) return "가격 문의"
-      if (min && max) return `${min.toLocaleString()}~${max.toLocaleString()}${u}`
-      if (min) return `${min.toLocaleString()}${u}~`
-      return `~${max?.toLocaleString()}${u}`
-    }
-
     try {
-      if (postType === "property") {
-        const { data } = await supabase
-          .from("properties")
-          .select("id, title, price, transaction_type, images, status, address")
-          .eq("id", postId)
-          .single()
-        if (data) {
-          setProperty(data)
-          const tone: "primary" | "amber" | "muted" =
-            data.status === "active" ? "primary" : data.status === "reserved" ? "amber" : "muted"
-          const label = data.status === "active" ? "판매중" : data.status === "reserved" ? "예약중" : "거래완료"
-          setPostContext({
-            href: `/property/${data.id}`,
-            image: data.images?.[0],
-            title: data.title,
-            meta: formatManwon(data.price),
-            badgeLabel: label,
-            badgeTone: tone,
-          })
-        }
-      } else if (postType === "sharing") {
+      if (postType === "sharing") {
         const { data } = await supabase
           .from("sharing_posts")
           .select("id, title, images, status")
@@ -306,22 +268,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
             badgeTone: tone,
           })
         }
-      } else if (postType === "new_store") {
-        const { data } = await supabase
-          .from("new_store_posts")
-          .select("id, store_name, images, category")
-          .eq("id", postId)
-          .single()
-        if (data) {
-          setPostContext({
-            href: `/new-store/${data.id}`,
-            image: data.images?.[0],
-            title: data.store_name,
-            meta: data.category || "신장개업",
-            badgeLabel: "신장개업",
-            badgeTone: "primary",
-          })
-        }
       } else if (postType === "local_food") {
         const { data } = await supabase
           .from("local_food")
@@ -338,46 +284,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
             title: data.title,
             meta: priceStr,
             badgeLabel: data.category || "로컬푸드",
-            badgeTone: "primary",
-          })
-        }
-      } else if (postType === "group_buying") {
-        const { data } = await supabase
-          .from("group_buying_posts")
-          .select("id, title, images, group_price")
-          .eq("id", postId)
-          .single()
-        if (data) {
-          const gp = (data as any).group_price
-          setPostContext({
-            href: `/group-buying/${data.id}`,
-            image: (data.images as string[] | null)?.[0],
-            title: data.title,
-            meta: typeof gp === "number" ? `${gp.toLocaleString()}원` : undefined,
-            badgeLabel: "공동구매",
-            badgeTone: "primary",
-          })
-        }
-      } else if (["interior", "moving", "cleaning", "repair"].includes(postType)) {
-        const tableName = `${postType}_posts`
-        const { data } = await (supabase as any)
-          .from(tableName)
-          .select("id, title, images, category, min_price, max_price, price_unit")
-          .eq("id", postId)
-          .single()
-        if (data) {
-          const badgeMap: Record<string, string> = {
-            interior: "인테리어",
-            moving: "이사",
-            cleaning: "청소",
-            repair: "수리",
-          }
-          setPostContext({
-            href: `/${postType}/${data.id}`,
-            image: data.images?.[0],
-            title: data.title,
-            meta: formatRange(data.min_price, data.max_price, data.price_unit),
-            badgeLabel: data.category || badgeMap[postType],
             badgeTone: "primary",
           })
         }

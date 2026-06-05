@@ -1,13 +1,11 @@
 /**
- * 채팅 탭 — 광장 web /chat 1:1 미러.
+ * 채팅 탭 — 전원일기 농촌 플랫폼 1:1 채팅.
  *
  * 구조:
  *   1. Header (← 뒤로 / 채팅 / ⋯ 더보기) · 일괄편집 모드 시 (× 취소 / N개 선택 / 나가기)
- *   2. Filter Tabs (전체/부동산/나눔/신장개업/로컬푸드/서비스/공구/모임/공지)
+ *   2. Filter Tabs (전체/나눔/로컬푸드/농기구/일손/공지)
  *   3. List — 섹션별 분기:
- *        - 부동산 / 나눔 / 신장개업 / 로컬푸드 / 서비스 (1:1 direct rooms)
- *        - 공동구매 채팅
- *        - 모임 채팅
+ *        - 나눔 / 로컬푸드 / 농기구 / 일손 (1:1 direct rooms)
  *        - 공지 (admin_notice)
  *
  * 인터랙션:
@@ -36,15 +34,11 @@ import { useThemedStyles } from "@/components/useColorScheme"
 import {
   leaveDirectRoom,
   listChatRooms,
-  listClubRooms,
-  listGbRooms,
   loadPostContext,
   reportChatRoom,
   type ChatContextDescriptor,
   type ChatReportReason,
   type ChatRoomWithMeta,
-  type ClubChatRoom,
-  type GbChatRoom,
 } from "@gwangjang/features/chat"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useAuth } from "@/lib/auth-context"
@@ -64,21 +58,25 @@ import { plazaName } from "@/lib/constants"
 
 type DirectRoom = ChatRoomWithMeta & { context: ChatContextDescriptor | null }
 
-
-const SERVICE_TYPES = ["interior", "moving", "cleaning", "repair"]
-
 function getCategory(postType?: string | null): ChatFilterKey | "other" {
-  if (!postType) return "property"
-  if (postType === "property") return "property"
+  if (!postType) return "other"
   if (postType === "admin_notice") return "notice"
   if (postType === "sharing") return "sharing"
-  if (postType === "new_store") return "new_store"
   if (postType === "local_food") return "local_food"
-  if (postType === "group_buying") return "group_buying"
+  if (postType === "secondhand") return "secondhand"
+  if (postType === "jobs") return "jobs"
   if (postType === "direct") return "direct"
-  if (SERVICE_TYPES.includes(postType)) return "service"
   return "other"
 }
+
+// 농기구(secondhand) / 일손(jobs) 섹션 라벨 — 거래 채팅 (1:1 direct)
+const DIRECT_CATEGORIES = [
+  "sharing",
+  "local_food",
+  "secondhand",
+  "jobs",
+  "direct",
+] as const
 
 function formatTime(iso: string | null): string {
   if (!iso) return ""
@@ -99,8 +97,6 @@ export default function ChatListTab() {
   const router = useRouter()
 
   const [directRooms, setDirectRooms] = useState<DirectRoom[]>([])
-  const [clubRooms, setClubRooms] = useState<ClubChatRoom[]>([])
-  const [gbRooms, setGbRooms] = useState<GbChatRoom[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -196,12 +192,8 @@ export default function ChatListTab() {
     setError(null)
     const supabase = getSupabase()
     try {
-      const [direct, clubs, gbs] = await Promise.all([
-        // 광장 격리 해제 — 모든 광장의 채팅방 통합 표시
-        listChatRooms(supabase, user.id, null),
-        listClubRooms(supabase, null).catch(() => []),
-        listGbRooms(supabase, { userId: user.id }).catch(() => []),
-      ])
+      // 광장 격리 해제 — 모든 광장의 채팅방 통합 표시
+      const direct = await listChatRooms(supabase, user.id, null)
       // direct rooms 의 context 병렬 로드 — 모든 방에 대해 로드 (listChatRooms 이 50개 cap)
       const directWithCtx = await Promise.all(
         direct.map(async (r) => {
@@ -210,13 +202,11 @@ export default function ChatListTab() {
         }),
       )
       setDirectRooms(directWithCtx)
-      setClubRooms(clubs as ClubChatRoom[])
-      setGbRooms(gbs as GbChatRoom[])
       // 캐시 저장 — 다음 진입 시 즉시 표시
       if (cacheKey) {
         AsyncStorage.setItem(
           cacheKey,
-          JSON.stringify({ directWithCtx, clubs, gbs, ts: Date.now() }),
+          JSON.stringify({ directWithCtx, ts: Date.now() }),
         ).catch(() => {})
       }
     } catch (e: any) {
@@ -237,8 +227,6 @@ export default function ChatListTab() {
         try {
           const c = JSON.parse(raw)
           if (Array.isArray(c.directWithCtx)) setDirectRooms(c.directWithCtx)
-          if (Array.isArray(c.clubs)) setClubRooms(c.clubs)
-          if (Array.isArray(c.gbs)) setGbRooms(c.gbs)
           setLoading(false) // 캐시 있으면 spinner 즉시 사라짐
         } catch {}
       })
@@ -268,21 +256,16 @@ export default function ChatListTab() {
 
   // 차단 필터
   const visibleDirect = useMemo(() => directRooms.filter((r) => !blockedSet.has(`direct:${r.id}`)), [directRooms, blockedSet])
-  const visibleClubs = useMemo(() => clubRooms.filter((r) => !blockedSet.has(`club:${r.club_id}`)), [clubRooms, blockedSet])
-  const visibleGbs = useMemo(() => gbRooms.filter((r) => !blockedSet.has(`gb:${r.post_id}`)), [gbRooms, blockedSet])
 
   // 카운트 (필터 탭 카운트)
   const counts: Record<ChatFilterKey, number> = useMemo(() => {
     const c: Record<ChatFilterKey, number> = {
-      all: visibleDirect.length + visibleClubs.length + visibleGbs.length,
-      property: 0,
+      all: visibleDirect.length,
       sharing: 0,
-      new_store: 0,
       local_food: 0,
-      service: 0,
-      group_buying: visibleGbs.length,
+      secondhand: 0,
+      jobs: 0,
       direct: 0,
-      club: visibleClubs.length,
       notice: 0,
     }
     for (const r of visibleDirect) {
@@ -290,7 +273,7 @@ export default function ChatListTab() {
       if (k !== "other") c[k] = (c[k] ?? 0) + 1
     }
     return c
-  }, [visibleDirect, visibleClubs, visibleGbs])
+  }, [visibleDirect])
 
   // 필터 적용
   const filteredDirect = useMemo(
@@ -299,15 +282,11 @@ export default function ChatListTab() {
       : visibleDirect.filter((r) => getCategory(r.post_type) === activeFilter),
     [activeFilter, visibleDirect],
   )
-  const showClubs = activeFilter === "all" || activeFilter === "club"
-  const showGbs = activeFilter === "all" || activeFilter === "group_buying"
   const showSectionHeader = activeFilter === "all"
 
   // ── SectionList sections ─────────────────────────────
   type SectionItem =
     | { type: "direct"; item: DirectRoom }
-    | { type: "club"; item: ClubChatRoom }
-    | { type: "gb"; item: GbChatRoom }
     | { type: "notice"; item: DirectRoom }
 
   type ChatSection = {
@@ -322,16 +301,7 @@ export default function ChatListTab() {
     const result: ChatSection[] = []
 
     // Direct sections — categorized
-    const directCategories = [
-      "property",
-      "sharing",
-      "new_store",
-      "local_food",
-      "service",
-      "group_buying",
-      "direct",
-    ] as const
-    for (const sec of directCategories) {
+    for (const sec of DIRECT_CATEGORIES) {
       const rooms = filteredDirect.filter((r) => getCategory(r.post_type) === sec)
       if (rooms.length === 0) continue
       result.push({
@@ -339,28 +309,6 @@ export default function ChatListTab() {
         title: SECTION_LABELS[sec],
         icon: "chatbubble-ellipses-outline",
         data: rooms.map((r) => ({ type: "direct" as const, item: r })),
-      })
-    }
-
-    // GB rooms
-    if (showGbs && visibleGbs.length > 0) {
-      result.push({
-        key: "gb",
-        title: "공동구매 채팅",
-        icon: "cart-outline",
-        iconColor: "#3b82f6",
-        data: visibleGbs.map((r) => ({ type: "gb" as const, item: r })),
-      })
-    }
-
-    // Club rooms
-    if (showClubs && visibleClubs.length > 0) {
-      result.push({
-        key: "club",
-        title: "모임 채팅",
-        icon: "people-outline",
-        iconColor: lightColors.primary,
-        data: visibleClubs.map((r) => ({ type: "club" as const, item: r })),
       })
     }
 
@@ -377,7 +325,7 @@ export default function ChatListTab() {
     }
 
     return result
-  }, [filteredDirect, visibleGbs, visibleClubs, showGbs, showClubs])
+  }, [filteredDirect])
 
   // 차단 라벨 매핑
   const labelFor = useCallback(
@@ -387,17 +335,9 @@ export default function ChatListTab() {
         const r = directRooms.find((x) => x.id === id)
         return r?.otherUser?.nickname || r?.context?.title || `1:1 채팅 ${id.slice(0, 6)}`
       }
-      if (key.startsWith("club:")) {
-        const id = key.slice(5)
-        return clubRooms.find((x) => x.club_id === id)?.title || `모임 ${id.slice(0, 6)}`
-      }
-      if (key.startsWith("gb:")) {
-        const id = key.slice(3)
-        return gbRooms.find((x) => x.post_id === id)?.title || `공동구매 ${id.slice(0, 6)}`
-      }
       return key
     },
-    [directRooms, clubRooms, gbRooms],
+    [directRooms],
   )
 
   // ── Handlers ──────────────────────────────────────
@@ -480,10 +420,6 @@ export default function ChatListTab() {
     }
     if (target.kind === "direct") {
       router.push(`/chat/${target.id}`)
-    } else if (target.kind === "club") {
-      router.push(`/chat/club/${target.id}`)
-    } else if (target.kind === "gb") {
-      router.push(`/chat/group-buying/${target.id}`)
     }
   }
 
@@ -551,36 +487,6 @@ export default function ChatListTab() {
           />
         )
       }
-      if (entry.type === "gb") {
-        const r = entry.item
-        return (
-          <MemoGbRow
-            room={r}
-            muted={mutedSet.has(`gb:${r.post_id}`)}
-            onPress={() =>
-              openRow({ kind: "gb", id: r.post_id, label: r.title })
-            }
-            onLongPress={() =>
-              setRoomMenu({ kind: "gb", id: r.post_id, label: r.title })
-            }
-          />
-        )
-      }
-      if (entry.type === "club") {
-        const r = entry.item
-        return (
-          <MemoClubRow
-            room={r}
-            muted={mutedSet.has(`club:${r.club_id}`)}
-            onPress={() =>
-              openRow({ kind: "club", id: r.club_id, label: r.title })
-            }
-            onLongPress={() =>
-              setRoomMenu({ kind: "club", id: r.club_id, label: r.title })
-            }
-          />
-        )
-      }
       return null
     },
     [mutedSet, bulkMode, bulkSelected, user?.id],
@@ -588,8 +494,6 @@ export default function ChatListTab() {
 
   const keyExtractor = useCallback((entry: SectionItem) => {
     if (entry.type === "direct" || entry.type === "notice") return `direct:${entry.item.id}`
-    if (entry.type === "gb") return `gb:${entry.item.post_id}`
-    if (entry.type === "club") return `club:${entry.item.club_id}`
     return "unknown"
   }, [])
 
@@ -856,12 +760,10 @@ export default function ChatListTab() {
 // ─── Section / Row 컴포넌트 ──────────────────────────────
 
 const SECTION_LABELS: Record<string, string> = {
-  property: "부동산 채팅",
   sharing: "나눔 채팅",
-  new_store: "신장개업 채팅",
   local_food: "로컬푸드 채팅",
-  service: "서비스 채팅",
-  group_buying: "공동구매 1:1 문의",
+  secondhand: "농기구 채팅",
+  jobs: "일손 채팅",
   direct: "다이렉트 메시지",
 }
 
@@ -989,148 +891,6 @@ function DirectRow({
 }
 
 const MemoDirectRow = React.memo(DirectRow)
-
-function ClubRow({
-  room,
-  muted,
-  onPress,
-  onLongPress,
-}: {
-  room: ClubChatRoom
-  muted: boolean
-  onPress: () => void
-  onLongPress: () => void
-}) {
-  const icon =
-    room.sport_type === "러닝"
-      ? "🏃"
-      : room.sport_type === "축구"
-      ? "⚽"
-      : room.sport_type === "배드민턴"
-      ? "🏸"
-      : room.sport_type === "등산"
-      ? "⛰️"
-      : "🎯"
-  return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.row,
-        pressed && { backgroundColor: lightColors.muted },
-        muted && { opacity: 0.6 },
-      ]}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      delayLongPress={400}
-    >
-      <View style={[styles.thumb, { backgroundColor: "#6366f1" }]}>
-        {room.images?.[0] ? (
-          <Image source={{ uri: room.images[0] }} style={styles.thumbImg} cachePolicy="memory-disk" transition={120} contentFit="cover" />
-        ) : (
-          <Text style={{ fontSize: 22 }}>{icon}</Text>
-        )}
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <View style={styles.rowTop}>
-          <Text style={styles.name} numberOfLines={1}>
-            {room.title}
-            {muted ? "  🔕" : ""}
-          </Text>
-          <Text style={styles.time}>{formatTime(room.last_message_at)}</Text>
-        </View>
-        <Text style={styles.last} numberOfLines={1}>
-          {room.last_message || "채팅방이 열렸습니다"}
-        </Text>
-        <Text style={styles.contextLine} numberOfLines={1}>
-          👥 {room.current_members}/{room.max_members}명
-        </Text>
-      </View>
-      {!muted && room.unread_count > 0 && (
-        <View style={styles.unread}>
-          <Text style={styles.unreadText}>
-            {room.unread_count > 99 ? "99+" : room.unread_count}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  )
-}
-
-const MemoClubRow = React.memo(ClubRow)
-
-function GbRow({
-  room,
-  muted,
-  onPress,
-  onLongPress,
-}: {
-  room: GbChatRoom
-  muted: boolean
-  onPress: () => void
-  onLongPress: () => void
-}) {
-  const statusLabel =
-    room.status === "pending_payment"
-      ? "입금 대기"
-      : room.status === "in_progress"
-      ? "주문 진행중"
-      : room.status === "completed"
-      ? "완료"
-      : room.status
-  // 광장 뱃지 — 모든 공구 채팅방에 광장 이름 표시 (격리 해제 후 통합 목록)
-  const plazaLabel = room.plaza_id ? plazaName(room.plaza_id) : null
-  return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.row,
-        pressed && { backgroundColor: lightColors.muted },
-        muted && { opacity: 0.6 },
-      ]}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      delayLongPress={400}
-    >
-      <View style={[styles.thumb, { backgroundColor: "#3b82f6" }]}>
-        {room.images?.[0] ? (
-          <Image source={{ uri: room.images[0] }} style={styles.thumbImg} cachePolicy="memory-disk" transition={120} contentFit="cover" />
-        ) : (
-          <Ionicons name="cart" size={22} color="#ffffff" />
-        )}
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <View style={styles.rowTop}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 1 }}>
-            {plazaLabel && (
-              <View style={styles.plazaChip}>
-                <Text style={styles.plazaChipText}>{plazaLabel}</Text>
-              </View>
-            )}
-            <Text style={styles.name} numberOfLines={1}>
-              {room.title}
-              {muted ? "  🔕" : ""}
-            </Text>
-          </View>
-          <Text style={styles.time}>{formatTime(room.last_message_at)}</Text>
-        </View>
-        <Text style={styles.last} numberOfLines={1}>
-          {room.last_message || "채팅방이 열렸습니다"}
-        </Text>
-        <Text style={[styles.contextLine, { color: "#3b82f6" }]} numberOfLines={1}>
-          🛒 {statusLabel} · {room.current_participants}
-          {room.max_participants ? `/${room.max_participants}` : ""}명
-        </Text>
-      </View>
-      {!muted && room.unread_count > 0 && (
-        <View style={styles.unread}>
-          <Text style={styles.unreadText}>
-            {room.unread_count > 99 ? "99+" : room.unread_count}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  )
-}
-
-const MemoGbRow = React.memo(GbRow)
 
 function makeStyles(colors: any) {
   return StyleSheet.create({
@@ -1406,7 +1166,7 @@ function makeStyles(colors: any) {
 }
 
 // module-level fallback — light 색상 (외부 함수에서 styles 참조용)
-// TODO: Dark-mode broken — DirectRow, ClubRow, GbRow reference this module-level
+// TODO: Dark-mode broken — DirectRow references this module-level
 // `styles` which is always built from lightColors. Each row component needs to
 // receive a theme-aware `styles` via props (or useColorScheme inside) so that
 // dark-mode colors are applied correctly.

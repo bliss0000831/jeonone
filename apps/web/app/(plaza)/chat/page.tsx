@@ -7,8 +7,6 @@ import {
   ArrowLeft,
   MessageCircle,
   Plus,
-  Users,
-  ShoppingCart,
   LogOut,
   MoreVertical,
   BellOff,
@@ -66,37 +64,9 @@ interface ChatRoom {
   unreadCount: number
 }
 
-interface ClubRoom {
-  club_id: string
-  title: string
-  images: string[] | null
-  sport_type: string
-  status: string
-  max_members: number
-  current_members: number
-  last_message: string | null
-  last_message_at: string | null
-  unread_count: number
-}
-
-interface GbRoom {
-  post_id: string
-  title: string
-  product_name: string | null
-  images: string[] | null
-  status: string
-  current_participants: number
-  max_participants: number | null
-  last_message: string | null
-  last_message_at: string | null
-  unread_count: number
-}
-
 // 우클릭/장기 누름으로 띄울 메뉴 대상
 type RoomMenuTarget =
   | { kind: "direct"; id: string; label: string }
-  | { kind: "club"; id: string; label: string }
-  | { kind: "gb"; id: string; label: string }
 
 const REPORT_REASONS = [
   "스팸/광고",
@@ -109,8 +79,6 @@ const REPORT_REASONS = [
 export default function ChatListPage() {
   const confirm = useConfirm()
   const [rooms, setRooms] = useState<ChatRoom[]>([])
-  const [clubRooms, setClubRooms] = useState<ClubRoom[]>([])
-  const [gbRooms, setGbRooms] = useState<GbRoom[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showExpertModal, setShowExpertModal] = useState(false)
   const [isServiceProvider, setIsServiceProvider] = useState(false)
@@ -192,31 +160,22 @@ export default function ChatListPage() {
 
   // 차단된 항목 제외 후 필터링
   const visibleRooms = useMemo(() => rooms.filter((r) => !blockedSet.has(`direct:${r.id}`)), [rooms, blockedSet])
-  const visibleClubRooms = useMemo(() => clubRooms.filter((r) => !blockedSet.has(`club:${r.club_id}`)), [clubRooms, blockedSet])
-  const visibleGbRooms = useMemo(() => gbRooms.filter((r) => !blockedSet.has(`gb:${r.post_id}`)), [gbRooms, blockedSet])
 
   const filteredRooms = useMemo(() => activeFilter === "all"
     ? visibleRooms
     : visibleRooms.filter((r) => getFilterCategory(r.post_type) === activeFilter), [visibleRooms, activeFilter])
-  const showClubRooms = activeFilter === "all" || activeFilter === "club"
-  const showGbRooms = activeFilter === "all" || activeFilter === "group_buying"
   // 빈 상태 판정을 단일 기준으로 — 조건이 여러 곳에 분산돼 오작동하는 것 방지
-  const hasAnyVisibleRoom =
-    filteredRooms.length > 0 ||
-    (showClubRooms && visibleClubRooms.length > 0) ||
-    (showGbRooms && visibleGbRooms.length > 0)
+  const hasAnyVisibleRoom = filteredRooms.length > 0
 
   const counts = useMemo(() => ({
-    all: visibleRooms.length + visibleClubRooms.length + visibleGbRooms.length,
+    all: visibleRooms.length,
     property: visibleRooms.filter((r) => getFilterCategory(r.post_type) === "property").length,
     sharing: visibleRooms.filter((r) => r.post_type === "sharing").length,
     new_store: visibleRooms.filter((r) => r.post_type === "new_store").length,
     local_food: visibleRooms.filter((r) => r.post_type === "local_food").length,
     service: visibleRooms.filter((r) => getFilterCategory(r.post_type) === "service").length,
-    group_buying: visibleGbRooms.length,
-    club: visibleClubRooms.length,
     notice: visibleRooms.filter((r) => r.post_type === "admin_notice").length,
-  }), [visibleRooms, visibleClubRooms, visibleGbRooms])
+  }), [visibleRooms])
 
   const directSectionsMemo = useMemo(() => [
     { key: "property", label: "부동산 채팅", rooms: filteredRooms.filter((r) => getFilterCategory(r.post_type) === "property") },
@@ -233,8 +192,6 @@ export default function ChatListPage() {
     { key: "new_store", label: "신장개업" },
     { key: "local_food", label: "로컬푸드" },
     { key: "service", label: "서비스" },
-    { key: "group_buying", label: "공동구매" },
-    { key: "club", label: "모임" },
     { key: "notice", label: "공지" },
   ]
 
@@ -246,8 +203,6 @@ export default function ChatListPage() {
         const parsed = JSON.parse(cached)
         if (parsed && typeof parsed === "object") {
           if (Array.isArray(parsed.rooms)) setRooms(parsed.rooms)
-          if (Array.isArray(parsed.clubRooms)) setClubRooms(parsed.clubRooms)
-          if (Array.isArray(parsed.gbRooms)) setGbRooms(parsed.gbRooms)
           setIsLoading(false) // 캐시 hit 시 즉시 표시, 백그라운드에서 fresh fetch
         }
       }
@@ -257,24 +212,20 @@ export default function ChatListPage() {
 
   // rooms 변경 시 캐시 업데이트 — 다음 진입 가속
   useEffect(() => {
-    if (rooms.length === 0 && clubRooms.length === 0 && gbRooms.length === 0) return
+    if (rooms.length === 0) return
     try {
       window.localStorage.setItem(
         "chat:rooms-cache",
-        JSON.stringify({ rooms, clubRooms, gbRooms, ts: Date.now() }),
+        JSON.stringify({ rooms, ts: Date.now() }),
       )
     } catch {}
-  }, [rooms, clubRooms, gbRooms])
+  }, [rooms])
 
   // account_type 조회는 위 프로필 동기화 useEffect 에서 통합 처리
 
   const fetchRooms = async () => {
     try {
-      const [directRes, clubRes, gbRes] = await Promise.all([
-        fetch("/api/chat/rooms"),
-        fetch("/api/club-chat/rooms"),
-        fetch("/api/group-buying-chat/rooms"),
-      ])
+      const directRes = await fetch("/api/chat/rooms")
 
       if (directRes.status === 401) {
         window.location.href = "/auth/login"
@@ -284,14 +235,6 @@ export default function ChatListPage() {
       if (directRes.ok) {
         const data = await directRes.json()
         setRooms(data.rooms || [])
-      }
-      if (clubRes.ok) {
-        const data = await clubRes.json()
-        setClubRooms(data.rooms || [])
-      }
-      if (gbRes.ok) {
-        const data = await gbRes.json()
-        setGbRooms(data.rooms || [])
       }
     } catch (error) {
       console.error("채팅방 목록 조회 실패:", error)
@@ -410,16 +353,6 @@ export default function ChatListPage() {
       const r = rooms.find((x) => x.id === id)
       return r?.otherUser?.nickname || r?.property?.title || `1:1 채팅 ${id.slice(0, 6)}`
     }
-    if (key.startsWith("club:")) {
-      const id = key.slice(5)
-      const r = clubRooms.find((x) => x.club_id === id)
-      return r?.title || `모임 ${id.slice(0, 6)}`
-    }
-    if (key.startsWith("gb:")) {
-      const id = key.slice(3)
-      const r = gbRooms.find((x) => x.post_id === id)
-      return r?.title || `공동구매 ${id.slice(0, 6)}`
-    }
     return key
   }
 
@@ -520,7 +453,7 @@ export default function ChatListPage() {
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
             <MessageCircle className="w-12 h-12 mb-4" />
             <p>채팅 내역이 없습니다</p>
-            <p className="text-sm mt-1">매물/모임에서 대화를 시작해보세요</p>
+            <p className="text-sm mt-1">거래글에서 대화를 시작해보세요</p>
           </div>
         ) : (
           <>
@@ -668,154 +601,6 @@ export default function ChatListPage() {
 
               return <>{directSections.map(renderSection)}</>
             })()}
-
-            {/* 공동구매 채팅방 섹션 */}
-            {showGbRooms && visibleGbRooms.length > 0 && (
-              <div className="border-b border-border">
-                {activeFilter === "all" && (
-                  <div className="px-4 pt-4 pb-2 flex items-center gap-2">
-                    <ShoppingCart className="w-4 h-4 text-blue-500" />
-                    <h2 className="text-sm font-bold text-foreground">공동구매 채팅</h2>
-                    <span className="text-xs text-muted-foreground">({visibleGbRooms.length})</span>
-                  </div>
-                )}
-                <div className="divide-y divide-border/50">
-                  {visibleGbRooms.map((room) => {
-                    const muted = mutedSet.has(`gb:${room.post_id}`)
-                    const statusLabel =
-                      room.status === "pending_payment" ? "입금 대기" :
-                      room.status === "in_progress" ? "주문 진행중" :
-                      room.status === "completed" ? "완료" : room.status
-                    return (
-                      <div
-                        key={room.post_id}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => {
-                          if (pressFiredRef.current) { pressFiredRef.current = false; return }
-                          router.push(`/chat/group-buying/${room.post_id}`)
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault()
-                            router.push(`/chat/group-buying/${room.post_id}`)
-                          }
-                        }}
-                        onContextMenu={(e) => { e.preventDefault(); setRoomMenu({ kind: "gb", id: room.post_id, label: room.title }) }}
-                        onPointerDown={() => startPress({ kind: "gb", id: room.post_id, label: room.title })}
-                        onPointerUp={cancelPress}
-                        onPointerLeave={cancelPress}
-                        onPointerMove={cancelPress}
-                        className={cn("flex items-center gap-3 p-4 hover:bg-secondary/50 transition-colors cursor-pointer select-none", muted && "opacity-60")}
-                      >
-                        <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-500">
-                          {room.images?.[0] ? (
-                            <Image src={room.images[0]} alt={room.title} width={56} height={56} className="w-full h-full object-cover" sizes="56px" />
-                          ) : (
-                            <ShoppingCart className="w-6 h-6 text-white" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium truncate text-foreground flex items-center gap-1">
-                              {room.title}
-                              {muted && <BellOff className="w-3 h-3 text-muted-foreground" />}
-                            </span>
-                            <span className="text-xs text-muted-foreground flex-shrink-0">{formatTime(room.last_message_at)}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate mb-1">{room.last_message || "채팅방이 열렸습니다"}</p>
-                          <p className="text-xs text-blue-500 truncate flex items-center gap-1">
-                            <ShoppingCart className="w-3 h-3" />
-                            {statusLabel} · {room.current_participants}
-                            {room.max_participants ? `/${room.max_participants}` : ""}명
-                          </p>
-                        </div>
-                        {!muted && room.unread_count > 0 && (
-                          <div className="min-w-[20px] h-5 px-1.5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs text-primary-foreground font-medium">{room.unread_count > 99 ? "99+" : room.unread_count}</span>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 모임 채팅방 섹션 */}
-            {showClubRooms && visibleClubRooms.length > 0 && (
-              <div className="border-b border-border">
-                {activeFilter === "all" && (
-                  <div className="px-4 pt-4 pb-2 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold text-foreground">모임 채팅</h2>
-                    <span className="text-xs text-muted-foreground">({visibleClubRooms.length})</span>
-                  </div>
-                )}
-                <div className="divide-y divide-border/50">
-                  {visibleClubRooms.map((room) => {
-                    const muted = mutedSet.has(`club:${room.club_id}`)
-                    const icon = room.sport_type === "러닝" ? "🏃" : room.sport_type === "축구" ? "⚽" : room.sport_type === "배드민턴" ? "🏸" : room.sport_type === "등산" ? "⛰️" : "🎯"
-                    return (
-                      <div
-                        key={room.club_id}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => {
-                          if (pressFiredRef.current) { pressFiredRef.current = false; return }
-                          router.push(`/chat/club/${room.club_id}`)
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault()
-                            router.push(`/chat/club/${room.club_id}`)
-                          }
-                        }}
-                        onContextMenu={(e) => { e.preventDefault(); setRoomMenu({ kind: "club", id: room.club_id, label: room.title }) }}
-                        onPointerDown={() => startPress({ kind: "club", id: room.club_id, label: room.title })}
-                        onPointerUp={cancelPress}
-                        onPointerLeave={cancelPress}
-                        onPointerMove={cancelPress}
-                        className={cn("flex items-center gap-3 p-4 hover:bg-secondary/50 transition-colors cursor-pointer select-none", muted && "opacity-60")}
-                      >
-                        <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-violet-600">
-                          {room.images?.[0] ? (
-                            <Image src={room.images[0]} alt={room.title} width={56} height={56} className="w-full h-full object-cover" sizes="56px" />
-                          ) : (
-                            <span className="text-2xl">{icon}</span>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium truncate text-foreground flex items-center gap-1">
-                              {room.title}
-                              {muted && <BellOff className="w-3 h-3 text-muted-foreground" />}
-                            </span>
-                            <span className="text-xs text-muted-foreground flex-shrink-0">
-                              {formatTime(room.last_message_at)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate mb-1">
-                            {room.last_message || "채팅방이 열렸습니다"}
-                          </p>
-                          <p className="text-xs text-primary truncate flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {room.current_members}/{room.max_members}명
-                          </p>
-                        </div>
-                        {!muted && room.unread_count > 0 && (
-                          <div className="min-w-[20px] h-5 px-1.5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs text-primary-foreground font-medium">
-                              {room.unread_count > 99 ? "99+" : room.unread_count}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
 
             {/* 공지 섹션 */}
             {(() => {
@@ -1015,7 +800,7 @@ export default function ChatListPage() {
             </div>
             <div className="divide-y divide-border/50">
               {(() => {
-                const key = `${roomMenu.kind === "direct" ? "direct" : roomMenu.kind === "club" ? "club" : "gb"}:${roomMenu.id}`
+                const key = `direct:${roomMenu.id}`
                 const isMuted = mutedSet.has(key)
                 return (
                   <>
@@ -1055,14 +840,7 @@ export default function ChatListPage() {
                       onClick={async () => {
                         const target = roomMenu
                         setRoomMenu(null)
-                        if (target.kind === "direct") {
-                          await handleLeaveRoom(target.id, "대화방에서 나가시겠습니까?")
-                        } else {
-                          // 모임/공동구매는 클라이언트 차단으로 대체
-                          if (await confirm("이 대화방을 목록에서 제거하시겠습니까?")) {
-                            chatPrefs.block(`${target.kind}:${target.id}`)
-                          }
-                        }
+                        await handleLeaveRoom(target.id, "대화방에서 나가시겠습니까?")
                       }}
                       className="w-full flex items-center gap-3 px-4 py-4 hover:bg-secondary/50 text-left text-destructive"
                     >
