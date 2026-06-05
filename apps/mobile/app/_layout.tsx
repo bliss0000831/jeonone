@@ -300,7 +300,7 @@ function RootLayoutNav() {
                   text: "업데이트",
                   onPress: () => {
                     const iosUrl = process.env.EXPO_PUBLIC_IOS_APP_STORE_URL || ""
-                    const androidUrl = "https://play.google.com/store/apps/details?id=app.gwangjang.mobile"
+                    const androidUrl = "https://play.google.com/store/apps/details?id=app.jeonwondiary.mobile"
                     const storeUrl = Platform.OS === "ios" ? iosUrl : androidUrl
                     if (storeUrl) {
                       Linking.openURL(storeUrl).catch(() => {})

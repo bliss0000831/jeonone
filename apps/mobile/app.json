@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "전원일기",
-    "slug": "gwangjang-mobile",
+    "slug": "jeonwondiary",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,8 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.gwangjang.mobile",
-      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "app.jeonwondiary.mobile",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "현재 위치를 기반으로 동네를 자동 설정하기 위해 사용됩니다.",
         "LSApplicationQueriesSchemes": [
@@ -24,8 +23,7 @@
       }
     },
     "android": {
-      "package": "app.gwangjang.mobile",
-      "googleServicesFile": "./google-services.json",
+      "package": "app.jeonwondiary.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#fae2aa"
@@ -91,16 +89,10 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "a4d7e247-0f55-42ba-917d-11589f1dcec9"
-      }
+      "router": {}
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/a4d7e247-0f55-42ba-917d-11589f1dcec9"
     }
   }
 }
