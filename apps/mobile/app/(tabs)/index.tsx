@@ -128,6 +128,14 @@ export default function HomeTab() {
           </View>
           <Text style={styles.searchHint}>농기구, 로컬푸드, 지원금 등 원하시는 정보를 검색하세요</Text>
 
+          {/* 농기구·로컬푸드·경매·일손 — 2열 사진 카드 */}
+          <View style={styles.cardGrid}>
+            <PhotoCard compact img={IMG.equipment} icon="construct" title="농기구/자재" subtitle="사고팔기" onPress={go("/secondhand")} />
+            <PhotoCard compact img={IMG.food} icon="nutrition" title="강원 로컬푸드" subtitle="직거래 장터" light onPress={go("/local-food")} />
+            <PhotoCard compact img={IMG.auction} icon="hammer" title="만물 경매장" subtitle="경매 / 즉시 거래" onPress={go("/auction")} />
+            <PhotoCard compact img={IMG.workers} icon="people" title="일손 찾기" subtitle="품앗이 / 인력" onPress={go("/jobs")} />
+          </View>
+
           {/* 소통과 나눔 */}
           <Text style={styles.sectionTitle}>소통과 나눔</Text>
           <View style={styles.row3}>
@@ -151,14 +159,8 @@ export default function HomeTab() {
             <Quick icon="call" label={"전화\n문의"} tint={BROWN} bg="#f3ede1" onPress={comingSoon} />
           </View>
 
-        {/* 대형 사진 카드 4개 */}
+        {/* 전원 소식통 배너 */}
         <View style={{ paddingHorizontal: 16, marginTop: 20, gap: 16 }}>
-          <PhotoCard img={IMG.equipment} icon="construct" title="농기구/자재" subtitle="사고팔기" desc="트랙터, 경운기, 하우스 자재 등" onPress={go("/secondhand")} />
-          <PhotoCard img={IMG.food} icon="nutrition" title="강원 로컬푸드" subtitle="직거래 장터" desc="방금 수확한 신선한 농산물" light onPress={go("/local-food")} />
-          <PhotoCard img={IMG.auction} icon="hammer" title="만물 경매장" subtitle="경매 / 즉시 거래" desc="농산물·농기구 경매 거래소" onPress={go("/auction")} />
-          <PhotoCard img={IMG.workers} icon="people" title="일손 찾기" subtitle="품앗이 / 인력" desc="구인·구직, 품앗이 게시판" onPress={go("/jobs")} />
-
-          {/* 전원 소식통 배너 */}
           <Pressable onPress={go("/board")} style={styles.newsBanner}>
             <ImageBackground source={IMG.news} style={styles.newsBg} imageStyle={{ borderRadius: 24 }}>
               <LinearGradient colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.25)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.newsOverlay}>
@@ -228,7 +230,23 @@ function Quick({ icon, label, onPress, tint, bg }: { icon: any; label: string; o
   )
 }
 
-function PhotoCard({ img, icon, title, subtitle, desc, light, onPress }: { img: any; icon: any; title: string; subtitle: string; desc: string; light?: boolean; onPress: () => void }) {
+function PhotoCard({ img, icon, title, subtitle, desc, light, compact, onPress }: { img: any; icon: any; title: string; subtitle: string; desc?: string; light?: boolean; compact?: boolean; onPress: () => void }) {
+  if (compact) {
+    return (
+      <Pressable onPress={onPress} style={styles.photoCardCompact}>
+        <ImageBackground source={img} style={styles.photoBgCompact} imageStyle={{ borderRadius: 16 }}>
+          <LinearGradient
+            colors={light ? ["rgba(255,255,255,0.35)", "rgba(0,0,0,0.55)"] : ["rgba(0,0,0,0.45)", "rgba(0,0,0,0.78)"]}
+            style={styles.photoOverlayCompact}
+          >
+            <View style={styles.photoIconCompact}><Ionicons name={icon} size={24} color="#fff" /></View>
+            <Text style={styles.photoTitleCompact}>{title}</Text>
+            <Text style={styles.photoSubCompact}>{subtitle}</Text>
+          </LinearGradient>
+        </ImageBackground>
+      </Pressable>
+    )
+  }
   return (
     <Pressable onPress={onPress} style={styles.photoCard}>
       <ImageBackground source={img} style={styles.photoBg} imageStyle={{ borderRadius: 24 }}>
@@ -239,7 +257,7 @@ function PhotoCard({ img, icon, title, subtitle, desc, light, onPress }: { img: 
           <View style={styles.photoIcon}><Ionicons name={icon} size={30} color="#fff" /></View>
           <Text style={styles.photoTitle}>{title}</Text>
           <Text style={styles.photoSub}>{subtitle}</Text>
-          <Text style={styles.photoDesc}>{desc}</Text>
+          {desc ? <Text style={styles.photoDesc}>{desc}</Text> : null}
           <View style={styles.photoBtn}><Text style={styles.photoBtnText}>보러가기 →</Text></View>
         </LinearGradient>
       </ImageBackground>
@@ -283,6 +301,14 @@ const styles = StyleSheet.create({
   quick: { flex: 1, alignItems: "center", gap: 8, backgroundColor: "rgba(255,255,255,0.92)", borderRadius: 16, paddingVertical: 14, borderWidth: 2, borderColor: "rgba(21,128,61,0.2)" },
   quickIcon: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
   quickLabel: { fontSize: 13, fontWeight: "700", textAlign: "center", color: "#3f3a2e" },
+
+  cardGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingHorizontal: 16, marginTop: 16 },
+  photoCardCompact: { width: "47.5%", flexGrow: 1, borderRadius: 16, overflow: "hidden", minHeight: 150 },
+  photoBgCompact: { width: "100%", minHeight: 150, justifyContent: "center" },
+  photoOverlayCompact: { flex: 1, minHeight: 150, alignItems: "center", justifyContent: "center", padding: 12, borderRadius: 16 },
+  photoIconCompact: { width: 48, height: 48, borderRadius: 24, backgroundColor: "rgba(120,120,120,0.55)", alignItems: "center", justifyContent: "center", marginBottom: 8 },
+  photoTitleCompact: { fontSize: 17, fontWeight: "900", color: "#fff", textAlign: "center", textShadowColor: "rgba(0,0,0,0.4)", textShadowRadius: 6 },
+  photoSubCompact: { fontSize: 13, fontWeight: "700", color: "#f1f5f9", marginTop: 2, textAlign: "center" },
 
   photoCard: { borderRadius: 24, overflow: "hidden", minHeight: 280 },
   photoBg: { width: "100%", minHeight: 280, justifyContent: "center" },

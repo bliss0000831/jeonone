@@ -39,25 +39,25 @@ export function MainNavButtons() {
           </a>
         </div>
 
-        {/* 핵심 메뉴 4개 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+        {/* 핵심 메뉴 4개 — 2열 (절반 크기) */}
+        <div className="grid grid-cols-2 gap-3 md:gap-6">
           {mainMenus.map((menu) => {
             const IconComponent = menu.icon
             const isDark = menu.variant === "dark"
             return (
-              <Link key={menu.id} href={menu.href} className="relative overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] rounded-3xl shadow-lg min-h-[300px] md:min-h-[340px] flex flex-col items-center justify-center text-center group">
+              <Link key={menu.id} href={menu.href} className="relative overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] rounded-2xl md:rounded-3xl shadow-lg min-h-[180px] md:min-h-[260px] flex flex-col items-center justify-center text-center group">
                 <Image src={menu.bgImage} alt={menu.title} fill className="object-cover" />
                 <div className={`absolute inset-0 ${isDark ? "bg-gradient-to-b from-black/50 to-black/75" : "bg-gradient-to-b from-white/50 to-black/40"}`} />
-                <div className="relative z-10 p-8 md:p-10 flex flex-col items-center justify-center flex-1">
-                  <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-5 ${isDark ? "bg-neutral-700/80" : "bg-neutral-300/80"} shadow-lg`}>
-                    <IconComponent className={`w-10 h-10 md:w-12 md:h-12 ${isDark ? "text-white" : "text-neutral-600"}`} />
+                <div className="relative z-10 p-4 md:p-8 flex flex-col items-center justify-center flex-1">
+                  <div className={`w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-2.5 md:mb-4 ${isDark ? "bg-neutral-700/80" : "bg-neutral-300/80"} shadow-lg`}>
+                    <IconComponent className={`w-7 h-7 md:w-10 md:h-10 ${isDark ? "text-white" : "text-neutral-600"}`} />
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-black mb-1 drop-shadow-lg text-white">{menu.title}</h2>
-                  <p className="text-xl md:text-2xl font-bold mb-3 drop-shadow-lg text-neutral-100">{menu.subtitle}</p>
-                  <p className="text-base md:text-lg drop-shadow-lg text-neutral-200">{menu.description}</p>
+                  <h2 className="text-lg md:text-2xl font-black mb-0.5 drop-shadow-lg text-white">{menu.title}</h2>
+                  <p className="text-sm md:text-xl font-bold mb-1 md:mb-2 drop-shadow-lg text-neutral-100">{menu.subtitle}</p>
+                  <p className="hidden md:block text-base drop-shadow-lg text-neutral-200">{menu.description}</p>
                 </div>
-                <div className="relative z-10 pb-6 md:pb-8">
-                  <div className="flex items-center gap-1 px-6 py-3 md:px-8 md:py-4 bg-white rounded-full font-bold text-lg md:text-xl text-primary shadow-xl border-2 border-primary/30 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">보러가기<span className="text-xl md:text-2xl ml-1">→</span></div>
+                <div className="relative z-10 pb-4 md:pb-7">
+                  <div className="flex items-center gap-1 px-4 py-2 md:px-7 md:py-3.5 bg-white rounded-full font-bold text-sm md:text-lg text-primary shadow-lg border-2 border-primary/30 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">보러가기<span className="text-base md:text-xl ml-1">→</span></div>
                 </div>
               </Link>
             )

@@ -75,11 +75,13 @@ export function FarmHome({ user, userRole, userAccountType, plazaName }: FarmHom
               </div>
 
               <div className="mb-8"><WeatherWidget /></div>
-              <div className="mb-8"><BoardNavButtons /></div>
             </div>
           </section>
 
+          {/* 농기구·로컬푸드·경매·일손 (소통과 나눔 위) */}
           <div className="relative z-10"><MainNavButtons /></div>
+          {/* 소통과 나눔 · 정보와 혜택 */}
+          <div className="relative z-10 max-w-4xl mx-auto w-full px-4 mb-8"><BoardNavButtons /></div>
           <div className="relative z-10"><NoticeSection /></div>
         </main>
 
