@@ -1,6 +1,6 @@
 "use client"
 
-import { Tractor, Carrot, Users, Gavel, Phone, Camera, Mic, Megaphone, Cloud, Sprout, HandCoins } from "lucide-react"
+import { Tractor, Carrot, Users, Gavel, Phone, Camera, Search, Megaphone, Cloud, Sprout, HandCoins } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -30,8 +30,8 @@ export function MainNavButtons() {
             <span className="text-sm md:text-xl font-bold text-foreground text-center leading-tight">사진으로<br className="md:hidden" /> 올리기</span>
           </Link>
           <Link href="/search" className="flex flex-col items-center gap-2 p-3 md:p-6 bg-white/90 backdrop-blur rounded-2xl border-2 border-primary/20 hover:bg-white hover:border-primary/40 transition-colors shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"><Mic className="w-6 h-6 md:w-10 md:h-10 text-primary" /></div>
-            <span className="text-sm md:text-xl font-bold text-foreground text-center leading-tight">음성으로<br className="md:hidden" /> 검색</span>
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"><Search className="w-6 h-6 md:w-10 md:h-10 text-primary" /></div>
+            <span className="text-sm md:text-xl font-bold text-foreground text-center leading-tight">검색<br className="md:hidden" /> 하기</span>
           </Link>
           <Link href="/support" className="flex flex-col items-center gap-2 p-3 md:p-6 bg-white/90 backdrop-blur rounded-2xl border-2 border-secondary/20 hover:bg-white hover:border-secondary/40 transition-colors shadow-lg">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0"><Phone className="w-6 h-6 md:w-10 md:h-10 text-secondary" /></div>

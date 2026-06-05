@@ -291,7 +291,7 @@ export default function BoardCreateScreen() {
           {/* Category chips */}
           <View>
             <Text style={styles.label}>게시판 *</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
               {categories.map((c) => (
                 <Pressable
                   key={c.id}
@@ -313,7 +313,7 @@ export default function BoardCreateScreen() {
                   </Text>
                 </Pressable>
               ))}
-            </ScrollView>
+            </View>
           </View>
 
           {/* 지역 (sub_region) — web Select 1:1 */}

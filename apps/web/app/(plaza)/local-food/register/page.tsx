@@ -187,7 +187,7 @@ export default function LocalFoodRegisterPage() {
                   key={cat}
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, category: cat }))}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-4 min-h-[44px] rounded-full text-base font-medium transition-colors ${
                     form.category === cat
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -335,7 +335,7 @@ export default function LocalFoodRegisterPage() {
                   key={u}
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, unit: u }))}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-4 min-h-[44px] rounded-full text-base font-medium transition-colors ${
                     form.unit === u
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"

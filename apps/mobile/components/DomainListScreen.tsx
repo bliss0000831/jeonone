@@ -1333,7 +1333,7 @@ function makeStyles(colors: any) {
   count: { fontSize: fontSize.sm, color: colors.ink500 },
   toolBtn: {
     flexDirection: "row", alignItems: "center", gap: 4,
-    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999,
     backgroundColor: colors.muted,
   },
   toolBtnText: { fontSize: 13, color: colors.ink900 },
@@ -1370,8 +1370,8 @@ function makeStyles(colors: any) {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 999,
   },
   viewSegBtnActive: {

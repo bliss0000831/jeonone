@@ -321,34 +321,46 @@ export default function SecondhandRegisterPage() {
         {/* 농기구 정보 (선택) */}
         <div>
           <label className="block text-base font-medium mb-2">농기구 정보 <span className="text-muted-foreground font-normal">(선택)</span></label>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              value={formData.brand}
-              onChange={(e) => setFormData((p) => ({ ...p, brand: e.target.value }))}
-              placeholder="제조사 (예: 대동)"
-              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-            <input
-              value={formData.model_year}
-              onChange={(e) => setFormData((p) => ({ ...p, model_year: e.target.value.replace(/[^0-9]/g, "") }))}
-              inputMode="numeric"
-              placeholder="연식 (예: 2019)"
-              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-            <input
-              value={formData.horsepower}
-              onChange={(e) => setFormData((p) => ({ ...p, horsepower: e.target.value.replace(/[^0-9]/g, "") }))}
-              inputMode="numeric"
-              placeholder="마력 (예: 45)"
-              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-            <input
-              value={formData.usage_hours}
-              onChange={(e) => setFormData((p) => ({ ...p, usage_hours: e.target.value.replace(/[^0-9]/g, "") }))}
-              inputMode="numeric"
-              placeholder="사용시간 (h)"
-              className="px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+            <div>
+              <span className="block text-sm font-medium text-foreground/80 mb-1">제조사</span>
+              <input
+                value={formData.brand}
+                onChange={(e) => setFormData((p) => ({ ...p, brand: e.target.value }))}
+                placeholder="예: 대동"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            <div>
+              <span className="block text-sm font-medium text-foreground/80 mb-1">연식</span>
+              <input
+                value={formData.model_year}
+                onChange={(e) => setFormData((p) => ({ ...p, model_year: e.target.value.replace(/[^0-9]/g, "") }))}
+                inputMode="numeric"
+                placeholder="예: 2019"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            <div>
+              <span className="block text-sm font-medium text-foreground/80 mb-1">마력</span>
+              <input
+                value={formData.horsepower}
+                onChange={(e) => setFormData((p) => ({ ...p, horsepower: e.target.value.replace(/[^0-9]/g, "") }))}
+                inputMode="numeric"
+                placeholder="예: 45"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            <div>
+              <span className="block text-sm font-medium text-foreground/80 mb-1">사용시간</span>
+              <input
+                value={formData.usage_hours}
+                onChange={(e) => setFormData((p) => ({ ...p, usage_hours: e.target.value.replace(/[^0-9]/g, "") }))}
+                inputMode="numeric"
+                placeholder="예: 1200 (시간)"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
           </div>
         </div>
 
@@ -366,7 +378,7 @@ export default function SecondhandRegisterPage() {
                     condition: prev.condition === c ? "" : c,
                   }))
                 }
-                className={`px-3 py-1.5 rounded-full text-sm border transition ${
+                className={`px-4 min-h-[44px] rounded-full text-base border transition ${
                   formData.condition === c
                     ? "bg-amber-500 text-white border-amber-500"
                     : "bg-background text-foreground border-border hover:border-amber-300"

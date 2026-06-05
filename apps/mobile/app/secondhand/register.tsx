@@ -396,9 +396,9 @@ export default function SecondhandRegisterScreen() {
             </>
           )}
 
-          {/* Category */}
+          {/* Category — 줄바꿈(wrap)으로 모든 항목이 한눈에 보이게 (어르신 가독성) */}
           <Field label="카테고리">
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
               {FARM_CATEGORIES.map((c) => (
                 <Pressable
                   key={c}
@@ -420,7 +420,7 @@ export default function SecondhandRegisterScreen() {
                   </Text>
                 </Pressable>
               ))}
-            </ScrollView>
+            </View>
           </Field>
 
           {/* Condition — 상품 상태 */}
