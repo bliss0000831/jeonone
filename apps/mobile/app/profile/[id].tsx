@@ -177,16 +177,21 @@ export default function PublicProfileScreen() {
       getProfileCard(supabase, id, DEFAULT_PLAZA),
       // 광장 격리 — 현재 광장 plaza_profile overlay
       DEFAULT_PLAZA
-        ? supabase
-            .from("plaza_profiles")
-            .select(
-              "nickname, avatar_url, bio, background_url, account_type, business_hours, specialties, service_areas, website, kakao_id, location",
-            )
-            .eq("user_id", id)
-            .eq("plaza_id", DEFAULT_PLAZA)
-            .maybeSingle()
-            .then((r) => r.data)
-            .catch(() => null)
+        ? (async () => {
+            try {
+              const r = await supabase
+                .from("plaza_profiles")
+                .select(
+                  "nickname, avatar_url, bio, background_url, account_type, business_hours, specialties, service_areas, website, kakao_id, location",
+                )
+                .eq("user_id", id)
+                .eq("plaza_id", DEFAULT_PLAZA)
+                .maybeSingle()
+              return r.data
+            } catch {
+              return null
+            }
+          })()
         : Promise.resolve(null),
       countFollowersInPlaza(supabase, id, DEFAULT_PLAZA).catch(() => 0),
       countFollowingInPlaza(supabase, id, DEFAULT_PLAZA).catch(() => 0),
@@ -227,7 +232,7 @@ export default function PublicProfileScreen() {
 
   // ── 사업자 정보 — account_type 이 사업자 계정일 때만 fetch ───
   const BIZ_ACCOUNT_TYPES = useMemo(
-    () => new Set(["agent", "business", "producer", "interior", "moving", "cleaning", "repair"]),
+    () => new Set(["business", "producer"]),
     [],
   )
   useEffect(() => {
@@ -262,9 +267,8 @@ export default function PublicProfileScreen() {
     const supabase = getSupabase()
     setPostsLoading(true)
     try {
-      const includeProperties = role.type !== "agent"
       const data = await listMyPosts(supabase, id, {
-        includeProperties,
+        includeProperties: true,
         plazaId: DEFAULT_PLAZA,
       })
       setPosts(data)
@@ -298,13 +302,8 @@ export default function PublicProfileScreen() {
   useEffect(() => {
     if (!id || !activeTab) return
     if (activeTab === "posts") loadPosts()
-    else if (activeTab === "listings") loadProperties()
-    // products/portfolio/services 는 posts 데이터를 재사용해 렌더 단계에서 필터
-    else if (
-      activeTab === "products" ||
-      activeTab === "portfolio" ||
-      activeTab === "services"
-    ) {
+    // products 는 posts 데이터를 재사용해 렌더 단계에서 필터
+    else if (activeTab === "products") {
       loadPosts()
     }
   }, [id, activeTab, role.type])
@@ -651,34 +650,7 @@ export default function PublicProfileScreen() {
           )
         })()}
 
-        {activeTab === "listings" && (
-          <View style={styles.tabContent}>
-            {propsLoading ? (
-              <ActivityIndicator color={lightColors.primary} />
-            ) : properties.length === 0 ? (
-              <EmptyHint label="등록된 매물이 없어요" />
-            ) : (
-              properties.map((p) => (
-                <PostListRow
-                  key={p.id}
-                  title={p.title}
-                  excerpt={p.excerpt ?? null}
-                  image={(p as any).image ?? null}
-                  kindLabel={p.kindLabel}
-                  onPress={() => openExternalRoute(router, p.href)}
-                  menuKind="properties"
-                  postId={p.id}
-                  authorId={id}
-                  onChanged={loadProperties}
-                />
-              ))
-            )}
-          </View>
-        )}
-
-        {(activeTab === "products" ||
-          activeTab === "portfolio" ||
-          activeTab === "services") && (
+        {activeTab === "products" && (
           <View style={styles.tabContent}>
             {postsLoading ? (
               <ActivityIndicator color={lightColors.primary} />
@@ -689,22 +661,9 @@ export default function PublicProfileScreen() {
                   ? ["group_buying"]
                   : role.type === "producer"
                   ? ["local_food"]
-                  : role.type === "interior"
-                  ? ["interior"]
-                  : role.type === "moving"
-                  ? ["moving"]
-                  : role.type === "cleaning"
-                  ? ["cleaning"]
-                  : role.type === "repair"
-                  ? ["repair"]
                   : []
               const filtered = posts.filter((p) => allowed.includes(p.kind))
-              const emptyLabel =
-                activeTab === "products"
-                  ? "등록된 상품이 없어요"
-                  : activeTab === "portfolio"
-                  ? "등록된 포트폴리오가 없어요"
-                  : "등록된 서비스가 없어요"
+              const emptyLabel = "등록된 상품이 없어요"
               if (filtered.length === 0) {
                 return <EmptyHint label={emptyLabel} />
               }

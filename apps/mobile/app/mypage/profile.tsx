@@ -86,7 +86,6 @@ import { ProfileSidebar, type SidebarData, type BusinessInfo } from "@/component
 import { StoryViewer } from "@/components/mypage/StoryViewer"
 import { useIsAdmin } from "@/lib/useIsAdmin"
 import {
-  INTERIOR_GROUP,
   POSTS_CATEGORIES_BY_ROLE,
   ROLE_EXCLUDE_FROM_POSTS,
   SAVED_CATEGORIES,
@@ -168,7 +167,7 @@ export default function MyPageTab() {
 
   // 사업자 정보 조회 — account_type 이 사업자 유형일 때만
   useEffect(() => {
-    if (!profile?.id || !profile.account_type || profile.account_type === "user" || profile.account_type === "individual") {
+    if (!profile?.id || !profile.account_type || profile.account_type === "individual") {
       setBizInfo(null)
       return
     }
@@ -320,37 +319,12 @@ export default function MyPageTab() {
       if (cancelled || !user) return
       switch (activeTab) {
         case "posts": {
-          // 광장 web 동작: agent 가 아닌 모든 역할은 properties 도 합산
-          // (매물도 "내 글" 에 표시). agent 는 매물 탭이 별도라 제외.
-          const includeProperties = role.type !== "agent"
           setPostsLoading(true)
           try {
-            const data = await listMyPosts(supabase, user.id, { includeProperties, plazaId })
+            const data = await listMyPosts(supabase, user.id, { includeProperties: true, plazaId })
             if (!cancelled) setPosts(data)
           } finally {
             if (!cancelled) setPostsLoading(false)
-          }
-          break
-        }
-        case "listings": {
-          setPropsLoading(true)
-          try {
-            const raw = await listMyProperties(supabase, user.id, plazaId)
-            // PostListRow 호환 포맷으로 변환
-            const items: UnifiedPost[] = (raw as any[]).map((p) => ({
-              id: String(p.id),
-              kind: "property",
-              kindLabel: "매물",
-              title: p.title || "(제목 없음)",
-              excerpt: p.description || p.district || null,
-              // 올리기 반영 — effective_at 우선 (= COALESCE(bumped_at, created_at))
-              created_at: (p as any).effective_at ?? (p as any).bumped_at ?? p.created_at,
-              href: `/property/${p.id}`,
-              image: Array.isArray(p.images) ? p.images[0] ?? null : null,
-            }))
-            if (!cancelled) setProperties(items)
-          } finally {
-            if (!cancelled) setPropsLoading(false)
           }
           break
         }
@@ -364,9 +338,7 @@ export default function MyPageTab() {
           }
           break
         }
-        case "products":
-        case "portfolio":
-        case "services": {
+        case "products": {
           // 역할 전용 탭 — listMyPosts 결과 재활용 (필터는 렌더 단계에서)
           setPostsLoading(true)
           try {
@@ -603,7 +575,6 @@ export default function MyPageTab() {
             active={activeTab}
             counts={{
               posts: posts.length,
-              listings: properties.length,
               saved: savedItems.length,
             }}
             onChange={setActiveTab}
@@ -623,25 +594,12 @@ export default function MyPageTab() {
               onChanged={reloadList}
             />
           )}
-          {activeTab === "listings" && (
-            <ListingsTab
-              items={properties}
-              loading={propsLoading}
-              onOpen={(href) => openExternalRoute(router, href)}
-              userId={user?.id}
-              onChanged={reloadList}
-            />
-          )}
-          {(activeTab === "products" ||
-            activeTab === "portfolio" ||
-            activeTab === "services") && (
+          {activeTab === "products" && (
             <PostsTab
               items={posts.filter((p) =>
                 role.type === "business"
                   ? p.kind === "group_buying"
-                  : role.type === "producer"
-                  ? p.kind === "local_food"
-                  : INTERIOR_GROUP.includes(p.kind),
+                  : p.kind === "local_food",
               )}
               loading={postsLoading}
               role={role.type}
@@ -880,17 +838,13 @@ function SavedTab({
   onCategoryChange: (c: string) => void
   onOpen: (href: string) => void
 }) {
-  // 카운트 (홈즈는 interior/moving/cleaning/repair 합산)
   const counts: Record<string, number> = { all: items.length }
   for (const it of items) {
-    const bucket = INTERIOR_GROUP.includes(it.kind) ? "interior" : it.kind
-    counts[bucket] = (counts[bucket] || 0) + 1
+    counts[it.kind] = (counts[it.kind] || 0) + 1
   }
   const filtered =
     category === "all"
       ? items
-      : category === "interior"
-      ? items.filter((i) => INTERIOR_GROUP.includes(i.kind))
       : items.filter((i) => i.kind === category)
 
   return (

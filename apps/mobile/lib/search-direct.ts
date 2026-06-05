@@ -18,25 +18,15 @@ export interface SearchResult {
 }
 
 const EMPTY_BUCKET: Record<SearchCategory, SearchHit[]> = {
-  properties: [],
   board: [],
   sharing: [],
-  clubs: [],
-  group_buying: [],
   local_food: [],
-  services: [],
-  new_store: [],
   profiles: [],
 }
 const ZERO_COUNTS: Record<SearchCategory, number> = {
-  properties: 0,
   board: 0,
   sharing: 0,
-  clubs: 0,
-  group_buying: 0,
   local_food: 0,
-  services: 0,
-  new_store: 0,
   profiles: 0,
 }
 
@@ -63,29 +53,6 @@ interface CatCfg {
 }
 
 const CATEGORIES: CatCfg[] = [
-  {
-    category: "properties",
-    table: "properties",
-    select: "id, title, description, address, images, transaction_type, property_type, price, monthly_rent, status, created_at",
-    searchFields: ["title", "description", "address"],
-    visibleStatuses: ["active"],
-    map: (r) => ({
-      id: r.id,
-      title: r.title,
-      summary: r.description || null,
-      thumbnail: firstImage(r.images),
-      location: r.address || null,
-      status: r.status || null,
-      href: `/property/${r.id}`,
-      createdAt: r.created_at,
-      meta: {
-        property_type: r.property_type,
-        transaction_type: r.transaction_type,
-        price: r.price,
-        monthly_rent: r.monthly_rent,
-      },
-    }),
-  },
   {
     category: "board",
     table: "board_posts",
@@ -125,42 +92,6 @@ const CATEGORIES: CatCfg[] = [
     }),
   },
   {
-    category: "clubs",
-    table: "clubs",
-    select: "id, title, description, images, status, created_at",
-    searchFields: ["title", "description"],
-    visibleStatuses: ["recruiting", "active"],
-    map: (r) => ({
-      id: r.id,
-      title: r.title,
-      summary: r.description || null,
-      thumbnail: firstImage(r.images),
-      location: null,
-      status: r.status || null,
-      href: `/clubs/${r.id}`,
-      createdAt: r.created_at,
-      meta: {},
-    }),
-  },
-  {
-    category: "group_buying",
-    table: "group_buying_posts",
-    select: "id, title, description, images, status, price, created_at",
-    searchFields: ["title", "description"],
-    visibleStatuses: ["recruiting", "active"],
-    map: (r) => ({
-      id: r.id,
-      title: r.title,
-      summary: r.description || null,
-      thumbnail: firstImage(r.images),
-      location: null,
-      status: r.status || null,
-      href: `/group-buying/${r.id}`,
-      createdAt: r.created_at,
-      meta: { price: r.price },
-    }),
-  },
-  {
     category: "local_food",
     table: "local_food",
     select: "id, title, description, images, status, price, created_at",
@@ -176,24 +107,6 @@ const CATEGORIES: CatCfg[] = [
       href: `/local-food/${r.id}`,
       createdAt: r.created_at,
       meta: { price: r.price },
-    }),
-  },
-  {
-    category: "new_store",
-    table: "new_store_posts",
-    select: "id, title, description, images, status, created_at",
-    searchFields: ["title", "description"],
-    visibleStatuses: ["active"],
-    map: (r) => ({
-      id: r.id,
-      title: r.title,
-      summary: r.description || null,
-      thumbnail: firstImage(r.images),
-      location: null,
-      status: r.status || null,
-      href: `/new-store/${r.id}`,
-      createdAt: r.created_at,
-      meta: {},
     }),
   },
   {
@@ -214,17 +127,6 @@ const CATEGORIES: CatCfg[] = [
     }),
   },
 ]
-
-// services 는 다중 테이블 (cleaning/interior/moving/repair/jobs) — 단순 통합용으로 jobs_posts 만 처리
-// (web 의 services 카테고리는 여러 테이블 union 이지만 자주 쓰는 jobs 만 우선)
-// "services" 는 4개 테이블(interior/moving/cleaning/repair) union — web runServices 미러
-// CATEGORIES 의 단일 table 구조와 맞지 않아 searchDirect 내부에서 특별 처리
-const SERVICE_TABLES = [
-  { key: "interior", href: "/interior" },
-  { key: "moving",   href: "/moving" },
-  { key: "cleaning", href: "/cleaning" },
-  { key: "repair",   href: "/repair" },
-] as const
 
 export async function searchDirect(args: {
   q: string
@@ -282,59 +184,6 @@ export async function searchDirect(args: {
       }
     }),
   )
-
-  // services — 4 테이블(interior/moving/cleaning/repair) union, web runServices 미러
-  if (args.scope === "all" || args.scope === "services") {
-    try {
-      const like = `%${q.replace(/[%_,();:.\\]/g, " ")}%`
-      const per = Math.max(5, Math.floor(limit / SERVICE_TABLES.length) + 2)
-      const taskRes = await Promise.all(
-        SERVICE_TABLES.map(async ({ key, href }) => {
-          const table = `${key}_posts`
-          let query: any = (supabase as any)
-            .from(table)
-            .select("id, title, content, category, images, service_region, service_district, min_price, max_price, price_unit, views, created_at")
-            .or(`title.ilike.${like},content.ilike.${like},category.ilike.${like}`)
-            .limit(per)
-          if (plaza) query = query.eq("plaza_id", plaza)
-          const orderCol = sort === "popular" ? "views" : "created_at"
-          query = query.order(orderCol, { ascending: false, nullsFirst: false })
-          if (args.signal) query = query.abortSignal(args.signal)
-          const { data, error } = await query
-          if (error) return []
-          return (data || []).map((r: any) => ({
-            id: r.id,
-            category: "services" as SearchCategory,
-            title: r.title,
-            summary: r.content ? String(r.content).slice(0, 120) : null,
-            thumbnail: firstImage(r.images),
-            location: [r.service_region, r.service_district].filter(Boolean).join(" ") || null,
-            status: null,
-            href: `${href}/${r.id}`,
-            createdAt: r.created_at,
-            meta: { service_type: key, category: r.category, min_price: r.min_price, max_price: r.max_price, price_unit: r.price_unit, views: r.views },
-          }))
-        }),
-      )
-      let merged = taskRes.flat()
-      merged.sort((a, b) => {
-        if (sort === "popular") {
-          const av = (a.meta as any).views || 0
-          const bv = (b.meta as any).views || 0
-          if (av !== bv) return bv - av
-        }
-        const at = a.createdAt ? Date.parse(a.createdAt) : 0
-        const bt = b.createdAt ? Date.parse(b.createdAt) : 0
-        return bt - at
-      })
-      const sliced = merged.slice(0, limit)
-      results.services = sliced as SearchHit[]
-      counts.services = sliced.length
-    } catch (e: any) {
-      if (e?.name === "AbortError") throw e
-      console.warn(`[searchDirect] services error:`, e?.message)
-    }
-  }
 
   // 검색 로그 (best-effort) — web logSearch 미러
   if (args.scope === "all" && q.length >= 2) {

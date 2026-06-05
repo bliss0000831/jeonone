@@ -10,10 +10,8 @@ import { useSiteBranding } from "@/components/site-branding-client"
 import { Button } from "@/components/ui/button"
 import { HeaderActions } from "@/components/header-actions"
 import { PointCoin } from "@/components/point-coin"
-import { PropertyCard } from "@/components/property-card"
-import { ServiceCard, type ServicePost } from "@/components/service-card"
 import { ShareSheet } from "@/components/detail/share-sheet"
-import { dbToProperty, type DbProperty, type Review } from "@/types/app"
+import { type Review } from "@/types/app"
 import { cn } from "@/lib/utils"
 
 import { MyPointsBalance } from "@/components/my-points-balance"
@@ -67,17 +65,9 @@ interface UnifiedPost {
 
 /** 찜 탭 통합 아이템 */
 type SavedKind =
-  | "property"
   | "board"
   | "local-food"
-  | "group-buying"
-  | "club"
-  | "interior"
   | "sharing"
-  | "new-store"
-  | "moving"
-  | "cleaning"
-  | "repair"
 interface SavedItem {
   id: string
   kind: SavedKind
@@ -96,17 +86,9 @@ interface ProfileShellProps {
   initialProfile?: ProfileRow | null
 }
 
-const SERVICE_TABLE: Partial<Record<AccountType, string>> = {
-  interior: "interior_posts",
-  moving: "moving_posts",
-  cleaning: "cleaning_posts",
-  repair: "repair_posts",
-}
-
 /**
  * 게시물 카운트 & 통합 리스트 대상 테이블.
  * user_id 컬럼을 가진 게시물류 테이블만 열거.
- * 주의: `properties` 는 "내 매물" 탭이 별도로 존재하므로 여기서 제외한다.
  */
 const POSTS_SOURCES: Array<{
   table: string
@@ -123,14 +105,7 @@ const POSTS_SOURCES: Array<{
   { table: "jobs_posts",         kind: "jobs",         kindLabel: "일손",     hrefPrefix: "/jobs/",         imageField: "images", cols: "id, title, description, images, created_at, status" },
   { table: "board_posts",        kind: "board",        kindLabel: "게시판",   hrefPrefix: "/board/",        imageField: "images" },
   { table: "sharing_posts",      kind: "sharing",      kindLabel: "나눔",     hrefPrefix: "/sharing/",      imageField: "images" },
-  { table: "group_buying_posts", kind: "group-buying", kindLabel: "공동구매", hrefPrefix: "/group-buying/", imageField: "images" },
-  { table: "new_store_posts",    kind: "new-store",    kindLabel: "신장개업", hrefPrefix: "/new-store/",    imageField: "images" },
   { table: "local_food",         kind: "local-food",   kindLabel: "로컬푸드", hrefPrefix: "/local-food/",   imageField: "images" },
-  { table: "clubs",              kind: "club",         kindLabel: "모임",     hrefPrefix: "/clubs/",        imageField: "images" },
-  { table: "interior_posts",     kind: "interior",     kindLabel: "인테리어", hrefPrefix: "/interior/",     imageField: "images" },
-  { table: "moving_posts",       kind: "moving",       kindLabel: "이사",     hrefPrefix: "/moving/",       imageField: "images" },
-  { table: "cleaning_posts",     kind: "cleaning",     kindLabel: "청소",     hrefPrefix: "/cleaning/",     imageField: "images" },
-  { table: "repair_posts",       kind: "repair",       kindLabel: "수리",     hrefPrefix: "/repair/",       imageField: "images" },
 ]
 
 // ─── Main ─────────────────────────────────────────────────
@@ -161,9 +136,6 @@ export function ProfileShell({
   const [businessInfo, setBusinessInfo] = useState<BusinessInfo | null>(null)
 
   const [highlights, setHighlights] = useState<Highlight[]>([])
-  const [properties, setProperties] = useState<DbProperty[]>([])
-  const [favorites, setFavorites] = useState<DbProperty[]>([])
-  const [servicePosts, setServicePosts] = useState<ServicePost[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
 
   // 찜 탭 — 전체 카테고리에서 찜한 항목 통합
@@ -171,11 +143,8 @@ export function ProfileShell({
   const [savedLoading, setSavedLoading] = useState(false)
   const [savedCategory, setSavedCategory] = useState<SavedKind | "all">("all")
 
-  // 내 글 탭 카테고리 필터 (일반인 계정 전용: 매물/게시판/나눔/모임/신장개업)
+  // 내 글 탭 카테고리 필터 (게시판/나눔/농기구/로컬푸드/일손)
   const [postsCategory, setPostsCategory] = useState<string>("all")
-
-  // 사장님(business) "내 메뉴·상품" 탭 — 공동구매 글 목록
-  const [businessProducts, setBusinessProducts] = useState<UnifiedPost[]>([])
 
   const [activeTab, setActiveTab] = useState<ProfileTabId | null>(null)
   const [shareOpen, setShareOpen] = useState(false)
@@ -183,8 +152,6 @@ export function ProfileShell({
 
   // 게시물 총합 (모든 게시물류 테이블 카운트 합산)
   const [totalPostsCount, setTotalPostsCount] = useState(0)
-  // 매물(또는 서비스 포토폴리오) 카운트 — 상단 "게시물" 카운터에 합산
-  const [listingsCount, setListingsCount] = useState(0)
 
   // posts 탭 통합 리스트
   const [unifiedPosts, setUnifiedPosts] = useState<UnifiedPost[]>([])
@@ -293,7 +260,7 @@ export function ProfileShell({
     return () => { cancelled = true }
   }, [supabase, userId, initialProfile, currentUserId, mode, withPlaza])
 
-  // 1-b) 프로필 의존 데이터 — 사업자 정보 + 매물/포토폴리오 카운트를 병렬 fetch
+  // 1-b) 프로필 의존 데이터 — 사업자 정보 fetch
   useEffect(() => {
     if (!profile) return
     let cancelled = false
@@ -304,38 +271,12 @@ export function ProfileShell({
       const needsBusiness = profile.account_type
         && profile.account_type !== "individual"
         && profile.account_type !== "user"
-      const businessPromise = needsBusiness
-        ? getBusinessInfo(supabase as any, profile.id)
-        : Promise.resolve(null)
-
-      // --- 매물/포토폴리오 카운트 ---
-      const acct = (profile.account_type || "user") as AccountType
-      const table = SERVICE_TABLE[acct] || "properties"
-      const listingsPromise = (async () => {
-        try {
-          let q: any = (supabase as any)
-            .from(table)
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId)
-          q = withPlaza(q)
-          if (mode === "other") {
-            q = q.eq("status", "active")
-          }
-          const { count } = await q
-          return count ?? 0
-        } catch {
-          return 0
-        }
-      })()
-
-      const [businessData, listingsData] = await Promise.all([
-        businessPromise,
-        listingsPromise,
-      ])
+      const businessData = needsBusiness
+        ? await getBusinessInfo(supabase as any, profile.id)
+        : null
 
       if (cancelled) return
       setBusinessInfo(businessData)
-      setListingsCount(listingsData)
     }
     load()
     return () => { cancelled = true }
@@ -374,22 +315,7 @@ export function ProfileShell({
       if (!profile || !activeTab) return
       const acct = (profile.account_type || "user") as AccountType
 
-      if (activeTab === "listings" || (activeTab === "posts" && acct === "user") || activeTab === "saved") {
-        // properties 필요
-      }
-
       switch (activeTab) {
-        case "listings": {
-          // limit 추가 — 매물 많은 중개사 프로필에서 무제한 fetch 방지 (2026-04 audit, #11).
-          // 50개면 보통 충분. 더 보고 싶으면 무한스크롤은 추후 작업.
-          // 정렬: 올리기 반영 → effective_at (= COALESCE(bumped_at, created_at)) DESC.
-          let q: any = supabase.from("properties").select("*").eq("user_id", userId)
-          q = withPlaza(q)
-          if (mode === "other") q = q.eq("status", "active")
-          const { data } = await q.order("effective_at", { ascending: false }).limit(50)
-          if (!cancelled && data) setProperties(data as DbProperty[])
-          break
-        }
         case "posts": {
           // 타인 프로필에서 비공개면 로드 건너뜀
           if (mode === "other" && profile.posts_public === false) {
@@ -400,8 +326,7 @@ export function ProfileShell({
           try {
             // 올리기(bump) 기능 있는 테이블 — effective_at(= COALESCE(bumped_at, created_at)) 로 정렬
             const BUMPABLE_TABLES = new Set([
-              "group_buying_posts", "new_store_posts", "local_food",
-              "interior_posts", "moving_posts", "cleaning_posts", "repair_posts",
+              "local_food",
             ])
             const results = await Promise.all(
               POSTS_SOURCES.map(async (src) => {
@@ -419,9 +344,6 @@ export function ProfileShell({
                     .order(isBumpable ? "effective_at" : "created_at", { ascending: false })
                     .limit(20)
                   q = withPlaza(q)
-                  if (mode === "other" && src.table === "properties") {
-                    q = q.eq("status", "active")
-                  }
                   const { data } = await q
                   return (data || []).map((row: any) => {
                     const imgs = Array.isArray(row[src.imageField || "images"])
@@ -444,38 +366,9 @@ export function ProfileShell({
                 }
               }),
             )
-            // 매물 권한 있는 계정의 본인 매물도 "내 글" 에 포함 (kind="property")
-            // agent 는 "매물"이 별도 탭(listings) 이므로 제외
-            let propertyPosts: UnifiedPost[] = []
-            if (acct !== "agent") {
-              try {
-                let pq: any = supabase
-                  .from("properties")
-                  .select("id, title, description, images, created_at, bumped_at, effective_at, status, district")
-                  .eq("user_id", userId)
-                  .order("effective_at", { ascending: false })
-                  .limit(50)
-                pq = withPlaza(pq)
-                if (mode === "other") pq = pq.eq("status", "active")
-                const { data: props } = await pq
-                propertyPosts = (props || []).map((row: any) => ({
-                  id: String(row.id),
-                  kind: "property",
-                  kindLabel: "매물",
-                  title: row.title || "(제목 없음)",
-                  excerpt: row.description || row.district || null,
-                  created_at: row.effective_at ?? row.bumped_at ?? row.created_at,
-                  href: `/property/${row.id}`,
-                  image: Array.isArray(row.images) && row.images.length > 0 ? row.images[0] : null,
-                }))
-              } catch {
-                propertyPosts = []
-              }
-            }
-
             // 역할 전용 콘텐츠는 "내 글" 에서 제외 (각자의 role tab 에 이미 표시됨)
             const excludeKinds = ROLE_EXCLUDE_FROM_POSTS[acct] ?? []
-            const merged = [...results.flat(), ...propertyPosts]
+            const merged = results.flat()
               .filter((p) => !excludeKinds.includes(p.kind))
               .sort(
                 (a, b) =>
@@ -490,52 +383,11 @@ export function ProfileShell({
           }
           break
         }
-        case "portfolio":
-        case "services":
-        case "products": {
-          // 사장님: 공동구매를 "내 메뉴·상품" 탭에 표시
-          if (acct === "business" && activeTab === "products") {
-            let gq: any = supabase
-              .from("group_buying_posts")
-              .select("id, title, description, images, created_at, bumped_at, effective_at, status")
-              .eq("user_id", userId)
-              .order("effective_at", { ascending: false })
-              .limit(50)
-            gq = withPlaza(gq)
-            if (mode === "other") gq = gq.eq("status", "active")
-            const { data } = await gq
-            if (!cancelled) {
-              setBusinessProducts(
-                (data || []).map((row: any) => ({
-                  id: String(row.id),
-                  kind: "group-buying",
-                  kindLabel: "공동구매",
-                  title: row.title || "(제목 없음)",
-                  excerpt: row.description || null,
-                  created_at: row.created_at,
-                  href: `/group-buying/${row.id}`,
-                  image: Array.isArray(row.images) && row.images.length > 0 ? row.images[0] : null,
-                })),
-              )
-              setServicePosts([])
-            }
-            break
-          }
-          const table = SERVICE_TABLE[acct]
-          if (!table) { if (!cancelled) setServicePosts([]); break }
-          let q: any = (supabase as any).from(table).select("*").eq("user_id", userId)
-          q = withPlaza(q)
-          if (mode === "other") q = q.eq("status", "active")
-          // 인테리어/이사/청소/수리 모두 bump 가능 — effective_at 정렬
-          const { data } = await q.order("effective_at", { ascending: false })
-          if (!cancelled && data) setServicePosts(data as ServicePost[])
-          break
-        }
         case "saved": {
           if (mode !== "self") break
           setSavedLoading(true)
           try {
-            // 11개 카테고리 찜 병렬 로드 (테이블 없을 때는 빈 배열 fallback)
+            // 찜 카테고리 병렬 로드 (테이블 없을 때는 빈 배열 fallback)
             const safeQuery = async <T,>(p: Promise<{ data: T | null; error: any }>) => {
               try {
                 const r = await p
@@ -545,28 +397,12 @@ export function ProfileShell({
               }
             }
             const [
-              propRes,
               boardRes,
               foodRes,
-              groupRes,
-              clubRes,
-              interiorRes,
               sharingRes,
-              newStoreRes,
-              movingRes,
-              cleaningRes,
-              repairRes,
             ] = await Promise.all([
               // 모든 like/favorite 테이블에 plaza_id 컬럼 존재 (마이그레이션 13).
               // 광장 도메인이면 그 광장 찜만 노출.
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("favorites")
-                    .select("created_at, property_id, properties(*)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
               safeQuery(
                 withPlaza(
                   supabase
@@ -586,64 +422,8 @@ export function ProfileShell({
               safeQuery(
                 withPlaza(
                   supabase
-                    .from("group_buying_wishlist")
-                    .select("created_at, post_id, group_buying_posts(id, title, description, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("club_likes")
-                    .select("created_at, club_id, clubs(id, title, sport_type, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("interior_favorites")
-                    .select("created_at, post_id, interior_posts(id, title, content, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
                     .from("sharing_likes")
                     .select("created_at, post_id, sharing_posts(id, title, description, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("new_store_likes")
-                    .select("created_at, post_id, new_store_posts(id, store_name, description, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("moving_favorites")
-                    .select("created_at, post_id, moving_posts(id, title, content, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("cleaning_favorites")
-                    .select("created_at, post_id, cleaning_posts(id, title, content, images, created_at)")
-                    .eq("user_id", userId),
-                ).order("created_at", { ascending: false }).limit(50),
-              ),
-              safeQuery(
-                withPlaza(
-                  supabase
-                    .from("repair_favorites")
-                    .select("created_at, post_id, repair_posts(id, title, content, images, created_at)")
                     .eq("user_id", userId),
                 ).order("created_at", { ascending: false }).limit(50),
               ),
@@ -652,20 +432,6 @@ export function ProfileShell({
             // 각 응답을 SavedItem 통일 포맷으로 변환 (테이블 없어서 에러 난 경우 무시)
             const items: SavedItem[] = []
 
-            for (const r of (propRes.data || []) as any[]) {
-              const p = r.properties
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "property",
-                kindLabel: "부동산",
-                title: p.title,
-                subtitle: p.district,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/property/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
             for (const r of (boardRes.data || []) as any[]) {
               const p = r.board_posts
               if (!p) continue
@@ -694,48 +460,6 @@ export function ProfileShell({
                 created_at: r.created_at,
               })
             }
-            for (const r of (groupRes.data || []) as any[]) {
-              const p = r.group_buying_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "group-buying",
-                kindLabel: "공동구매",
-                title: p.title,
-                subtitle: p.description?.slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/group-buying/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
-            for (const r of (clubRes.data || []) as any[]) {
-              const p = r.clubs
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "club",
-                kindLabel: "모임",
-                title: p.title,
-                subtitle: p.sport_type || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/clubs/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
-            for (const r of (interiorRes.data || []) as any[]) {
-              const p = r.interior_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "interior",
-                kindLabel: "홈즈",
-                title: p.title,
-                subtitle: (p.content || "").slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/interior/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
             for (const r of (sharingRes.data || []) as any[]) {
               const p = r.sharing_posts
               if (!p) continue
@@ -750,62 +474,6 @@ export function ProfileShell({
                 created_at: r.created_at,
               })
             }
-            for (const r of (newStoreRes.data || []) as any[]) {
-              const p = r.new_store_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "new-store",
-                kindLabel: "신장개업",
-                title: p.store_name,
-                subtitle: p.description?.slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/new-store/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
-            for (const r of (movingRes.data || []) as any[]) {
-              const p = r.moving_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "moving",
-                kindLabel: "이사",
-                title: p.title,
-                subtitle: (p.content || "").slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/moving/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
-            for (const r of (cleaningRes.data || []) as any[]) {
-              const p = r.cleaning_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "cleaning",
-                kindLabel: "청소",
-                title: p.title,
-                subtitle: (p.content || "").slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/cleaning/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
-            for (const r of (repairRes.data || []) as any[]) {
-              const p = r.repair_posts
-              if (!p) continue
-              items.push({
-                id: String(p.id),
-                kind: "repair",
-                kindLabel: "수리",
-                title: p.title,
-                subtitle: (p.content || "").slice(0, 40) || null,
-                image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
-                href: `/repair/${p.id}`,
-                created_at: r.created_at,
-              })
-            }
 
             // 찜한 시각 내림차순 정렬
             items.sort(
@@ -814,13 +482,7 @@ export function ProfileShell({
                 new Date(a.created_at).getTime(),
             )
 
-            // 기존 호환 (favorites 상태는 부동산만 유지)
             if (!cancelled) {
-              setFavorites(
-                ((propRes.data || []) as any[])
-                  .map((f: any) => f.properties)
-                  .filter(Boolean) as DbProperty[],
-              )
               setSavedItems(items)
             }
           } finally {
@@ -965,16 +627,12 @@ export function ProfileShell({
     reviewCount: profile.review_count,
   }
 
-  // 게시물 수 (상단 카운터) = 매물/포토폴리오 + 내 글
-  cardData.postsCount = listingsCount + totalPostsCount
+  // 게시물 수 (상단 카운터) = 내 글
+  cardData.postsCount = totalPostsCount
 
   const tabCounts: Partial<Record<ProfileTabId, number>> = {
-    listings: properties.length,
-    portfolio: servicePosts.length,
-    services: servicePosts.length,
-    products: servicePosts.length,
     posts: totalPostsCount,
-    saved: favorites.length,
+    saved: savedItems.length,
   }
 
   // 타인 프로필에서 게시물 비공개 설정
@@ -1080,9 +738,6 @@ export function ProfileShell({
             renderTabContent({
               activeTab,
               profile,
-              properties,
-              favorites,
-              servicePosts,
               unifiedPosts,
               unifiedLoading,
               postsHiddenForOthers,
@@ -1095,7 +750,6 @@ export function ProfileShell({
               onSavedCategoryChange: setSavedCategory,
               postsCategory,
               onPostsCategoryChange: setPostsCategory,
-              businessProducts,
             })
           )}
         </div>
@@ -1153,9 +807,6 @@ export function ProfileShell({
 interface RenderArgs {
   activeTab: ProfileTabId | null
   profile: ProfileRow
-  properties: DbProperty[]
-  favorites: DbProperty[]
-  servicePosts: ServicePost[]
   unifiedPosts: UnifiedPost[]
   unifiedLoading: boolean
   postsHiddenForOthers: boolean
@@ -1168,90 +819,22 @@ interface RenderArgs {
   onSavedCategoryChange: (c: SavedKind | "all") => void
   postsCategory: string
   onPostsCategoryChange: (c: string) => void
-  businessProducts: UnifiedPost[]
 }
 
 function renderTabContent(args: RenderArgs) {
   const {
-    activeTab, profile, properties, favorites, servicePosts,
+    activeTab, profile,
     unifiedPosts, unifiedLoading, postsHiddenForOthers,
-    reviews, currentUserId, mode,
+    mode,
     savedItems, savedLoading, savedCategory, onSavedCategoryChange,
     postsCategory, onPostsCategoryChange,
-    businessProducts,
   } = args
 
   switch (activeTab) {
-    case "listings":
-      return (
-        <Grid empty={properties.length === 0} emptyText="등록된 매물이 없습니다">
-          {properties.map((p) => (
-            <PropertyCard key={p.id} property={dbToProperty(p)} currentUserId={currentUserId || undefined} />
-          ))}
-        </Grid>
-      )
-
     case "portfolio":
     case "services":
-    case "products": {
-      const acct = (profile.account_type || "user") as AccountType
-      // 사장님: "내 메뉴·상품" 탭에서 본인의 공동구매 글 목록 표시
-      if (acct === "business" && activeTab === "products") {
-        if (businessProducts.length === 0) return <Empty text="등록된 공동구매가 없습니다" />
-        return (
-          <ul className="space-y-2">
-            {businessProducts.map((p) => (
-              <li key={`${p.kind}-${p.id}`}>
-                <Link
-                  href={p.href}
-                  className="flex gap-3 p-3 bg-card rounded-xl border border-border hover:bg-secondary/50 transition-colors"
-                >
-                  {p.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.image}
-                      alt=""
-                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-secondary"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-lg bg-secondary flex-shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-violet-500/10 text-violet-600">
-                        {p.kindLabel}
-                      </span>
-                      <h4 className="font-medium text-sm truncate flex-1">{p.title}</h4>
-                    </div>
-                    {p.excerpt && (
-                      <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{p.excerpt}</p>
-                    )}
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {new Date(p.created_at).toLocaleDateString("ko-KR")}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )
-      }
-      if (!["interior", "moving", "cleaning", "repair"].includes(acct)) {
-        return <Empty text="등록된 콘텐츠가 없습니다" />
-      }
-      return (
-        <Grid empty={servicePosts.length === 0} emptyText="등록된 글이 없습니다">
-          {servicePosts.map((post) => (
-            <ServiceCard
-              key={post.id}
-              post={post}
-              serviceType={acct as "interior" | "moving" | "cleaning" | "repair"}
-              currentUserId={currentUserId || undefined}
-            />
-          ))}
-        </Grid>
-      )
-    }
+    case "products":
+      return <Empty text="등록된 콘텐츠가 없습니다" />
 
     case "posts": {
       if (postsHiddenForOthers) {
@@ -1365,8 +948,6 @@ function renderTabContent(args: RenderArgs) {
           loading={savedLoading}
           category={savedCategory}
           onCategoryChange={onSavedCategoryChange}
-          favorites={favorites}
-          currentUserId={currentUserId}
         />
       )
     }
@@ -1391,8 +972,8 @@ function renderTabContent(args: RenderArgs) {
 }
 
 // ─── 내 글 탭 — 역할별 카테고리 필터 ───────────────────
-// 권한 매트릭스와 1:1 매칭. 역할 전용 콘텐츠(매물 for agent, 로컬푸드 for producer,
-// 인테리어/이사/청소/수리)는 각자의 role tab 에 이미 있으므로 "내 글"에서 제외.
+// 권한 매트릭스와 1:1 매칭. 역할 전용 콘텐츠(로컬푸드 for producer)는
+// 각자의 role tab 에 이미 있으므로 "내 글"에서 제외.
 // key 는 UnifiedPost.kind 와 동일하게 맞춤.
 type PostsCategory = { key: string; label: string }
 
@@ -1407,29 +988,17 @@ const BASE_POSTS_CATEGORIES: PostsCategory[] = [
 
 const POSTS_CATEGORIES_BY_ROLE: Record<AccountType, PostsCategory[]> = {
   user:     BASE_POSTS_CATEGORIES,
-  // 공인중개사: 매물은 별도 탭이므로 제외
-  agent:    BASE_POSTS_CATEGORIES.filter((c) => c.key !== "property"),
   // 생산자: 로컬푸드는 별도 탭(상품)
   producer: BASE_POSTS_CATEGORIES,
-  // 사장님: 공동구매는 "내 메뉴·상품" 탭에 속하므로 "내 글"에서는 제외
+  // 사장님: 기본 그대로
   business: BASE_POSTS_CATEGORIES,
-  // 전문 서비스: 각자의 서비스는 별도 탭이므로 기본 그대로
-  interior: BASE_POSTS_CATEGORIES,
-  moving:   BASE_POSTS_CATEGORIES,
-  cleaning: BASE_POSTS_CATEGORIES,
-  repair:   BASE_POSTS_CATEGORIES,
 }
 
 /** 역할별로 "내 글" 에서 빼야 하는 UnifiedPost.kind 목록 (role tab 중복 방지). */
 const ROLE_EXCLUDE_FROM_POSTS: Record<AccountType, string[]> = {
   user:     [],
-  agent:    ["property"],      // 매물은 listings 탭
   producer: ["local-food"],    // 로컬푸드는 products 탭
-  business: ["group-buying"],  // 공동구매는 "내 메뉴·상품" 탭에서 표시
-  interior: ["interior"],      // portfolio 탭
-  moving:   ["moving"],        // services 탭
-  cleaning: ["cleaning"],      // services 탭
-  repair:   ["repair"],        // services 탭
+  business: [],
 }
 
 // ─── 찜 탭 ─────────────────────────────────────────────
@@ -1438,47 +1007,32 @@ const SAVED_CATEGORIES: Array<{
   label: string
 }> = [
   { key: "all",          label: "전체" },
-  { key: "property",     label: "부동산" },
-  { key: "interior",     label: "홈즈" }, // 인테리어 + 이사 + 청소 + 수리 합산
   { key: "sharing",      label: "나눔" },
-  { key: "group-buying", label: "공동구매" },
   { key: "local-food",   label: "로컬푸드" },
-  { key: "new-store",    label: "신장개업" },
-  { key: "club",         label: "모임" },
   { key: "board",        label: "게시판" },
 ]
-
-/** "홈즈" 카테고리에 포함되는 kinds */
-const INTERIOR_GROUP: SavedKind[] = ["interior", "moving", "cleaning", "repair"]
 
 function SavedTab({
   items,
   loading,
   category,
   onCategoryChange,
-  favorites,
-  currentUserId,
 }: {
   items: SavedItem[]
   loading: boolean
   category: SavedKind | "all"
   onCategoryChange: (c: SavedKind | "all") => void
-  favorites: DbProperty[]
-  currentUserId: string | null
 }) {
-  // 카테고리별 개수 (홈즈는 interior/moving/cleaning/repair 합산)
+  // 카테고리별 개수
   const counts: Record<string, number> = { all: items.length }
   for (const it of items) {
-    const bucket = INTERIOR_GROUP.includes(it.kind) ? "interior" : it.kind
-    counts[bucket] = (counts[bucket] || 0) + 1
+    counts[it.kind] = (counts[it.kind] || 0) + 1
   }
 
   const filtered =
     category === "all"
       ? items
-      : category === "interior"
-        ? items.filter((i) => INTERIOR_GROUP.includes(i.kind))
-        : items.filter((i) => i.kind === category)
+      : items.filter((i) => i.kind === category)
 
   return (
     <div className="space-y-4">
@@ -1520,19 +1074,8 @@ function SavedTab({
         <div className="py-12 text-center text-muted-foreground text-sm">불러오는 중…</div>
       ) : filtered.length === 0 ? (
         <Empty text="찜한 항목이 없습니다" />
-      ) : category === "property" ? (
-        // 부동산만 보는 경우 PropertyCard 로 표시
-        <Grid empty={favorites.length === 0} emptyText="찜한 매물이 없습니다">
-          {favorites.map((p) => (
-            <PropertyCard
-              key={p.id}
-              property={dbToProperty(p)}
-              currentUserId={currentUserId || undefined}
-            />
-          ))}
-        </Grid>
       ) : (
-        // 그 외(전체 포함): 통합 리스트 카드
+        // 통합 리스트 카드
         <ul className="space-y-2">
           {filtered.map((it) => (
             <li key={`${it.kind}-${it.id}`}>
@@ -1571,17 +1114,6 @@ function SavedTab({
           ))}
         </ul>
       )}
-    </div>
-  )
-}
-
-function Grid({
-  children, empty, emptyText,
-}: { children: React.ReactNode; empty: boolean; emptyText: string }) {
-  if (empty) return <Empty text={emptyText} />
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3">
-      {children}
     </div>
   )
 }

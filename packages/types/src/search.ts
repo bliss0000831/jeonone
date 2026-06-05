@@ -1,12 +1,7 @@
 export type SearchCategory =
-  | "properties"
   | "board"
   | "sharing"
-  | "clubs"
-  | "group_buying"
   | "local_food"
-  | "services"
-  | "new_store"
   | "profiles"
 
 export type SearchSort = "latest" | "popular"

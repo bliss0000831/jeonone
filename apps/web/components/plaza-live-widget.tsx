@@ -21,15 +21,13 @@ import {
 import { createClient } from "@/lib/supabase/client"
 import { useSiteBranding } from "@/components/site-branding-client"
 import { plazaCityName } from "@/lib/plaza/city-name"
-import type { ClubPost } from "@/components/club-card"
 import type { SharingPost } from "@/components/sharing-card"
-import type { GroupBuyingPost } from "@/components/group-buying-card"
 import type { LocalFoodPost } from "@/components/local-food-card"
 import type { SecondhandPost } from "@/components/secondhand-card"
 import type { JobsPost } from "@/components/jobs-card"
 import { cn } from "@/lib/utils"
 
-type FeedKind = "club" | "sharing" | "group_buying" | "local_food" | "secondhand" | "jobs"
+type FeedKind = "sharing" | "local_food" | "secondhand" | "jobs"
 
 interface FeedItem {
   id: string
@@ -43,24 +41,15 @@ interface FeedItem {
 }
 
 interface PlazaLiveWidgetProps {
-  clubPosts: ClubPost[]
   sharingPosts: SharingPost[]
-  groupBuyingPosts: GroupBuyingPost[]
   localFoodPosts: LocalFoodPost[]
   secondhandPosts: SecondhandPost[]
   jobsPosts: JobsPost[]
 }
 
-const SPORT_EMOJI: Record<string, string> = {
-  러닝: "🏃", 배드민턴: "🏸", 축구: "⚽", 농구: "🏀", 테니스: "🎾",
-  등산: "🥾", 자전거: "🚴", 요가: "🧘", 골프: "⛳", 볼링: "🎳",
-}
-
 // 카테고리: 라벨 + 색상 (단색만 사용 — 차분하게)
 const KIND_META: Record<FeedKind, { label: string; ring: string; text: string; bg: string }> = {
-  club:         { label: "모임",     ring: "ring-violet-500/30",  text: "text-violet-700 dark:text-violet-300",  bg: "bg-violet-500"  },
   sharing:      { label: "나눔",     ring: "ring-rose-500/30",    text: "text-rose-700 dark:text-rose-300",      bg: "bg-rose-500"    },
-  group_buying: { label: "공동구매", ring: "ring-blue-500/30",    text: "text-blue-700 dark:text-blue-300",      bg: "bg-blue-500"    },
   local_food:   { label: "로컬푸드", ring: "ring-emerald-500/30", text: "text-emerald-700 dark:text-emerald-300", bg: "bg-emerald-500" },
   secondhand:   { label: "중고거래", ring: "ring-amber-500/30",   text: "text-amber-700 dark:text-amber-300",    bg: "bg-amber-500"   },
   jobs:         { label: "구인구직", ring: "ring-teal-500/30",    text: "text-teal-700 dark:text-teal-300",      bg: "bg-teal-500"    },
@@ -78,9 +67,7 @@ function timeAgo(dateStr: string) {
 
 function actionVerb(kind: FeedKind) {
   switch (kind) {
-    case "club":         return "모임을 열었어요"
     case "sharing":      return "나눠요"
-    case "group_buying": return "공동구매를 열었어요"
     case "local_food":   return "팔아요"
     case "secondhand":   return "내놓았어요"
     case "jobs":         return "모집해요"
@@ -120,7 +107,7 @@ function todayLabel() {
 }
 
 export function PlazaLiveWidget({
-  clubPosts, sharingPosts, groupBuyingPosts, localFoodPosts, secondhandPosts, jobsPosts,
+  sharingPosts, localFoodPosts, secondhandPosts, jobsPosts,
 }: PlazaLiveWidgetProps) {
   const { name: plazaName } = useSiteBranding()
   const cityName = plazaCityName(plazaName)
@@ -129,19 +116,14 @@ export function PlazaLiveWidget({
     const items: FeedItem[] = []
     const firstImage = (imgs: any): string | null =>
       Array.isArray(imgs) && typeof imgs[0] === "string" ? imgs[0] : null
-    for (const p of clubPosts) {
-      const emoji = (p.sport_type && SPORT_EMOJI[p.sport_type]) || "🏃"
-      items.push({ id: `club-${p.id}`, kind: "club", emoji, userId: p.user_id, title: p.title, created_at: p.created_at, href: `/clubs/${p.id}`, thumbnail: firstImage((p as any).images) })
-    }
     for (const p of sharingPosts)      items.push({ id: `sh-${p.id}`,  kind: "sharing",      emoji: "💝", userId: p.user_id, title: p.title, created_at: p.created_at, href: `/sharing/${p.id}`,      thumbnail: firstImage((p as any).images) })
-    for (const p of groupBuyingPosts)  items.push({ id: `gb-${p.id}`,  kind: "group_buying", emoji: "🛒", userId: p.user_id, title: p.title, created_at: p.created_at, href: `/group-buying/${p.id}`, thumbnail: firstImage((p as any).images) })
     for (const p of localFoodPosts)    items.push({ id: `lf-${p.id}`,  kind: "local_food",   emoji: "🥬", userId: p.user_id, title: p.title, created_at: p.created_at, href: `/local-food/${p.id}`,   thumbnail: firstImage((p as any).images) })
     for (const p of secondhandPosts)   items.push({ id: `2h-${p.id}`,  kind: "secondhand",   emoji: "🛍️", userId: p.user_id, title: p.title, created_at: p.created_at, href: `/secondhand/${p.id}`,  thumbnail: firstImage((p as any).images) })
     for (const p of jobsPosts)         items.push({ id: `job-${p.id}`, kind: "jobs",         emoji: "💼", userId: p.user_id, title: p.title, created_at: p.created_at, href: `/jobs/${p.id}`,         thumbnail: firstImage((p as any).images) })
     return items
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 6)
-  }, [clubPosts, sharingPosts, groupBuyingPosts, localFoodPosts, secondhandPosts, jobsPosts])
+  }, [sharingPosts, localFoodPosts, secondhandPosts, jobsPosts])
 
   // 닉네임 (sessionStorage TTL 5분 캐시 — 홈 로드마다 DB 조회 방지)
   const [nicknames, setNicknames] = useState<Record<string, string>>({})
@@ -182,20 +164,18 @@ export function PlazaLiveWidget({
   // 단일 패스로 통계 계산 (이전: 3회 전체 스캔 + 2 중간 배열 생성)
   const stats = useMemo(() => {
     let todayPosts = 0
-    let newClubs = 0
     const authorSet = new Set<string>()
-    const allArrays = [clubPosts, sharingPosts, groupBuyingPosts, localFoodPosts, secondhandPosts, jobsPosts]
+    const allArrays = [sharingPosts, localFoodPosts, secondhandPosts, jobsPosts]
     for (let i = 0; i < allArrays.length; i++) {
       for (const p of allArrays[i]) {
         if (p.created_at && isToday(p.created_at)) {
           todayPosts++
           authorSet.add((p as any).user_id)
-          if (i === 0) newClubs++ // clubPosts는 첫 번째 배열
         }
       }
     }
-    return { todayPosts, todayAuthors: authorSet.size, newClubs }
-  }, [clubPosts, sharingPosts, groupBuyingPosts, localFoodPosts, secondhandPosts, jobsPosts])
+    return { todayPosts, todayAuthors: authorSet.size }
+  }, [sharingPosts, localFoodPosts, secondhandPosts, jobsPosts])
 
   const [newNeighbors, setNewNeighbors] = useState<number>(0)
   useEffect(() => {
@@ -251,7 +231,6 @@ export function PlazaLiveWidget({
   if (stats.todayPosts > 0)   statBits.push({ label: "오늘 새 글",  value: stats.todayPosts, accent: true })
   if (newNeighbors > 0)       statBits.push({ label: "새 이웃",     value: newNeighbors })
   if (stats.todayAuthors > 0) statBits.push({ label: "활동한 이웃", value: stats.todayAuthors })
-  if (stats.newClubs > 0)     statBits.push({ label: "새 모임",     value: stats.newClubs })
 
   return (
     <section className="py-8 border-t border-border">

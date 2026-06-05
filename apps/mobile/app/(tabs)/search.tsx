@@ -41,9 +41,6 @@ function recentKey(plaza: string | null | undefined): string {
   return `${RECENT_KEY_PREFIX}${plaza || "default"}`
 }
 
-const PROPERTY_TYPES = ["전체", "아파트", "빌라", "오피스텔", "원룸", "투룸", "주택", "펜션", "상가", "사무실", "토지"]
-const TRANSACTION_TYPES = ["전체", "매매", "전세", "월세"]
-
 type TabKey = "all" | SearchCategory
 
 interface TabMeta {
@@ -61,26 +58,10 @@ const TABS: TabMeta[] = [
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; color: string; bg: string; icon: string }> = {
-  properties:   { label: "부동산",   color: "#2563eb", bg: "rgba(59,130,246,0.1)", icon: "home-outline" },
   board:        { label: "마을소식", color: "#225a39", bg: "rgba(34,90,57,0.1)", icon: "newspaper-outline" },
   sharing:      { label: "무료나눔", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "gift-outline" },
-  clubs:        { label: "모임",     color: "#6366f1", bg: "rgba(99,102,241,0.1)", icon: "people-outline" },
-  group_buying: { label: "공동구매", color: "#8b5cf6", bg: "rgba(139,92,246,0.1)", icon: "cart-outline" },
   local_food:   { label: "로컬푸드", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: "leaf-outline" },
-  services:     { label: "서비스",   color: "#ea580c", bg: "rgba(234,88,12,0.1)", icon: "construct-outline" },
-  new_store:    { label: "신장개업", color: "#f97316", bg: "rgba(249,115,22,0.1)", icon: "storefront-outline" },
   profiles:     { label: "사람",     color: "#ec4899", bg: "rgba(236,72,153,0.1)", icon: "person-outline" },
-}
-
-function formatPrice(meta: Record<string, any>): string | null {
-  const { transaction_type, price, monthly_rent } = meta
-  if (!transaction_type) return null
-  if (transaction_type === "매매" && price) return `${Number(price).toLocaleString()}만원`
-  if (transaction_type === "전세" && price) return `${Number(price).toLocaleString()}만원`
-  if (transaction_type === "월세" && (price || monthly_rent)) {
-    return `${Number(price || 0).toLocaleString()}/${Number(monthly_rent || 0).toLocaleString()}만원`
-  }
-  return null
 }
 
 import { relativeDate } from "@/lib/relative-date"
@@ -94,12 +75,10 @@ export default function SearchTab() {
   const [tab, setTab] = useState<TabKey>("all")
   const [sort, setSort] = useState<SearchSort>("latest")
   const [results, setResults] = useState<Record<SearchCategory, SearchHit[]>>({
-    properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-    local_food: [], services: [], new_store: [], profiles: [],
+    board: [], sharing: [], local_food: [], profiles: [],
   })
   const [counts, setCounts] = useState<Record<SearchCategory, number>>({
-    properties: 0, board: 0, sharing: 0, clubs: 0, group_buying: 0,
-    local_food: 0, services: 0, new_store: 0, profiles: 0,
+    board: 0, sharing: 0, local_food: 0, profiles: 0,
   })
   const [loading, setLoading] = useState(false)
   const [recent, setRecent] = useState<string[]>([])
@@ -109,9 +88,6 @@ export default function SearchTab() {
 
   const [refreshing, setRefreshing] = useState(false)
   const [searchError, setSearchError] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
-  const [propertyType, setPropertyType] = useState("전체")
-  const [transactionType, setTransactionType] = useState("전체")
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -157,12 +133,10 @@ export default function SearchTab() {
   const runSearch = useCallback(async (query: string, targetTab: TabKey, targetSort: SearchSort) => {
     if (!query) {
       setResults({
-        properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-        local_food: [], services: [], new_store: [], profiles: [],
+        board: [], sharing: [], local_food: [], profiles: [],
       })
       setCounts({
-        properties: 0, board: 0, sharing: 0, clubs: 0, group_buying: 0,
-        local_food: 0, services: 0, new_store: 0, profiles: 0,
+        board: 0, sharing: 0, local_food: 0, profiles: 0,
       })
       return
     }
@@ -198,8 +172,7 @@ export default function SearchTab() {
         console.warn("[search] error", e)
         setSearchError(true)
         setResults({
-          properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-          local_food: [], services: [], new_store: [], profiles: [],
+          board: [], sharing: [], local_food: [], profiles: [],
         })
       }
     } finally {
@@ -231,15 +204,7 @@ export default function SearchTab() {
 
   const isEmpty = !q
   const totalCount =
-    counts.properties + counts.board + counts.sharing + counts.clubs + counts.group_buying +
-    counts.local_food + counts.services + counts.new_store + counts.profiles
-
-  const filteredProperties = useMemo(() => {
-    let hits = results.properties
-    if (propertyType !== "전체") hits = hits.filter((h) => h.meta?.property_type === propertyType)
-    if (transactionType !== "전체") hits = hits.filter((h) => h.meta?.transaction_type === transactionType)
-    return hits
-  }, [results.properties, propertyType, transactionType])
+    counts.board + counts.sharing + counts.local_food + counts.profiles
 
   const handleHitPress = useCallback((hit: SearchHit) => {
     // 모든 도메인이 RN 라우트로 마이그레이션 완료.
@@ -291,42 +256,7 @@ export default function SearchTab() {
             </Pressable>
           )}
         </View>
-        {tab === "properties" && q && (
-          <Pressable onPress={() => setShowFilters((v) => !v)} hitSlop={6} style={styles.filterBtn}>
-            <Ionicons name="options-outline" size={18} color={lightColors.ink900} />
-          </Pressable>
-        )}
       </View>
-
-      {/* 부동산 필터 */}
-      {tab === "properties" && q && showFilters && (
-        <View style={styles.filtersWrap}>
-          <Text style={styles.filterLabel}>유형</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-            {PROPERTY_TYPES.map((t) => (
-              <Pressable
-                key={t}
-                onPress={() => setPropertyType(t)}
-                style={[styles.filterChip, propertyType === t && styles.filterChipActive]}
-              >
-                <Text style={[styles.filterChipText, propertyType === t && { color: "#ffffff" }]}>{t}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-          <Text style={[styles.filterLabel, { marginTop: 8 }]}>거래</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-            {TRANSACTION_TYPES.map((t) => (
-              <Pressable
-                key={t}
-                onPress={() => setTransactionType(t)}
-                style={[styles.filterChip, transactionType === t && styles.filterChipActive]}
-              >
-                <Text style={[styles.filterChipText, transactionType === t && { color: "#ffffff" }]}>{t}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-      )}
 
       {/* 탭 — web 은 빈 상태에서도 노출 (검색어 입력 후 카운트 표시) */}
       <View style={styles.tabWrap}>
@@ -511,7 +441,6 @@ export default function SearchTab() {
           tab={tab}
           results={results}
           counts={counts}
-          filteredProperties={filteredProperties}
           totalCount={totalCount}
           sort={sort}
           setSort={setSort}
@@ -536,7 +465,6 @@ function SearchResultsList({
   tab,
   results,
   counts,
-  filteredProperties,
   totalCount,
   sort,
   setSort,
@@ -549,7 +477,6 @@ function SearchResultsList({
   tab: TabKey
   results: Record<SearchCategory, SearchHit[]>
   counts: Record<SearchCategory, number>
-  filteredProperties: SearchHit[]
   totalCount: number
   sort: SearchSort
   setSort: (s: SearchSort) => void
@@ -572,9 +499,9 @@ function SearchResultsList({
       }
       return items
     }
-    const hits = (tab === "properties" ? filteredProperties : results[tab as SearchCategory]).slice(0, 30)
+    const hits = results[tab as SearchCategory].slice(0, 30)
     return hits.map((h) => ({ type: "hit" as const, hit: h }))
-  }, [tab, results, counts, filteredProperties])
+  }, [tab, results, counts])
 
   const keyExtractor = useCallback(
     (item: ResultListItem, index: number) =>
@@ -652,7 +579,6 @@ function SearchResultsList({
 
 const HitCard = memo(function HitCard({ hit, onPress }: { hit: SearchHit; onPress: (hit: SearchHit) => void }) {
   const meta = CATEGORY_META[hit.category]
-  const price = hit.category === "properties" ? formatPrice(hit.meta) : null
   const isProfile = hit.category === "profiles"
   return (
     <Pressable
@@ -689,7 +615,6 @@ const HitCard = memo(function HitCard({ hit, onPress }: { hit: SearchHit; onPres
           {hit.location && (
             <Text style={styles.hitMetaText} numberOfLines={1}>📍 {hit.location}</Text>
           )}
-          {price && <Text style={styles.hitPrice}>{price}</Text>}
           {hit.createdAt && <Text style={styles.hitMetaText}>· {relativeDate(hit.createdAt)}</Text>}
         </View>
       </View>

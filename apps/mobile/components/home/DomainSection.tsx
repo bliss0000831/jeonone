@@ -12,8 +12,6 @@ import { useRouter } from "expo-router"
 import { ScrollFadeHint } from "@/components/ScrollFadeHint"
 import { useHorizontalEnd } from "@/lib/use-horizontal-end"
 import type { DomainPost } from "./constants"
-import { ClubPlaceholder } from "./PropertyMiniCard"
-import { pickClubTheme } from "./formatters"
 
 export interface DomainTabConfig {
   key: string
@@ -181,10 +179,7 @@ export const DomainSection = memo(function DomainSection({
         scrollEventThrottle={32}
       >
         {posts.slice(0, 7).map((p) => {
-          const rawThumb = p.images?.[0] ?? p.thumbnail ?? null
-          const thumb = rawThumb || (basePath === "/clubs"
-            ? pickClubTheme((p as any).sport_type ?? (p as any).category ?? p.title ?? "").thumb
-            : null)
+          const thumb = p.images?.[0] ?? p.thumbnail ?? null
           const labelTitle = useStoreName ? p.store_name ?? p.title : p.title
           // 가격 표기 — 할인 노출 도메인은 [퍼센트] + 원가취소선 + 최종가, 아니면 최종가만
           const showsDiscount =
@@ -203,40 +198,6 @@ export const DomainSection = memo(function DomainSection({
           let subInfo: { text: string; color?: string } | null = null
           if (basePath === "/sharing" && any.location) {
             subInfo = { text: any.location }
-          } else if (basePath === "/clubs") {
-            // 모임 — 날짜 (M/D + 요일) + 모집현황 (칩 스타일)
-            const rawDate = any.meeting_date
-            let date: string | null = null
-            if (typeof rawDate === "string") {
-              const m = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/)
-              if (m) {
-                const month = parseInt(m[2], 10)
-                const day = parseInt(m[3], 10)
-                const dt = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00`)
-                const wd = isNaN(dt.getTime())
-                  ? ""
-                  : ` (${["일", "월", "화", "수", "목", "금", "토"][dt.getDay()]})`
-                date = `${month}/${day}${wd}`
-              } else date = rawDate
-            } else if (rawDate) {
-              date = String(rawDate)
-            }
-            const cur = any.current_members
-            const max = any.max_members
-            const hasMembers =
-              typeof cur === "number" && typeof max === "number"
-            const isFull = hasMembers && cur >= max
-            if (date || hasMembers) {
-              subInfo = {
-                text: "__clubs__", // sentinel — 아래 render 에서 처리
-                color: isFull ? "#94a3b8" : color,
-                clubsDate: date ?? null,
-                clubsMembers: hasMembers
-                  ? `${cur}/${max}${isFull ? " 마감" : "명"}`
-                  : null,
-                clubsIsFull: isFull,
-              } as any
-            }
           } else if (basePath === "/jobs") {
             const wage = any.hourly_wage ?? any.hourlyWage
             const wageText =
@@ -252,12 +213,6 @@ export const DomainSection = memo(function DomainSection({
                 jobsWage: wageText,
               } as any
             }
-          } else if (basePath === "/new-store") {
-            if (any.opening_event) {
-              subInfo = { text: String(any.opening_event), color }
-            } else if (any.opening_date) {
-              subInfo = { text: String(any.opening_date) }
-            }
           }
           return (
             <Pressable
@@ -270,8 +225,6 @@ export const DomainSection = memo(function DomainSection({
             >
               {thumb ? (
                 <Image source={{ uri: thumb }} style={domainSectionStyles.domainThumb} cachePolicy="memory-disk" transition={150} contentFit="cover" />
-              ) : basePath === "/clubs" ? (
-                <ClubPlaceholder title={p.title ?? ""} />
               ) : (
                 <View style={[domainSectionStyles.domainThumb, { overflow: "hidden" }]}>
                   <LinearGradient

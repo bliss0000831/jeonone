@@ -3,23 +3,13 @@ import type { AccountType, Role } from './types'
 const ACCOUNT_TYPE_LABEL: Record<AccountType, string> = {
   individual: '일반인',
   business: '사장님',
-  agent: '공인중개사',
   producer: '생산자',
-  interior: '인테리어',
-  moving: '이사',
-  cleaning: '청소',
-  repair: '수리',
 }
 
 const ACCOUNT_TYPE_BADGE_COLOR: Record<AccountType, string> = {
   individual: 'bg-gray-500',
   business: 'bg-emerald-500',
-  agent: 'bg-blue-500',
   producer: 'bg-green-500',
-  interior: 'bg-purple-500',
-  moving: 'bg-yellow-500',
-  cleaning: 'bg-pink-500',
-  repair: 'bg-orange-500',
 }
 
 const ROLE_LABEL: Record<Role, string> = {

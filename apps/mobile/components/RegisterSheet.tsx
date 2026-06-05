@@ -36,38 +36,17 @@ interface RegisterAction {
   roles?: string[]
 }
 
-const NON_AGENT_ROLES = [
-  "user",
-  "producer",
-  "business",
-  "interior",
-  "moving",
-  "cleaning",
-  "repair",
-]
+const FARM_ROLES = ["user", "producer", "business"]
 
 const REGISTER_ACTIONS: RegisterAction[] = [
-  // ── 매물 등록 (계정별 분기) ────
-  { icon: "add-circle",      label: "매물 등록",        route: "/property/register",  iconColor: lightColors.primary, bgColor: lightColors.primary + "1A", roles: NON_AGENT_ROLES },
-  { icon: "add-circle",      label: "공인중개사 매물 등록", route: "/property/register",  iconColor: "#2563eb", bgColor: "#2563eb1A", roles: ["agent"] },
-  { icon: "hand-left",       label: "구해주세요(의뢰)",  route: "/requests/new",       iconColor: "#f43f5e", bgColor: "#f43f5e1A", roles: NON_AGENT_ROLES },
-  { icon: "help-circle",     label: "도와주세요(홈서비스)", route: "/service-requests/new", iconColor: "#10b981", bgColor: "#10b9811A" },
+  // ── 모든 계정 공통 (농촌 직거래·커뮤니티) ────
+  { icon: "bag-handle",      label: "농기구",            route: "/secondhand/register",   iconColor: "#d97706", bgColor: "#f59e0b1A" },
+  { icon: "gift",            label: "나눔",              route: "/sharing/register",      iconColor: "#ef4444", bgColor: "#ef44441A" },
+  { icon: "briefcase",       label: "일손",              route: "/jobs/register",         iconColor: "#0d9488", bgColor: "#14b8a61A" },
+  { icon: "chatbox",         label: "마을 소식",         route: "/board/create",          iconColor: "#3b82f6", bgColor: "#3b82f61A" },
 
   // ── 역할 전용 ────
   { icon: "leaf",            label: "로컬 푸드 등록",    route: "/local-food/register",   iconColor: "#22c55e", bgColor: "#22c55e1A", roles: ["producer"] },
-  { icon: "cart",            label: "공동구매",          route: "/group-buying/register", iconColor: "#8b5cf6", bgColor: "#8b5cf61A", roles: ["business"] },
-  { icon: "color-palette",   label: "인테리어 등록",     route: "/interior/register",     iconColor: "#a855f7", bgColor: "#a855f71A", roles: ["interior"] },
-  { icon: "car-sport",       label: "이사 서비스 등록",  route: "/moving/register",       iconColor: "#eab308", bgColor: "#eab3081A", roles: ["moving"] },
-  { icon: "sparkles",        label: "청소 서비스 등록",  route: "/cleaning/register",     iconColor: "#ec4899", bgColor: "#ec48991A", roles: ["cleaning"] },
-  { icon: "construct",       label: "수리 서비스 등록",  route: "/repair/register",       iconColor: "#ea580c", bgColor: "#ea580c1A", roles: ["repair"] },
-
-  // ── 모든 계정 공통 ────
-  { icon: "chatbox",         label: "게시판",            route: "/board/create",          iconColor: "#3b82f6", bgColor: "#3b82f61A" },
-  { icon: "gift",            label: "나눔",              route: "/sharing/register",      iconColor: "#ef4444", bgColor: "#ef44441A" },
-  { icon: "bag-handle",      label: "중고거래",          route: "/secondhand/register",   iconColor: "#d97706", bgColor: "#f59e0b1A" },
-  { icon: "briefcase",       label: "구인구직",          route: "/jobs/register",         iconColor: "#0d9488", bgColor: "#14b8a61A" },
-  { icon: "people",          label: "모임",              route: "/clubs/register",        iconColor: "#6366f1", bgColor: "#6366f11A" },
-  { icon: "storefront",      label: "신장개업 등록",     route: "/new-store/register",    iconColor: "#f97316", bgColor: "#f973161A", roles: ["business"] },
 ]
 
 export function RegisterSheet({ visible, onClose }: Props) {
@@ -98,23 +77,17 @@ export function RegisterSheet({ visible, onClose }: Props) {
   }, [visible, user, plaza])
 
   // 권한 필터
-  const KNOWN_ROLES = new Set([...NON_AGENT_ROLES, "agent"])
+  const KNOWN_ROLES = new Set(FARM_ROLES)
   const role = KNOWN_ROLES.has(accountType) ? accountType : "user"
   const actions = REGISTER_ACTIONS.filter(
     (a) => !a.roles || a.roles.includes(role),
   )
 
-  // 잠긴 카드 — 일반인 (user) 에게만
+  // 잠긴 카드 — 일반인 (user) 에게만 (로컬푸드 생산자 전환 안내)
   const lockedActions =
     role === "user"
       ? [
           { icon: "leaf",          label: "로컬 푸드",   color: "#22c55e" },
-          { icon: "cart",          label: "공동구매",     color: "#8b5cf6" },
-          { icon: "storefront",    label: "신장개업",     color: "#f97316" },
-          { icon: "color-palette", label: "인테리어",     color: "#a855f7" },
-          { icon: "car-sport",     label: "이사",         color: "#eab308" },
-          { icon: "sparkles",      label: "청소",         color: "#ec4899" },
-          { icon: "construct",     label: "수리",         color: "#ea580c" },
         ]
       : []
 
@@ -195,11 +168,11 @@ export function RegisterSheet({ visible, onClose }: Props) {
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                     <Ionicons name="lock-closed" size={11} color={lightColors.ink900} />
                     <Text style={styles.lockedTitle}>
-                      전문가 · 사업자 계정 전환 시 더 많은 등록 가능
+                      로컬푸드 생산자 계정 전환 시 등록 가능
                     </Text>
                   </View>
                   <Text style={styles.lockedSub} numberOfLines={1}>
-                    로컬푸드 · 공동구매 · 인테리어 · 이사 · 청소 · 수리
+                    직접 키운 농산물을 로컬푸드로 판매해보세요
                   </Text>
                 </View>
                 <Text style={styles.lockedArrow}>신청 →</Text>

@@ -1,5 +1,5 @@
 import {
-  User, Store, Building2, Leaf, Paintbrush, Truck, SprayCan, Wrench,
+  User, Store, Leaf,
   FileText, Heart, Info,
   type LucideIcon,
 } from "lucide-react"
@@ -7,12 +7,7 @@ import {
 export type AccountType =
   | "user"
   | "business"
-  | "agent"
   | "producer"
-  | "interior"
-  | "moving"
-  | "cleaning"
-  | "repair"
 
 export type ProfileTabId =
   // 공개 탭
@@ -101,33 +96,13 @@ export const ROLE_CONFIG: Record<AccountType, RoleConfig> = {
     icon: Store,
     badgeClass: "bg-orange-500 text-white",
     coverGradient: "bg-gradient-to-br from-amber-300 via-orange-300 to-rose-300",
-    tabs: [
-      { id: "products", label: "메뉴/상품", icon: Store },
-      postsTab,
-    ],
+    tabs: [postsTab],
     sidebar: { ...baseSidebar, intro: true, hours: true, serviceAreas: true, verify: true },
     defaultHighlights: ["영업중", "메뉴", "이벤트", "찾아오시는길"],
     extraCta: ["call"],
   },
 
-  // 3. 공인중개사
-  agent: {
-    type: "agent",
-    label: "공인중개사",
-    shortLabel: "중개사",
-    icon: Building2,
-    badgeClass: "bg-blue-500 text-white",
-    coverGradient: "bg-gradient-to-br from-blue-400 via-cyan-400 to-emerald-400",
-    tabs: [
-      { id: "listings", label: "매물", icon: Building2 },
-      postsTab,
-    ],
-    sidebar: { ...baseSidebar, intro: true, stats: true, verify: true, specialties: true, serviceAreas: true },
-    defaultHighlights: ["신축", "원룸", "전세", "월세", "후기"],
-    extraCta: ["call", "inquiry"],
-  },
-
-  // 4. 생산자 (로컬푸드)
+  // 3. 생산자 (로컬푸드)
   producer: {
     type: "producer",
     label: "로컬푸드 생산자",
@@ -142,73 +117,6 @@ export const ROLE_CONFIG: Record<AccountType, RoleConfig> = {
     sidebar: { ...baseSidebar, intro: true, verify: true, specialties: true, serviceAreas: true },
     defaultHighlights: ["제철", "예약주문", "농장일지", "레시피"],
     extraCta: ["inquiry"],
-  },
-
-  // 5. 인테리어
-  interior: {
-    type: "interior",
-    label: "인테리어",
-    icon: Paintbrush,
-    badgeClass: "bg-purple-500 text-white",
-    coverGradient: "bg-gradient-to-br from-stone-300 via-zinc-300 to-neutral-400",
-    tabs: [
-      { id: "portfolio", label: "포트폴리오", icon: Paintbrush },
-      postsTab,
-    ],
-    sidebar: { ...baseSidebar, intro: true, stats: true, verify: true, specialties: true, serviceAreas: true },
-    defaultHighlights: ["아파트", "상가", "원룸", "부분시공", "전후비교"],
-    extraCta: ["call", "inquiry"],
-  },
-
-  // 6. 이사
-  moving: {
-    type: "moving",
-    label: "이사 전문가",
-    shortLabel: "이사",
-    icon: Truck,
-    badgeClass: "bg-yellow-500 text-white",
-    coverGradient: "bg-gradient-to-br from-yellow-300 via-amber-300 to-orange-300",
-    tabs: [
-      { id: "services", label: "서비스", icon: Truck },
-      postsTab,
-    ],
-    sidebar: { ...baseSidebar, intro: true, stats: true, verify: true, specialties: true, serviceAreas: true },
-    defaultHighlights: ["포장이사", "일반이사", "사무실", "보관"],
-    extraCta: ["call", "inquiry"],
-  },
-
-  // 7. 청소
-  cleaning: {
-    type: "cleaning",
-    label: "청소 전문가",
-    shortLabel: "청소",
-    icon: SprayCan,
-    badgeClass: "bg-pink-500 text-white",
-    coverGradient: "bg-gradient-to-br from-sky-200 via-cyan-200 to-blue-200",
-    tabs: [
-      { id: "services", label: "서비스", icon: SprayCan },
-      postsTab,
-    ],
-    sidebar: { ...baseSidebar, intro: true, stats: true, verify: true, specialties: true, serviceAreas: true },
-    defaultHighlights: ["입주청소", "이사청소", "정기청소", "에어컨"],
-    extraCta: ["call", "inquiry"],
-  },
-
-  // 8. 수리
-  repair: {
-    type: "repair",
-    label: "수리 전문가",
-    shortLabel: "수리",
-    icon: Wrench,
-    badgeClass: "bg-orange-600 text-white",
-    coverGradient: "bg-gradient-to-br from-slate-300 via-gray-300 to-zinc-400",
-    tabs: [
-      { id: "services", label: "서비스", icon: Wrench },
-      postsTab,
-    ],
-    sidebar: { ...baseSidebar, intro: true, stats: true, verify: true, specialties: true, serviceAreas: true },
-    defaultHighlights: ["가전", "배관", "전기", "샷시", "긴급"],
-    extraCta: ["call", "inquiry"],
   },
 }
 

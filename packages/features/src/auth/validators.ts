@@ -3,12 +3,7 @@ import type { AccountType, Role } from './types'
 const ACCOUNT_TYPES: AccountType[] = [
   'individual',
   'business',
-  'agent',
   'producer',
-  'interior',
-  'moving',
-  'cleaning',
-  'repair',
 ]
 
 const ROLES: Role[] = ['user', 'admin', 'superadmin', 'expert']

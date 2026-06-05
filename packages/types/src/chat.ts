@@ -12,16 +12,9 @@
 
 /** 채팅방의 게시글 타입 */
 export type ChatPostType =
-  | "property"
   | "direct"
   | "sharing"
-  | "new_store"
   | "local_food"
-  | "group_buying"
-  | "interior"
-  | "moving"
-  | "cleaning"
-  | "repair"
   | "secondhand"
   | "jobs"
   | "admin_notice"
@@ -74,13 +67,8 @@ export interface ChatParticipant {
 /** 계정 타입 — profiles.account_type */
 export type AccountType =
   | "individual"
-  | "agent" // 공인중개사
   | "business" // 사업자
   | "producer" // 로컬푸드 생산자
-  | "interior"
-  | "moving"
-  | "cleaning"
-  | "repair"
 
 /** 전문가 (검색/초대 표시용) */
 export interface Expert {

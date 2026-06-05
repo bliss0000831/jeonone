@@ -10,12 +10,7 @@
 export type AccountType =
   | 'individual'
   | 'business'
-  | 'agent'
   | 'producer'
-  | 'interior'
-  | 'moving'
-  | 'cleaning'
-  | 'repair'
 
 export type Role = 'user' | 'admin' | 'superadmin' | 'expert'
 

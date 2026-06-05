@@ -461,8 +461,8 @@ export default function ChatRoomScreen() {
     : (otherUser?.nickname ?? "이웃")
   const otherPhone = otherUser?.phone
   const isFirstMessage = messages.length === 0
-  const canInviteExpert =
-    room.post_type === "property" && participants.length < 3
+  // 부동산/서비스 전문가 도메인 제거 — 전문가 초대 비활성화
+  const canInviteExpert = false
 
   // 참가자 strip 데이터 변환
   const stripParticipants: StripParticipant[] = participants.map((p) => ({

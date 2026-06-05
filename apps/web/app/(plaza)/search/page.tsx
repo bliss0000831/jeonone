@@ -54,14 +54,9 @@ const TABS: TabMeta[] = [
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; icon: any; iconClass: string; bgClass: string }> = {
-  properties:   { label: "부동산",   icon: HomeIcon,      iconClass: "text-blue-600",    bgClass: "bg-blue-500/10" },
   board:        { label: "마을소식", icon: MessageSquare, iconClass: "text-primary",     bgClass: "bg-primary/10" },
   sharing:      { label: "무료나눔", icon: Gift,          iconClass: "text-red-500",     bgClass: "bg-red-500/10" },
-  clubs:        { label: "모임",     icon: Users,         iconClass: "text-indigo-500",  bgClass: "bg-indigo-500/10" },
-  group_buying: { label: "공동구매", icon: ShoppingCart,  iconClass: "text-violet-500",  bgClass: "bg-violet-500/10" },
   local_food:   { label: "로컬푸드", icon: Leaf,          iconClass: "text-green-500",   bgClass: "bg-green-500/10" },
-  services:     { label: "서비스",   icon: Wrench,        iconClass: "text-orange-600",  bgClass: "bg-orange-600/10" },
-  new_store:    { label: "신장개업", icon: Store,         iconClass: "text-orange-500",  bgClass: "bg-orange-500/10" },
   profiles:     { label: "사람",     icon: User,          iconClass: "text-pink-500",    bgClass: "bg-pink-500/10" },
 }
 
@@ -171,22 +166,15 @@ function SearchPageInner() {
   const [tab, setTab] = useState<TabKey>(initialTab)
   const [sort, setSort] = useState<SearchSort>("latest")
   const [results, setResults] = useState<Record<SearchCategory, SearchHit[]>>({
-    properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-    local_food: [], services: [], new_store: [], profiles: [],
+    board: [], sharing: [], local_food: [], profiles: [],
   })
   const [counts, setCounts] = useState<Record<SearchCategory, number>>({
-    properties: 0, board: 0, sharing: 0, clubs: 0, group_buying: 0,
-    local_food: 0, services: 0, new_store: 0, profiles: 0,
+    board: 0, sharing: 0, local_food: 0, profiles: 0,
   })
   const [loading, setLoading] = useState(false)
   const [searchError, setSearchError] = useState(false)
   const [recent, setRecent] = useState<string[]>([])
   const [trending, setTrending] = useState<string[]>([])
-
-  // 부동산 탭 전용 필터
-  const [showFilters, setShowFilters] = useState(false)
-  const [propertyType, setPropertyType] = useState<(typeof PROPERTY_TYPES)[number]>("전체")
-  const [transactionType, setTransactionType] = useState<(typeof TRANSACTION_TYPES)[number]>("전체")
 
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -227,12 +215,10 @@ function SearchPageInner() {
   const runSearch = useCallback(async (query: string, targetTab: TabKey, targetSort: SearchSort) => {
     if (!query) {
       setResults({
-        properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-        local_food: [], services: [], new_store: [], profiles: [],
+        board: [], sharing: [], local_food: [], profiles: [],
       })
       setCounts({
-        properties: 0, board: 0, sharing: 0, clubs: 0, group_buying: 0,
-        local_food: 0, services: 0, new_store: 0, profiles: 0,
+        board: 0, sharing: 0, local_food: 0, profiles: 0,
       })
       return
     }
@@ -260,12 +246,10 @@ function SearchPageInner() {
         // 실패를 "결과 없음"과 구분 — 이전 결과 비우고 에러 표시
         setSearchError(true)
         setResults({
-          properties: [], board: [], sharing: [], clubs: [], group_buying: [],
-          local_food: [], services: [], new_store: [], profiles: [],
+          board: [], sharing: [], local_food: [], profiles: [],
         })
         setCounts({
-          properties: 0, board: 0, sharing: 0, clubs: 0, group_buying: 0,
-          local_food: 0, services: 0, new_store: 0, profiles: 0,
+          board: 0, sharing: 0, local_food: 0, profiles: 0,
         })
       }
     } finally {
@@ -335,22 +319,9 @@ function SearchPageInner() {
     setRecent([])
   }
 
-  // 부동산 탭에서 클라이언트 필터 적용
-  const filteredProperties = useMemo(() => {
-    let hits = results.properties
-    if (propertyType !== "전체") {
-      hits = hits.filter((h) => h.meta?.property_type === propertyType)
-    }
-    if (transactionType !== "전체") {
-      hits = hits.filter((h) => h.meta?.transaction_type === transactionType)
-    }
-    return hits
-  }, [results.properties, propertyType, transactionType])
-
   const isEmptyState = !q
   const totalCount =
-    counts.properties + counts.board + counts.sharing + counts.clubs + counts.group_buying +
-    counts.local_food + counts.services + counts.new_store + counts.profiles
+    counts.board + counts.sharing + counts.local_food + counts.profiles
 
   return (
     <div className="min-h-screen bg-[#f7f6f0] pb-20">
@@ -384,18 +355,7 @@ function SearchPageInner() {
               )}
             </div>
           </form>
-          {tab === "properties" ? (
-            <button
-              onClick={() => setShowFilters((v) => !v)}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                showFilters ? "bg-primary text-primary-foreground" : "hover:bg-secondary",
-              )}
-              aria-label="필터"
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-            </button>
-          ) : tab !== "profiles" && q ? (
+          {tab !== "profiles" && q ? (
             <button
               onClick={() => setSort((s) => s === "latest" ? "popular" : "latest")}
               className="flex items-center gap-1 px-2.5 h-8 rounded-full text-xs font-medium bg-secondary/60 hover:bg-secondary transition-colors"
@@ -444,22 +404,6 @@ function SearchPageInner() {
           </div>
         </div>
 
-        {/* 부동산 필터 패널 */}
-        {tab === "properties" && showFilters && (
-          <div className="px-4 py-3 border-t border-border bg-secondary/30 space-y-3">
-            <FilterRow label="매물유형" values={PROPERTY_TYPES} active={propertyType} onPick={(v) => setPropertyType(v as any)} />
-            <FilterRow label="거래유형" values={TRANSACTION_TYPES} active={transactionType} onPick={(v) => setTransactionType(v as any)} />
-            {(propertyType !== "전체" || transactionType !== "전체") && (
-              <button
-                type="button"
-                onClick={() => { setPropertyType("전체"); setTransactionType("전체") }}
-                className="text-xs text-primary hover:underline"
-              >
-                필터 초기화
-              </button>
-            )}
-          </div>
-        )}
       </header>
 
       <main className="px-4 py-4">
@@ -491,14 +435,6 @@ function SearchPageInner() {
           <NoResults q={q} onPick={handlePickRecent} />
         ) : tab === "all" ? (
           <AllTab results={results} counts={counts} onJumpTab={handleTabChange} />
-        ) : tab === "properties" ? (
-          filteredProperties.length === 0 ? (
-            <div className="text-center py-16 text-sm text-muted-foreground">
-              선택한 필터에 맞는 매물이 없어요. 필터를 조정해보세요.
-            </div>
-          ) : (
-            <ResultList hits={filteredProperties} showBadge={false} />
-          )
         ) : (
           <ResultList hits={results[tab]} showBadge={false} />
         )}
@@ -716,8 +652,7 @@ function AllTab({
   onJumpTab: (cat: TabKey) => void
 }) {
   const order: SearchCategory[] = [
-    "properties", "board", "sharing", "clubs", "group_buying",
-    "local_food", "services", "new_store", "profiles",
+    "board", "sharing", "local_food", "profiles",
   ]
   const visible = order.filter((c) => results[c].length > 0)
   if (visible.length === 0) return null
@@ -767,7 +702,7 @@ function ResultList({ hits, showBadge }: { hits: SearchHit[]; showBadge: boolean
 function ResultItem({ hit, showBadge }: { hit: SearchHit; showBadge: boolean }) {
   const meta = CATEGORY_META[hit.category]
   const CIcon = meta.icon
-  const price = hit.category === "properties" ? formatPrice(hit.meta) : null
+  const price = null
   return (
     <li>
       <Link

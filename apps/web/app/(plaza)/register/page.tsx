@@ -18,7 +18,6 @@ import { isValidYouTubeUrl, normalizeYouTubeUrl } from "@/lib/integrations/youtu
 import { Instagram, Youtube } from "lucide-react"
 import { AiVideoModal, AiVideoTriggerCard } from "@/components/ai-video-modal"
 import { AI_VIDEO_UI_ENABLED } from "@/lib/ai-video/pricing"
-import { PropertyPanoramaUploader } from "@/components/property-panorama-uploader"
 import { RegionFormField } from "@/components/region-form-field"
 import { toast } from "sonner"
 
@@ -80,7 +79,6 @@ export default function RegisterPage() {
     images: [] as string[],
     instagramPostUrl: "",
     youtubePostUrl: "",
-    panoramaImages: [] as Array<{ url: string; title?: string | null }>,
   })
 
   // 법적 동의 — 공인중개사법·전상법 면책 근거. 4개 다 체크해야 등록 활성화.
@@ -227,7 +225,6 @@ export default function RegisterPage() {
           images: formData.images && formData.images.length > 0 ? formData.images : null,
           instagram_post_url: normalizeInstagramUrl(formData.instagramPostUrl) || null,
           youtube_post_url: normalizeYouTubeUrl(formData.youtubePostUrl) || null,
-          panorama_images: formData.panoramaImages.length > 0 ? formData.panoramaImages : null,
           sub_region: subRegion || null,
         }),
       })
@@ -681,19 +678,6 @@ export default function RegisterPage() {
                 images={formData.images}
                 onChange={(images) => updateFormData("images", images)}
                 maxImages={10}
-              />
-            </div>
-
-            {/* 360° 가상 투어 */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-3">
-                360° 가상 투어 (선택)
-              </label>
-              <PropertyPanoramaUploader
-                value={formData.panoramaImages}
-                onChange={(panoramaImages) =>
-                  setFormData((prev) => ({ ...prev, panoramaImages }))
-                }
               />
             </div>
 
