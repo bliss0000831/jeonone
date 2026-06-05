@@ -8,7 +8,7 @@
  */
 import { Platform } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { GWANGJANG_API_BASE } from "./supabase"
+import { API_BASE } from "./supabase"
 import { getCachedPlaza } from "./plaza"
 import * as Device from "expo-device"
 
@@ -85,7 +85,7 @@ export async function trackVisit(pageUrl: string = "/app"): Promise<void> {
     }
 
     // fire-and-forget
-    fetch(`${GWANGJANG_API_BASE}/api/visitor-track`, {
+    fetch(`${API_BASE}/api/visitor-track`, {
       method: "POST",
       headers,
       body: JSON.stringify(payload),

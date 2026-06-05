@@ -38,7 +38,7 @@ import {
 } from "@gwangjang/features/profile"
 import { useAuth } from "@/lib/auth-context"
 import { useCurrentPlaza } from "@/lib/plaza"
-import { getSupabase, uploadImage, GWANGJANG_API_BASE } from "@/lib/supabase"
+import { getSupabase, uploadImage, API_BASE } from "@/lib/supabase"
 import { VideoPoster } from "@/components/mypage/VideoPoster"
 
 const MAX_HIGHLIGHTS = 20
@@ -125,7 +125,7 @@ export default function HighlightsScreen() {
         const { data: { session } } = await supabase.auth.getSession()
         const headers: Record<string, string> = {}
         if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-        const res = await fetch(`${GWANGJANG_API_BASE}/api/upload`, {
+        const res = await fetch(`${API_BASE}/api/upload`, {
           method: "POST",
           headers,
           body: fd,

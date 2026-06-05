@@ -49,8 +49,8 @@ interface Props {
   disabled?: boolean
 }
 
-const GWANGJANG_API_BASE =
-  process.env.EXPO_PUBLIC_GWANGJANG_API_BASE ?? "https://www.gwangjang.app"
+const API_BASE =
+  process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app"
 
 interface JusoItem {
   roadAddr: string
@@ -94,7 +94,7 @@ export function JusoSearch({
     const t = setTimeout(async () => {
       try {
         const res = await fetch(
-          `${GWANGJANG_API_BASE}/api/juso/search?keyword=${encodeURIComponent(q)}&perPage=20`,
+          `${API_BASE}/api/juso/search?keyword=${encodeURIComponent(q)}&perPage=20`,
         )
         if (reqId !== reqIdRef.current) return
         const data = await res.json()

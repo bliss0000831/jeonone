@@ -35,8 +35,8 @@ import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
 import { MapPrewarmer } from "@/components/MapPrewarmer"
 import { FullscreenMapModal } from "@/components/FullscreenMapModal"
 
-const GWANGJANG_API_BASE =
-  process.env.EXPO_PUBLIC_GWANGJANG_API_BASE ?? "https://www.gwangjang.app"
+const API_BASE =
+  process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app"
 
 // 영구 캐시 키 prefix — 한번 geocode 한 주소는 앱 재실행해도 캐시.
 const PERSIST_PREFIX = "geocode:v1:"
@@ -169,7 +169,7 @@ export function AddressMapPreview({
       // 2) 네트워크 fetch — 영구 캐시에 결과 저장.
       try {
         const res = await fetch(
-          `${GWANGJANG_API_BASE}/api/geocode/naver?address=${encodeURIComponent(addr)}`,
+          `${API_BASE}/api/geocode/naver?address=${encodeURIComponent(addr)}`,
         )
         if (cancelled || reqId !== reqIdRef.current) return
         if (!res.ok) return done(null)
@@ -304,7 +304,7 @@ const MiniMap = memo(function MiniMap({
   const winWidth = useWindowDimensions().width
   // 좌우 padding 24px (spacing[3]*2) 가정 — 실제 매물 detail 의 컨테이너 폭과 거의 일치
   const staticW = Math.round(winWidth - 24)
-  const staticMapUrl = `${GWANGJANG_API_BASE}/api/static-map?lat=${lat}&lng=${lng}&w=${staticW}&h=${height}&level=15`
+  const staticMapUrl = `${API_BASE}/api/static-map?lat=${lat}&lng=${lng}&w=${staticW}&h=${height}&level=15`
   // 정적 → 동적 fade transition (250ms)
   const fadeAnim = useRef(new Animated.Value(1)).current
   useEffect(() => {

@@ -12,7 +12,7 @@
  *
  * Bearer token 으로 광장 API 호출 시:
  *   const { data: { session } } = await supabase.auth.getSession()
- *   fetch('https://www.gwangjang.app/api/...', {
+ *   fetch('https://jeonwondiary.vercel.app/api/...', {
  *     headers: { Authorization: `Bearer ${session?.access_token}` }
  *   })
  */
@@ -111,8 +111,8 @@ export function getSupabase(): SupabaseClient<Database> {
  *   if (!res.ok) throw new Error(...)
  *   return res.json()
  */
-export const GWANGJANG_API_BASE =
-  process.env.EXPO_PUBLIC_GWANGJANG_API_BASE ?? "https://www.gwangjang.app"
+export const API_BASE =
+  process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app"
 
 export async function gwangjangFetch(
   path: string,
@@ -147,7 +147,7 @@ export async function gwangjangFetch(
     console.warn("[gwangjangFetch] plaza header not set:", (e as Error)?.message)
   }
 
-  return fetch(`${GWANGJANG_API_BASE}${path}`, {
+  return fetch(`${API_BASE}${path}`, {
     ...init,
     headers,
   })
@@ -213,7 +213,7 @@ export async function uploadImage(
     if (folder) form.append("folder", folder)
     const headers: Record<string, string> = {}
     if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-    const r = await fetch(`${GWANGJANG_API_BASE}/api/upload`, {
+    const r = await fetch(`${API_BASE}/api/upload`, {
       method: "POST",
       headers,
       body: form,
