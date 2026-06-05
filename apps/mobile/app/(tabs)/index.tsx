@@ -268,14 +268,14 @@ function PhotoCard({ img, icon, title, subtitle, desc, light, compact, onPress }
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
   topbar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#f7f6f0" },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 1 },
+  brandRow: { flexDirection: "row", alignItems: "center", gap: 6, flex: 1, flexShrink: 1 },
   brandLogo: { width: 28, height: 28, borderRadius: 14 },
   brand: { fontSize: 16, fontWeight: "900", color: GREEN_DARK, flexShrink: 1 },
   topRight: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 },
-  locChip: { flexDirection: "row", alignItems: "center", gap: 2, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 6, maxWidth: 110 },
+  locChip: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 2, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 11, minHeight: 36, maxWidth: 120 },
   locText: { fontSize: 13, fontWeight: "700", color: GREEN_DARK, flexShrink: 1 },
-  iconBtn: { width: 34, height: 34, alignItems: "center", justifyContent: "center" },
-  loginBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
+  iconBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
+  loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, minHeight: 36 },
   loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
 
   hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
