@@ -25,10 +25,10 @@ const DEFAULT_LIMIT = 10
 const MAX_LIMIT = 50
 
 const EMPTY_RESULTS: Record<SearchCategory, SearchHit[]> = {
-  board: [], sharing: [], local_food: [], profiles: [],
+  secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
 }
 const EMPTY_COUNTS: Record<SearchCategory, number> = {
-  board: 0, sharing: 0, local_food: 0, profiles: 0,
+  secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
 }
 
 /**
@@ -96,6 +96,42 @@ async function runCategory(
 }
 
 const CATEGORIES: CategoryConfig[] = [
+  {
+    category: "secondhand",
+    table: "secondhand_posts",
+    select: "id, title, description, category, images, price, status, location, views, created_at",
+    searchFields: ["title", "description", "category"],
+    popularColumn: "views",
+    map: (r) => ({
+      id: r.id,
+      title: r.title,
+      summary: r.description || null,
+      thumbnail: firstImage(r.images),
+      location: r.location || null,
+      status: r.status || null,
+      href: `/secondhand/${r.id}`,
+      createdAt: r.created_at,
+      meta: { category: r.category, price: r.price, views: r.views },
+    }),
+  },
+  {
+    category: "jobs",
+    table: "jobs_posts",
+    select: "id, title, description, category, images, status, location, views, created_at",
+    searchFields: ["title", "description", "category"],
+    popularColumn: "views",
+    map: (r) => ({
+      id: r.id,
+      title: r.title,
+      summary: r.description || null,
+      thumbnail: firstImage(r.images),
+      location: r.location || null,
+      status: r.status || null,
+      href: `/jobs/${r.id}`,
+      createdAt: r.created_at,
+      meta: { category: r.category, views: r.views },
+    }),
+  },
   {
     category: "board",
     table: "board_posts",

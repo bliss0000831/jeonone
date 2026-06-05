@@ -52,15 +52,19 @@ interface TabMeta {
 
 const TABS: TabMeta[] = [
   { key: "all",          label: "전체",     icon: "sparkles",        color: lightColors.primary },
+  { key: "secondhand",   label: "농기구",   icon: "construct",       color: "#d97706" },
   { key: "local_food",   label: "로컬푸드", icon: "leaf",            color: "#16a34a" },
-  { key: "board",        label: "마을소식", icon: "newspaper",       color: "#225a39" },
   { key: "sharing",      label: "무료나눔", icon: "gift",            color: "#ef4444" },
+  { key: "jobs",         label: "일손",     icon: "people",          color: "#0d9488" },
+  { key: "board",        label: "마을소식", icon: "newspaper",       color: "#225a39" },
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; color: string; bg: string; icon: string }> = {
-  board:        { label: "마을소식", color: "#225a39", bg: "rgba(34,90,57,0.1)", icon: "newspaper-outline" },
-  sharing:      { label: "무료나눔", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: "gift-outline" },
-  local_food:   { label: "로컬푸드", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: "leaf-outline" },
+  secondhand:   { label: "농기구",   color: "#d97706", bg: "rgba(217,119,6,0.1)",  icon: "construct-outline" },
+  local_food:   { label: "로컬푸드", color: "#22c55e", bg: "rgba(34,197,94,0.1)",  icon: "leaf-outline" },
+  sharing:      { label: "무료나눔", color: "#ef4444", bg: "rgba(239,68,68,0.1)",  icon: "gift-outline" },
+  jobs:         { label: "일손",     color: "#0d9488", bg: "rgba(13,148,136,0.1)", icon: "people-outline" },
+  board:        { label: "마을소식", color: "#225a39", bg: "rgba(34,90,57,0.1)",   icon: "newspaper-outline" },
   profiles:     { label: "사람",     color: "#ec4899", bg: "rgba(236,72,153,0.1)", icon: "person-outline" },
 }
 
@@ -75,10 +79,10 @@ export default function SearchTab() {
   const [tab, setTab] = useState<TabKey>("all")
   const [sort, setSort] = useState<SearchSort>("latest")
   const [results, setResults] = useState<Record<SearchCategory, SearchHit[]>>({
-    board: [], sharing: [], local_food: [], profiles: [],
+    secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
   })
   const [counts, setCounts] = useState<Record<SearchCategory, number>>({
-    board: 0, sharing: 0, local_food: 0, profiles: 0,
+    secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
   })
   const [loading, setLoading] = useState(false)
   const [recent, setRecent] = useState<string[]>([])
@@ -133,10 +137,10 @@ export default function SearchTab() {
   const runSearch = useCallback(async (query: string, targetTab: TabKey, targetSort: SearchSort) => {
     if (!query) {
       setResults({
-        board: [], sharing: [], local_food: [], profiles: [],
+        secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
       })
       setCounts({
-        board: 0, sharing: 0, local_food: 0, profiles: 0,
+        secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
       })
       return
     }
@@ -172,7 +176,7 @@ export default function SearchTab() {
         console.warn("[search] error", e)
         setSearchError(true)
         setResults({
-          board: [], sharing: [], local_food: [], profiles: [],
+          secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
         })
       }
     } finally {

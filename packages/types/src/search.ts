@@ -1,7 +1,9 @@
 export type SearchCategory =
-  | "board"
-  | "sharing"
+  | "secondhand"
   | "local_food"
+  | "sharing"
+  | "jobs"
+  | "board"
   | "profiles"
 
 export type SearchSort = "latest" | "popular"

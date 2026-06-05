@@ -18,15 +18,19 @@ export interface SearchResult {
 }
 
 const EMPTY_BUCKET: Record<SearchCategory, SearchHit[]> = {
-  board: [],
-  sharing: [],
+  secondhand: [],
   local_food: [],
+  sharing: [],
+  jobs: [],
+  board: [],
   profiles: [],
 }
 const ZERO_COUNTS: Record<SearchCategory, number> = {
-  board: 0,
-  sharing: 0,
+  secondhand: 0,
   local_food: 0,
+  sharing: 0,
+  jobs: 0,
+  board: 0,
   profiles: 0,
 }
 
@@ -53,6 +57,44 @@ interface CatCfg {
 }
 
 const CATEGORIES: CatCfg[] = [
+  {
+    category: "secondhand",
+    table: "secondhand_posts",
+    select: "id, title, description, category, images, price, status, location, views, created_at",
+    searchFields: ["title", "description", "category"],
+    popularColumn: "views",
+    visibleStatuses: ["active", "reserved"],
+    map: (r) => ({
+      id: r.id,
+      title: r.title,
+      summary: r.description || null,
+      thumbnail: firstImage(r.images),
+      location: r.location || null,
+      status: r.status || null,
+      href: `/secondhand/${r.id}`,
+      createdAt: r.created_at,
+      meta: { price: r.price, category: r.category },
+    }),
+  },
+  {
+    category: "jobs",
+    table: "jobs_posts",
+    select: "id, title, description, category, images, status, location, views, created_at",
+    searchFields: ["title", "description", "category"],
+    popularColumn: "views",
+    visibleStatuses: ["active"],
+    map: (r) => ({
+      id: r.id,
+      title: r.title,
+      summary: r.description || null,
+      thumbnail: firstImage(r.images),
+      location: r.location || null,
+      status: r.status || null,
+      href: `/jobs/${r.id}`,
+      createdAt: r.created_at,
+      meta: { category: r.category },
+    }),
+  },
   {
     category: "board",
     table: "board_posts",

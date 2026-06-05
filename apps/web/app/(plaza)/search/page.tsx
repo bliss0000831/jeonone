@@ -48,15 +48,19 @@ interface TabMeta {
 
 const TABS: TabMeta[] = [
   { key: "all",          label: "전체",     icon: Sparkles,       iconClass: "text-primary" },
+  { key: "secondhand",   label: "농기구",   icon: Tractor,        iconClass: "text-amber-600" },
   { key: "local_food",   label: "로컬푸드", icon: Leaf,           iconClass: "text-green-600" },
-  { key: "board",        label: "마을소식", icon: MessageSquare,  iconClass: "text-primary" },
   { key: "sharing",      label: "무료나눔", icon: Gift,           iconClass: "text-red-500" },
+  { key: "jobs",         label: "일손",     icon: Briefcase,      iconClass: "text-teal-600" },
+  { key: "board",        label: "마을소식", icon: MessageSquare,  iconClass: "text-primary" },
 ]
 
 const CATEGORY_META: Record<SearchCategory, { label: string; icon: any; iconClass: string; bgClass: string }> = {
-  board:        { label: "마을소식", icon: MessageSquare, iconClass: "text-primary",     bgClass: "bg-primary/10" },
-  sharing:      { label: "무료나눔", icon: Gift,          iconClass: "text-red-500",     bgClass: "bg-red-500/10" },
+  secondhand:   { label: "농기구",   icon: Tractor,       iconClass: "text-amber-600",   bgClass: "bg-amber-500/10" },
   local_food:   { label: "로컬푸드", icon: Leaf,          iconClass: "text-green-500",   bgClass: "bg-green-500/10" },
+  sharing:      { label: "무료나눔", icon: Gift,          iconClass: "text-red-500",     bgClass: "bg-red-500/10" },
+  jobs:         { label: "일손",     icon: Briefcase,     iconClass: "text-teal-600",    bgClass: "bg-teal-500/10" },
+  board:        { label: "마을소식", icon: MessageSquare, iconClass: "text-primary",     bgClass: "bg-primary/10" },
   profiles:     { label: "사람",     icon: User,          iconClass: "text-pink-500",    bgClass: "bg-pink-500/10" },
 }
 
@@ -166,10 +170,10 @@ function SearchPageInner() {
   const [tab, setTab] = useState<TabKey>(initialTab)
   const [sort, setSort] = useState<SearchSort>("latest")
   const [results, setResults] = useState<Record<SearchCategory, SearchHit[]>>({
-    board: [], sharing: [], local_food: [], profiles: [],
+    secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
   })
   const [counts, setCounts] = useState<Record<SearchCategory, number>>({
-    board: 0, sharing: 0, local_food: 0, profiles: 0,
+    secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
   })
   const [loading, setLoading] = useState(false)
   const [searchError, setSearchError] = useState(false)
@@ -215,10 +219,10 @@ function SearchPageInner() {
   const runSearch = useCallback(async (query: string, targetTab: TabKey, targetSort: SearchSort) => {
     if (!query) {
       setResults({
-        board: [], sharing: [], local_food: [], profiles: [],
+        secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
       })
       setCounts({
-        board: 0, sharing: 0, local_food: 0, profiles: 0,
+        secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
       })
       return
     }
@@ -246,10 +250,10 @@ function SearchPageInner() {
         // 실패를 "결과 없음"과 구분 — 이전 결과 비우고 에러 표시
         setSearchError(true)
         setResults({
-          board: [], sharing: [], local_food: [], profiles: [],
+          secondhand: [], local_food: [], sharing: [], jobs: [], board: [], profiles: [],
         })
         setCounts({
-          board: 0, sharing: 0, local_food: 0, profiles: 0,
+          secondhand: 0, local_food: 0, sharing: 0, jobs: 0, board: 0, profiles: 0,
         })
       }
     } finally {
@@ -652,7 +656,7 @@ function AllTab({
   onJumpTab: (cat: TabKey) => void
 }) {
   const order: SearchCategory[] = [
-    "board", "sharing", "local_food", "profiles",
+    "secondhand", "local_food", "sharing", "jobs", "board", "profiles",
   ]
   const visible = order.filter((c) => results[c].length > 0)
   if (visible.length === 0) return null
