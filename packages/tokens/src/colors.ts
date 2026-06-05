@@ -76,7 +76,7 @@ export const lightColors = {
   /* 한국형 ink 팔레트 — 당근/토스 톤 (globals.css L84-87, hex 직접 정의) */
   ink900: "#1a1a1a", // 본문/제목
   ink700: "#4d4d4d", // 보조 본문
-  ink500: "#8e8e8e", // 메타
+  ink500: "#6b6b6b", // 메타 — WCAG AA(4.5:1+) 충족하도록 진하게 (이전 #8e8e8e 는 3.5:1)
   ink300: "#c8c8c8", // 비활성
 } as const
 

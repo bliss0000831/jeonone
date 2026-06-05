@@ -919,13 +919,13 @@ function renderTabContent(args: RenderArgs) {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
                           {p.kindLabel}
                         </span>
-                        <h4 className="font-medium text-sm truncate flex-1">{p.title}</h4>
+                        <h4 className="font-medium text-base truncate flex-1">{p.title}</h4>
                       </div>
                       {p.excerpt && (
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{p.excerpt}</p>
+                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>
                       )}
                       <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(p.created_at).toLocaleDateString("ko-KR")}
@@ -1057,7 +1057,7 @@ function SavedTab({
               {count > 0 && (
                 <span
                   className={cn(
-                    "text-[10px] tabular-nums",
+                    "text-xs tabular-nums",
                     active ? "text-primary-foreground/80" : "text-muted-foreground/70",
                   )}
                 >
@@ -1095,17 +1095,17 @@ function SavedTab({
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
                       {it.kindLabel}
                     </span>
-                    <h4 className="font-medium text-sm truncate flex-1">{it.title}</h4>
+                    <h4 className="font-medium text-base truncate flex-1">{it.title}</h4>
                   </div>
                   {it.subtitle && (
-                    <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
                       {it.subtitle}
                     </p>
                   )}
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {new Date(it.created_at).toLocaleDateString("ko-KR")} 찜
                   </p>
                 </div>

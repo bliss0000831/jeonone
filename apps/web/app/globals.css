@@ -38,7 +38,7 @@
 
   /* muted: 아주 옅은 뉴트럴 그레이 (노란톤 제거) */
   --muted: oklch(0.978 0 0);
-  --muted-foreground: oklch(0.48 0.03 220);
+  --muted-foreground: oklch(0.44 0.03 230);
 
   /* accent: 로고 포인트 오렌지 */
   --accent: oklch(0.68 0.16 40);

@@ -218,13 +218,13 @@ export default function SecondhandRegisterPage() {
 
       <form onSubmit={handleSubmit} onChange={() => setFormDirty(true)} className="max-w-2xl mx-auto p-4 space-y-6">
         {/* 하루 3건 제한 안내 */}
-        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300">
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-800 dark:text-amber-300">
           업자/스팸 방지를 위해 <strong>하루 최대 3건</strong>까지만 등록할 수 있습니다.
         </div>
 
         {/* 미디어 업로드 — 사진 + 동영상 + 대표이미지 지정 */}
         <div>
-          <label className="block text-sm font-medium mb-2">사진 / 동영상 (최대 10장)</label>
+          <label className="block text-base font-medium mb-2">사진 / 동영상 (최대 10장)</label>
           <MediaUploader
             value={images}
             onChange={setImages}
@@ -236,7 +236,7 @@ export default function SecondhandRegisterPage() {
 
         {/* 제목 */}
         <div>
-          <label className="block text-sm font-medium mb-2">제목 *</label>
+          <label className="block text-base font-medium mb-2">제목 *</label>
           <input
             ref={titleRef}
             type="text"
@@ -247,12 +247,12 @@ export default function SecondhandRegisterPage() {
             className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500"
             required
           />
-          <p className="text-xs text-muted-foreground text-right mt-1">{formData.title.length}/100</p>
+          <p className="text-sm text-muted-foreground text-right mt-1">{formData.title.length}/100</p>
         </div>
 
         {/* 카테고리 */}
         <div>
-          <label className="block text-sm font-medium mb-2">카테고리</label>
+          <label className="block text-base font-medium mb-2">카테고리</label>
           <select
             value={formData.category}
             onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
@@ -272,7 +272,7 @@ export default function SecondhandRegisterPage() {
             <div className="flex items-center gap-1.5 font-bold text-primary mb-3">🔨 경매 설정</div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">시작가(원)</label>
+                <label className="block text-sm text-muted-foreground mb-1">시작가(원)</label>
                 <input
                   value={auctionStartPrice}
                   onChange={(e) => setAuctionStartPrice(e.target.value.replace(/[^0-9]/g, ""))}
@@ -282,7 +282,7 @@ export default function SecondhandRegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">경매 기간(일)</label>
+                <label className="block text-sm text-muted-foreground mb-1">경매 기간(일)</label>
                 <select
                   value={auctionDays}
                   onChange={(e) => setAuctionDays(e.target.value)}
@@ -292,7 +292,7 @@ export default function SecondhandRegisterPage() {
                 </select>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">마감 5분 전 입찰 시 자동 5분 연장됩니다.</p>
+            <p className="text-sm text-muted-foreground mt-2">마감 5분 전 입찰 시 자동 5분 연장됩니다.</p>
           </div>
         )}
 
@@ -302,25 +302,25 @@ export default function SecondhandRegisterPage() {
             <div className="flex items-center gap-1.5 font-bold text-primary mb-3">🚜 대여 설정</div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">일 대여료(원)</label>
+                <label className="block text-sm text-muted-foreground mb-1">일 대여료(원)</label>
                 <input value={rentalDaily} onChange={(e) => setRentalDaily(e.target.value.replace(/[^0-9]/g, ""))}
                   inputMode="numeric" placeholder="예: 50000"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">보증금(원)</label>
+                <label className="block text-sm text-muted-foreground mb-1">보증금(원)</label>
                 <input value={rentalDeposit} onChange={(e) => setRentalDeposit(e.target.value.replace(/[^0-9]/g, ""))}
                   inputMode="numeric" placeholder="예: 200000"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">대여 신청은 일 단위로 받습니다. 보증금은 반납 후 환급.</p>
+            <p className="text-sm text-muted-foreground mt-2">대여 신청은 일 단위로 받습니다. 보증금은 반납 후 환급.</p>
           </div>
         )}
 
         {/* 농기구 정보 (선택) */}
         <div>
-          <label className="block text-sm font-medium mb-2">농기구 정보 <span className="text-muted-foreground font-normal">(선택)</span></label>
+          <label className="block text-base font-medium mb-2">농기구 정보 <span className="text-muted-foreground font-normal">(선택)</span></label>
           <div className="grid grid-cols-2 gap-2">
             <input
               value={formData.brand}
@@ -354,7 +354,7 @@ export default function SecondhandRegisterPage() {
 
         {/* 상품 상태 */}
         <div>
-          <label className="block text-sm font-medium mb-2">상품 상태</label>
+          <label className="block text-base font-medium mb-2">상품 상태</label>
           <div className="flex flex-wrap gap-2">
             {SECONDHAND_CONDITIONS.map((c) => (
               <button
@@ -376,14 +376,14 @@ export default function SecondhandRegisterPage() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             선택 안 해도 됩니다.
           </p>
         </div>
 
         {/* 가격 */}
         <div>
-          <label className="block text-sm font-medium mb-2">가격 (원) *</label>
+          <label className="block text-base font-medium mb-2">가격 (원) *</label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₩</span>
             <input
@@ -399,7 +399,7 @@ export default function SecondhandRegisterPage() {
               className="w-full pl-8 pr-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             0 원 입력 시 무료나눔으로 표시됩니다.
           </p>
           {(() => {
@@ -421,7 +421,7 @@ export default function SecondhandRegisterPage() {
                         <Gift className="w-4 h-4 text-rose-500" />
                         <span className="text-sm font-medium text-foreground">나눔 게시판에 올리기</span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         체크하면 중고거래가 아닌 <strong className="text-rose-600">나눔 게시판</strong>으로 등록됩니다.
                       </p>
                     </div>
@@ -448,7 +448,7 @@ export default function SecondhandRegisterPage() {
 
         {/* 설명 */}
         <div>
-          <label className="block text-sm font-medium mb-2">설명 *</label>
+          <label className="block text-base font-medium mb-2">설명 *</label>
           <textarea
             ref={descRef}
             value={formData.description}
@@ -459,12 +459,12 @@ export default function SecondhandRegisterPage() {
             className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
             required
           />
-          <p className="text-xs text-muted-foreground text-right mt-1">{formData.description.length}/3000</p>
+          <p className="text-sm text-muted-foreground text-right mt-1">{formData.description.length}/3000</p>
         </div>
 
         {/* 위치 */}
         <div>
-          <label className="block text-sm font-medium mb-2">거래 희망 장소</label>
+          <label className="block text-base font-medium mb-2">거래 희망 장소</label>
           <input
             type="text"
             value={formData.location}

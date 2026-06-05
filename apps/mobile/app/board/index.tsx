@@ -752,7 +752,7 @@ function makeStyles(colors: any) {
     flex: 1,
   },
   statsHeaderRule: {
-    fontSize: 10,
+    fontSize: 12,
     color: colors.ink500,
   },
   statsLoadingBox: { paddingVertical: 16, alignItems: "center" },
@@ -776,7 +776,7 @@ function makeStyles(colors: any) {
     width: 22, height: 22, borderRadius: 6,
     alignItems: "center", justifyContent: "center",
   },
-  hotRankText: { fontSize: 11, fontWeight: "800", color: "#ffffff" },
+  hotRankText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
   hotThumb: {
     width: 36, height: 36, borderRadius: 6,
     backgroundColor: colors.muted,
@@ -791,7 +791,7 @@ function makeStyles(colors: any) {
     color: colors.ink900,
   },
   hotMeta: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.ink500,
     marginTop: 2,
   },
@@ -810,7 +810,7 @@ function makeStyles(colors: any) {
     width: 20,
     alignItems: "center", justifyContent: "center",
   },
-  rankerMedalNum: { fontSize: 11, fontWeight: "700", color: colors.ink500 },
+  rankerMedalNum: { fontSize: 13, fontWeight: "700", color: colors.ink500 },
   rankerRowFirst: {
     borderWidth: 1.5,
     borderColor: "#fbbf24",
@@ -824,7 +824,7 @@ function makeStyles(colors: any) {
     alignItems: "center", justifyContent: "center",
   },
   rankerAvatarChar: {
-    fontSize: 11, fontWeight: "700",
+    fontSize: 13, fontWeight: "700",
     color: colors.primary,
   },
   rankerName: {
@@ -832,7 +832,7 @@ function makeStyles(colors: any) {
     color: colors.ink900,
   },
   rankerMeta: {
-    fontSize: 10,
+    fontSize: 12,
     color: colors.ink500,
     marginTop: 2,
   },
@@ -851,7 +851,7 @@ function makeStyles(colors: any) {
     color: "#059669",
   },
   rankerScoreUnit: {
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: "600",
     color: "#059669",
   },
@@ -951,10 +951,10 @@ function makeStyles(colors: any) {
     alignItems: "center",
   },
   postTitle: { fontSize: 14, fontWeight: "700", color: colors.ink900 },
-  postContent: { fontSize: 12, color: colors.ink700 },
+  postContent: { fontSize: 14, color: colors.ink700 },
   postMeta: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
-  postMetaText: { fontSize: 11, color: colors.ink500 },
-  postMetaDot: { fontSize: 11, color: colors.ink500 },
+  postMetaText: { fontSize: 13, color: colors.ink500 },
+  postMetaDot: { fontSize: 13, color: colors.ink500 },
   postThumb: { width: 64, height: 64, borderRadius: 8, backgroundColor: colors.muted },
   videobadge: {
     position: "absolute",
@@ -974,7 +974,7 @@ function makeStyles(colors: any) {
   },
   postCommentBox: { alignItems: "center", justifyContent: "center", minWidth: 36 },
   postCommentCount: { fontSize: 16, fontWeight: "700", color: colors.ink900 },
-  postCommentLabel: { fontSize: 10, color: colors.ink500 },
+  postCommentLabel: { fontSize: 12, color: colors.ink500 },
   // 핫글 카드 — 약간 골드 그라데이션 테두리
   hotCard: {
     borderColor: "#fde68a",

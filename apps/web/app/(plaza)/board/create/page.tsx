@@ -247,8 +247,8 @@ export default function CreatePostPage() {
 
           {/* 미디어 업로드 - 맨 위 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">사진/동영상</label>
-            <p className="text-xs text-muted-foreground">최대 10개 • 이미지 10MB / 동영상 100MB • ⭐ 클릭 시 대표이미지로 설정</p>
+            <label className="text-base font-medium">사진/동영상</label>
+            <p className="text-sm text-muted-foreground">최대 10개 • 이미지 10MB / 동영상 100MB • ⭐ 클릭 시 대표이미지로 설정</p>
 
             <div
               className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
@@ -332,7 +332,7 @@ export default function CreatePostPage() {
           {/* 카테고리 + 지역 — 두 컬럼 */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">게시판 <span className="text-destructive">*</span></label>
+              <label className="text-base font-medium">게시판 <span className="text-destructive">*</span></label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger>
                   <SelectValue placeholder="게시판 선택" />
@@ -345,7 +345,7 @@ export default function CreatePostPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">지역</label>
+              <label className="text-base font-medium">지역</label>
               <Select value={region || '__none__'} onValueChange={(v) => setRegion(v === '__none__' ? '' : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="지역 선택" />
@@ -362,19 +362,19 @@ export default function CreatePostPage() {
 
           {/* 제목 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">제목 <span className="text-destructive">*</span></label>
+            <label className="text-base font-medium">제목 <span className="text-destructive">*</span></label>
             <Input
               placeholder="게시글 제목을 입력해주세요"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
             />
-            <p className="text-xs text-muted-foreground text-right">{title.length}/200</p>
+            <p className="text-sm text-muted-foreground text-right">{title.length}/200</p>
           </div>
 
           {/* 내용 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">내용 <span className="text-destructive">*</span></label>
+            <label className="text-base font-medium">내용 <span className="text-destructive">*</span></label>
             <Textarea
               placeholder="내용을 작성해주세요"
               value={content}
@@ -382,7 +382,7 @@ export default function CreatePostPage() {
               rows={8}
               className="resize-none"
             />
-            <p className="text-xs text-muted-foreground text-right">{content.length}자</p>
+            <p className="text-sm text-muted-foreground text-right">{content.length}자</p>
           </div>
 
           {/* 버튼 */}

@@ -162,11 +162,11 @@ export default function MyOrdersPage() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${STATUS_TONES[order.status]}`}
+                    className={`px-2 py-0.5 rounded-full text-base font-semibold ${STATUS_TONES[order.status]}`}
                   >
                     {STATUS_LABELS[order.status]}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {new Date(order.created_at).toLocaleDateString("ko-KR")}
                   </span>
                 </div>
@@ -190,8 +190,8 @@ export default function MyOrdersPage() {
                         ) : null}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium line-clamp-1">{it.title}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-base font-medium line-clamp-1">{it.title}</p>
+                        <p className="text-sm text-muted-foreground">
                           {it.unit_price.toLocaleString()}원 × {it.quantity}{" "}
                           = {it.subtotal.toLocaleString()}원
                         </p>
@@ -203,7 +203,7 @@ export default function MyOrdersPage() {
 
                 {/* 운송장 */}
                 {order.tracking_number && (
-                  <div className="text-xs bg-secondary/40 rounded-lg px-3 py-2 mb-3">
+                  <div className="text-sm bg-secondary/40 rounded-lg px-3 py-2 mb-3">
                     🚚 <strong>{order.tracking_company}</strong> · 운송장{" "}
                     <span className="font-mono">{order.tracking_number}</span>
                   </div>
@@ -211,7 +211,7 @@ export default function MyOrdersPage() {
 
                 {/* 합계 + 액션 */}
                 <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <div className="text-sm">
+                  <div className="text-base">
                     <span className="text-muted-foreground">결제금액 </span>
                     <strong className="text-base">{order.amount.toLocaleString()}원</strong>
                   </div>

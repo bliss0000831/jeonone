@@ -114,19 +114,19 @@ export default function MySalesPage() {
         {/* 요약 카드 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
           <div className="rounded-xl bg-card border border-border p-3 text-center">
-            <p className="text-[11px] text-muted-foreground">전체</p>
+            <p className="text-sm text-muted-foreground">전체</p>
             <p className="text-lg font-bold">{stats.total}</p>
           </div>
           <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 p-3 text-center">
-            <p className="text-[11px] text-amber-700 dark:text-amber-300">발송 대기</p>
+            <p className="text-sm text-amber-700 dark:text-amber-300">발송 대기</p>
             <p className="text-lg font-bold text-amber-800 dark:text-amber-300">{stats.toShip}</p>
           </div>
           <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/40 p-3 text-center">
-            <p className="text-[11px] text-indigo-700 dark:text-indigo-300">배송 중</p>
+            <p className="text-sm text-indigo-700 dark:text-indigo-300">배송 중</p>
             <p className="text-lg font-bold text-indigo-800 dark:text-indigo-300">{stats.shipped}</p>
           </div>
           <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 p-3 text-center">
-            <p className="text-[11px] text-emerald-700 dark:text-emerald-300">정산 예정</p>
+            <p className="text-sm text-emerald-700 dark:text-emerald-300">정산 예정</p>
             <p className="text-lg font-bold text-emerald-800 dark:text-emerald-300">
               {stats.revenue.toLocaleString()}원
             </p>
@@ -141,9 +141,9 @@ export default function MySalesPage() {
           <div className="flex items-center gap-2 text-sm">
             <Banknote className="w-4 h-4 text-emerald-600" />
             <span className="font-medium">정산 계좌 등록</span>
-            <span className="text-muted-foreground text-xs ml-auto">→</span>
+            <span className="text-muted-foreground text-sm ml-auto">→</span>
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             구매확정된 주문은 등록한 계좌로 입금됩니다 (실서비스 전환 후)
           </p>
         </Link>
@@ -167,11 +167,11 @@ export default function MySalesPage() {
               <div key={order.id} className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${STATUS_TONES[order.status]}`}
+                    className={`px-2 py-0.5 rounded-full text-base font-semibold ${STATUS_TONES[order.status]}`}
                   >
                     {STATUS_LABELS[order.status]}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {new Date(order.created_at).toLocaleString("ko-KR")}
                   </span>
                 </div>
@@ -186,8 +186,8 @@ export default function MySalesPage() {
                         ) : null}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium line-clamp-1">{it.title}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-base font-medium line-clamp-1">{it.title}</p>
+                        <p className="text-sm text-muted-foreground">
                           {it.unit_price.toLocaleString()}원 × {it.quantity}
                         </p>
                       </div>
@@ -196,7 +196,7 @@ export default function MySalesPage() {
                 </div>
 
                 {/* 받는사람·주소 */}
-                <div className="text-xs bg-secondary/40 rounded-lg px-3 py-2 mb-3 leading-relaxed">
+                <div className="text-sm bg-secondary/40 rounded-lg px-3 py-2 mb-3 leading-relaxed">
                   <p>
                     <strong>받는 사람</strong> {order.delivery_addr.recipient_name} ·{" "}
                     {order.delivery_addr.phone}
@@ -214,7 +214,7 @@ export default function MySalesPage() {
 
                 {/* 운송장 표시 또는 입력 */}
                 {order.tracking_number ? (
-                  <div className="text-xs bg-indigo-50 dark:bg-indigo-950/30 rounded-lg px-3 py-2 mb-3">
+                  <div className="text-sm bg-indigo-50 dark:bg-indigo-950/30 rounded-lg px-3 py-2 mb-3">
                     🚚 <strong>{order.tracking_company}</strong> · 운송장{" "}
                     <span className="font-mono">{order.tracking_number}</span>
                   </div>
@@ -269,7 +269,7 @@ export default function MySalesPage() {
                   )
                 ) : null}
 
-                <div className="flex items-center justify-between pt-2 border-t border-border text-sm">
+                <div className="flex items-center justify-between pt-2 border-t border-border text-base">
                   <span className="text-muted-foreground">정산 예정액</span>
                   <strong>{(order.settlement_amount || 0).toLocaleString()}원</strong>
                 </div>

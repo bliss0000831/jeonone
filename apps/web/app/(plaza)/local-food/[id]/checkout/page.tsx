@@ -243,7 +243,7 @@ export default function LocalFoodCheckoutPage({
           </div>
           <div>
             <h1 className="text-lg font-bold">주문/결제</h1>
-            <p className="text-xs text-muted-foreground">택배 배송으로 받습니다</p>
+            <p className="text-sm text-muted-foreground">택배 배송으로 받습니다</p>
           </div>
         </div>
 
@@ -264,8 +264,8 @@ export default function LocalFoodCheckoutPage({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm line-clamp-2">{post.title}</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="font-medium text-base line-clamp-2">{post.title}</p>
+            <p className="text-sm text-muted-foreground mt-1">
               {post.price.toLocaleString()}원{post.unit ? ` / ${post.unit}` : ""}
             </p>
             <div className="flex items-center gap-2 mt-2">
@@ -298,7 +298,7 @@ export default function LocalFoodCheckoutPage({
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="recipient" className="text-xs">받는 사람 *</Label>
+              <Label htmlFor="recipient" className="text-base">받는 사람 *</Label>
               <Input
                 id="recipient"
                 value={addr.recipient_name}
@@ -307,7 +307,7 @@ export default function LocalFoodCheckoutPage({
               />
             </div>
             <div>
-              <Label htmlFor="phone" className="text-xs">연락처 *</Label>
+              <Label htmlFor="phone" className="text-base">연락처 *</Label>
               <Input
                 id="phone"
                 value={addr.phone}
@@ -319,7 +319,7 @@ export default function LocalFoodCheckoutPage({
             </div>
           </div>
           <div>
-            <Label className="text-xs mb-1 block">주소 *</Label>
+            <Label className="text-base mb-1 block">주소 *</Label>
             <AddressSearch
               value={addr.addr1}
               onChange={(_full, data) => {
@@ -339,7 +339,7 @@ export default function LocalFoodCheckoutPage({
             />
           </div>
           <div>
-            <Label htmlFor="postcode" className="text-xs">우편번호</Label>
+            <Label htmlFor="postcode" className="text-base">우편번호</Label>
             <Input
               id="postcode"
               value={addr.postcode}
@@ -349,7 +349,7 @@ export default function LocalFoodCheckoutPage({
             />
           </div>
           <div>
-            <Label htmlFor="addr2" className="text-xs">상세 주소</Label>
+            <Label htmlFor="addr2" className="text-base">상세 주소</Label>
             <Input
               id="addr2"
               value={addr.addr2}
@@ -359,7 +359,7 @@ export default function LocalFoodCheckoutPage({
             />
           </div>
           <div>
-            <Label className="text-xs mb-1 block">배송 메모 (선택)</Label>
+            <Label className="text-base mb-1 block">배송 메모 (선택)</Label>
             <select
               value={memoPreset}
               onChange={(e) => {
@@ -393,7 +393,7 @@ export default function LocalFoodCheckoutPage({
             포인트 사용
           </h2>
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>보유 포인트</span>
               <span className="font-semibold text-foreground">
                 {availablePoints.toLocaleString()} P
@@ -425,7 +425,7 @@ export default function LocalFoodCheckoutPage({
                 전체 사용
               </Button>
             </div>
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>
                 결제액의 {maxPct}% 까지 (최대 {maxPoints.toLocaleString()}P)
               </span>
@@ -436,7 +436,7 @@ export default function LocalFoodCheckoutPage({
               )}
             </div>
             {availablePoints === 0 && (
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 💡 글 작성·댓글·매물 등록 등 활동을 하면 포인트가 적립됩니다.{" "}
                 <Link href="/mypage/points" className="text-primary hover:underline">
                   포인트 내역 보기
@@ -476,7 +476,7 @@ export default function LocalFoodCheckoutPage({
               <span>총 결제 금액</span>
               <span className="text-primary">{total.toLocaleString()}원</span>
             </div>
-            <div className="flex items-center justify-between text-[11px] text-amber-600 dark:text-amber-400 pt-1">
+            <div className="flex items-center justify-between text-sm text-amber-600 dark:text-amber-400 pt-1">
               <span className="flex items-center gap-1">
                 <Coins className="w-3 h-3" />
                 구매확정 시 적립
@@ -485,7 +485,7 @@ export default function LocalFoodCheckoutPage({
                 +{Math.floor(total * 0.01).toLocaleString()} P (1%)
               </span>
             </div>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               플랫폼 수수료 {fee.toLocaleString()}원은 정산 시 생산자에게서 차감됩니다.
             </p>
           </div>
@@ -493,7 +493,7 @@ export default function LocalFoodCheckoutPage({
 
         {/* 안내 */}
         <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-3 mb-5">
-          <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+          <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
             🚧 <strong>개발 단계 안내</strong> — 현재는 실 결제가 아닌 테스트 결제로 진행됩니다.
             사업자 등록·PortOne 연동 후 실제 결제로 전환됩니다.
           </p>
@@ -507,7 +507,7 @@ export default function LocalFoodCheckoutPage({
             onChange={(e) => setAgreedPurchase(e.target.checked)}
             className="mt-0.5 w-4 h-4 rounded border-border accent-primary"
           />
-          <span className="text-xs leading-relaxed text-muted-foreground">
+          <span className="text-sm leading-relaxed text-muted-foreground">
             주문 내용을 확인하였으며,{" "}
             <Link href="/terms" className="underline hover:text-primary">이용약관</Link> 및{" "}
             <Link href="/privacy" className="underline hover:text-primary">개인정보 처리방침</Link>에

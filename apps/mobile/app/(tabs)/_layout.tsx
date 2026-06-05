@@ -73,8 +73,8 @@ export default function TabLayout() {
           elevation: 12,
         },
         tabBarLabelStyle: {
-          fontSize: 10,                                // web text-[10px]
-          fontWeight: "500",                           // font-medium
+          fontSize: 12,                                // 어르신 가독성 — 10→12
+          fontWeight: "600",
           marginTop: 2,
         },
         tabBarItemStyle: {

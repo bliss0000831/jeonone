@@ -210,7 +210,7 @@ export default function LocalFoodRegisterPage() {
               maxLength={60}
               required
             />
-            <p className="text-xs text-muted-foreground text-right mt-1">{form.title.length}/60</p>
+            <p className="text-sm text-muted-foreground text-right mt-1">{form.title.length}/60</p>
           </div>
 
           {/* Origin — 원산지 (location 컬럼 재활용) */}
@@ -241,7 +241,7 @@ export default function LocalFoodRegisterPage() {
               placeholder="예: 행복농원"
               maxLength={60}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               비워두면 카드에 작성자 닉네임으로 표시됩니다.
             </p>
           </div>

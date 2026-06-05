@@ -330,7 +330,7 @@ export default function SearchTab() {
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="trending-up-outline" size={14} color={lightColors.primary} />
                 <Text style={styles.sectionTitle}>인기 검색어</Text>
-                <Text style={{ fontSize: 10, color: lightColors.ink500, marginLeft: 4 }}>
+                <Text style={{ fontSize: 12, color: lightColors.ink500, marginLeft: 4 }}>
                   · 최근 7일
                 </Text>
               </View>
@@ -739,7 +739,7 @@ function makeStyles(colors: any) {
   tabCountActive: {
     backgroundColor: "rgba(255,255,255,0.2)",
   },
-  tabCountText: { fontSize: 10, fontWeight: "700", color: colors.ink500 },
+  tabCountText: { fontSize: 12, fontWeight: "700", color: colors.ink500 },
 
   // Empty state
   sectionHead: {
@@ -755,7 +755,7 @@ function makeStyles(colors: any) {
     color: colors.ink900,
   },
   clearLink: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.ink500,
   },
   chipWrap: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
@@ -843,7 +843,7 @@ function makeStyles(colors: any) {
     marginTop: spacing[3],
   },
   noResultHint: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.ink500,
     marginTop: 4,
   },
@@ -865,7 +865,7 @@ function makeStyles(colors: any) {
     borderRadius: 999,
     backgroundColor: colors.muted,
   },
-  sortText: { fontSize: 11, color: colors.ink900 },
+  sortText: { fontSize: 13, color: colors.ink900 },
 
   catHead: {
     flexDirection: "row",
@@ -881,8 +881,8 @@ function makeStyles(colors: any) {
     justifyContent: "center",
   },
   catLabel: { fontSize: fontSize.sm, fontWeight: "600" },
-  catCount: { fontSize: 11, color: colors.ink500 },
-  moreLink: { fontSize: 11, color: colors.primary, fontWeight: "500" },
+  catCount: { fontSize: 13, color: colors.ink500 },
+  moreLink: { fontSize: 13, color: colors.primary, fontWeight: "500" },
 
   // Hit card
   hitCard: {
@@ -929,15 +929,15 @@ function makeStyles(colors: any) {
     paddingVertical: 2,
     borderRadius: 4,
   },
-  hitCatBadgeText: { fontSize: 10, fontWeight: "700" },
+  hitCatBadgeText: { fontSize: 12, fontWeight: "700" },
   hitTitle: {
     flex: 1,
-    fontSize: fontSize.sm,
+    fontSize: 16,
     fontWeight: "500",
     color: colors.ink900,
   },
   hitSummary: {
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 17,
     color: colors.ink500,
     marginBottom: 4,
@@ -948,9 +948,9 @@ function makeStyles(colors: any) {
     gap: 6,
     flexWrap: "wrap",
   },
-  hitMetaText: { fontSize: 11, color: colors.ink500 },
+  hitMetaText: { fontSize: 13, color: colors.ink500 },
   hitPrice: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "700",
     color: colors.primary,
   },

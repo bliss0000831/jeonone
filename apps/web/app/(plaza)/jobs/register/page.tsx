@@ -128,7 +128,7 @@ export default function JobsRegisterPage() {
       <form onSubmit={handleSubmit} onChange={() => setFormDirty(true)} className="max-w-2xl mx-auto p-4 space-y-6">
         {/* Kind 토글 */}
         <div>
-          <label className="block text-sm font-medium mb-2">종류 *</label>
+          <label className="block text-base font-medium mb-2">종류 *</label>
           <div className="grid grid-cols-2 gap-2">
             {[
               { value: "hiring", label: "구인 (사람을 구해요)" },
@@ -152,7 +152,7 @@ export default function JobsRegisterPage() {
 
         {/* 이미지 */}
         <div>
-          <label className="block text-sm font-medium mb-2">사진 (최대 10장, 선택)</label>
+          <label className="block text-base font-medium mb-2">사진 (최대 10장, 선택)</label>
           <MediaUploader
             value={images}
             onChange={setImages}
@@ -164,7 +164,7 @@ export default function JobsRegisterPage() {
 
         {/* 제목 */}
         <div>
-          <label className="block text-sm font-medium mb-2">제목 *</label>
+          <label className="block text-base font-medium mb-2">제목 *</label>
           <input
             type="text"
             value={formData.title}
@@ -178,7 +178,7 @@ export default function JobsRegisterPage() {
 
         {/* 카테고리 */}
         <div>
-          <label className="block text-sm font-medium mb-2">카테고리</label>
+          <label className="block text-base font-medium mb-2">카테고리</label>
           <select
             value={formData.category}
             onChange={(e) => setFormData((p) => ({ ...p, category: e.target.value }))}
@@ -194,7 +194,7 @@ export default function JobsRegisterPage() {
 
         {/* 근무형태 */}
         <div>
-          <label className="block text-sm font-medium mb-2">근무형태</label>
+          <label className="block text-base font-medium mb-2">근무형태</label>
           <select
             value={formData.workType}
             onChange={(e) => setFormData((p) => ({ ...p, workType: e.target.value }))}
@@ -210,7 +210,7 @@ export default function JobsRegisterPage() {
 
         {/* 시급 */}
         <div>
-          <label className="block text-sm font-medium mb-2">시급 * (원)</label>
+          <label className="block text-base font-medium mb-2">시급 * (원)</label>
           <input
             type="number"
             min="0"
@@ -235,7 +235,7 @@ export default function JobsRegisterPage() {
 
         {/* 근무일 */}
         <div>
-          <label className="block text-sm font-medium mb-2">근무일</label>
+          <label className="block text-base font-medium mb-2">근무일</label>
           <input
             type="text"
             value={formData.workDays}
@@ -247,7 +247,7 @@ export default function JobsRegisterPage() {
 
         {/* 근무시간 — 시작/종료 분리 (저장 시 "HH:MM ~ HH:MM" 합쳐 workHours) */}
         <div>
-          <label className="block text-sm font-medium mb-2">근무시간</label>
+          <label className="block text-base font-medium mb-2">근무시간</label>
           <div className="flex items-center gap-2">
             <input
               type="time"
@@ -283,7 +283,7 @@ export default function JobsRegisterPage() {
 
         {/* 위치 */}
         <div>
-          <label className="block text-sm font-medium mb-2">근무지</label>
+          <label className="block text-base font-medium mb-2">근무지</label>
           <input
             type="text"
             value={formData.location}
@@ -298,7 +298,7 @@ export default function JobsRegisterPage() {
 
         {/* 설명 */}
         <div>
-          <label className="block text-sm font-medium mb-2">상세 설명 *</label>
+          <label className="block text-base font-medium mb-2">상세 설명 *</label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
@@ -312,7 +312,7 @@ export default function JobsRegisterPage() {
 
         {/* 연락처 */}
         <div>
-          <label className="block text-sm font-medium mb-2">연락처 (선택)</label>
+          <label className="block text-base font-medium mb-2">연락처 (선택)</label>
           <input
             type="text"
             value={formData.contact}

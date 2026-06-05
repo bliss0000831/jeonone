@@ -792,7 +792,7 @@ const jobsInfoStyles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    fontSize: 10,
+    fontSize: 12,
     color: lightColors.ink500,
     lineHeight: 14,
   },
@@ -1336,7 +1336,7 @@ function makeStyles(colors: any) {
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999,
     backgroundColor: colors.muted,
   },
-  toolBtnText: { fontSize: 12, color: colors.ink900 },
+  toolBtnText: { fontSize: 13, color: colors.ink900 },
 
   sortMenu: {
     position: "absolute",
@@ -1378,7 +1378,7 @@ function makeStyles(colors: any) {
     backgroundColor: colors.ink900,
   },
   viewSegText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "600",
     color: colors.ink700,
   },
@@ -1412,12 +1412,12 @@ function makeStyles(colors: any) {
   gridThumb: { width: "100%", height: "100%" },
   gridBody: { padding: 10, gap: 3 },
   gridTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "600",
     color: colors.ink900,
     lineHeight: 18,
   },
-  gridMeta: { fontSize: 11, color: colors.ink500, flex: 1 },
+  gridMeta: { fontSize: 13, color: colors.ink500, flex: 1 },
   gridExtraRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1471,7 +1471,7 @@ function makeStyles(colors: any) {
     elevation: 1,
   },
   listCatBadgeText: {
-    fontSize: 10, fontWeight: "500", color: colors.ink900,
+    fontSize: 12, fontWeight: "500", color: colors.ink900,
   },
   // 상태 배지 — bottom-1.5 left-1.5
   listStatusBadge: {
@@ -1479,7 +1479,7 @@ function makeStyles(colors: any) {
     paddingHorizontal: 8, paddingVertical: 2,
     borderRadius: 4,
   },
-  listStatusBadgeText: { fontSize: 10, fontWeight: "600", color: "#ffffff" },
+  listStatusBadgeText: { fontSize: 12, fontWeight: "600", color: "#ffffff" },
 
   // 우측 본문
   listBody: { flex: 1, minWidth: 0 },

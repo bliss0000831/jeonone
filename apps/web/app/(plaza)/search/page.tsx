@@ -362,7 +362,7 @@ function SearchPageInner() {
           {tab !== "profiles" && q ? (
             <button
               onClick={() => setSort((s) => s === "latest" ? "popular" : "latest")}
-              className="flex items-center gap-1 px-2.5 h-8 rounded-full text-xs font-medium bg-secondary/60 hover:bg-secondary transition-colors"
+              className="flex items-center gap-1 px-2.5 h-8 rounded-full text-sm font-medium bg-secondary/60 hover:bg-secondary transition-colors"
               aria-label="정렬"
               title={sort === "latest" ? "최신순" : "인기순"}
             >
@@ -396,7 +396,7 @@ function SearchPageInner() {
                   {t.label}
                   {q && cnt > 0 && (
                     <span className={cn(
-                      "text-[10px] font-semibold px-1.5 rounded-full",
+                      "text-xs font-semibold px-1.5 rounded-full",
                       active ? "bg-primary-foreground/20" : "bg-muted",
                     )}>
                       {cnt}
@@ -736,24 +736,24 @@ function ResultItem({ hit, showBadge }: { hit: SearchHit; showBadge: boolean }) 
         {/* 본문 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className={cn("inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md", meta.bgClass, meta.iconClass)}>
+            <span className={cn("inline-flex items-center gap-0.5 text-xs font-medium px-1.5 py-0.5 rounded-md", meta.bgClass, meta.iconClass)}>
               <CIcon className="w-2.5 h-2.5" />
               {meta.label}
             </span>
             {hit.status && (
-              <span className="text-[10px] font-medium text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted">
+              <span className="text-xs font-medium text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted">
                 {hit.status}
               </span>
             )}
           </div>
-          <h4 className="font-medium text-sm mt-1 line-clamp-1">{hit.title}</h4>
+          <h4 className="font-medium text-base mt-1 line-clamp-1">{hit.title}</h4>
           {price && (
             <p className="text-sm font-semibold text-primary mt-0.5">{price}</p>
           )}
           {hit.summary && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{hit.summary}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{hit.summary}</p>
           )}
-          <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
             {hit.location && <span className="truncate">📍 {hit.location}</span>}
             {hit.createdAt && <span>· {relativeDate(hit.createdAt)}</span>}
           </div>
