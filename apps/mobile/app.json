@@ -18,6 +18,8 @@
         "NSLocationWhenInUseUsageDescription": "현재 위치를 기반으로 동네를 자동 설정하기 위해 사용됩니다.",
         "LSApplicationQueriesSchemes": [
           "nmap",
+          "kakaomap",
+          "nmap",
           "kakaomap"
         ]
       }
@@ -33,6 +35,8 @@
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ]
@@ -96,6 +100,9 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/578779ed-4583-4580-af31-80a36aba9457"
     }
   }
 }
