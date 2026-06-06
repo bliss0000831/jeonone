@@ -498,8 +498,8 @@ const splashStyles = StyleSheet.create({
     zIndex: 999,
   },
   splashLottie: {
-    width: 600,
-    height: 600,
+    width: 620,
+    height: 620,
     marginBottom: 60,
   },
 })
