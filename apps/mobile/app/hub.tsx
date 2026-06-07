@@ -296,7 +296,13 @@ export default function HubScreen() {
                 <View style={styles.kickerRow}>
                   <View style={styles.kickerBar} />
                   <Text style={styles.kicker}>
-                    {byLocation ? “📍 가까운 지역이에요” : trimmed ? `🔍 “${trimmed}” 검색 결과` : hasVisited ? “최근 동네” : “추천 동네”}
+                    {byLocation
+                      ? “📍 가까운 지역이에요”
+                      : trimmed
+                      ? `🔍 “${trimmed}” 검색 결과`
+                      : hasVisited
+                      ? “최근 동네”
+                      : “추천 동네”}
                   </Text>
                 </View>
                 <BigCard plaza={featured} onEnter={() => enterPlaza(featured)} />
