@@ -29,7 +29,7 @@ import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import * as Location from "expo-location"
 import { getSupabase } from "@/lib/supabase"
-import { setSelectedPlaza, loadSelectedPlaza } from "@/lib/plaza"
+import { setSelectedPlaza, loadSelectedPlaza, provinceName } from "@/lib/plaza"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1b4a2f"
@@ -101,6 +101,7 @@ export default function HubScreen() {
     const q = trimmed.toLowerCase()
     return sorted.filter((p) => {
       if (p.name.toLowerCase().includes(q)) return true
+      if (provinceName(p.id, p.name).toLowerCase().includes(q)) return true
       if ((p.parent_region ?? "").toLowerCase().includes(q)) return true
       if ((p.coverage ?? []).some((c) => c.toLowerCase().includes(q))) return true
       return false
@@ -181,8 +182,8 @@ export default function HubScreen() {
             <Text style={styles.brandText}>🌱 전원일기</Text>
           </View>
 
-          <Text style={styles.h1}>어느 지역에 사세요?</Text>
-          <Text style={styles.sub}>우리 동네를 고르면 농기구·로컬푸드·이웃 소식을 한 곳에서 볼 수 있어요.</Text>
+          <Text style={styles.h1}>어디에 사세요?</Text>
+          <Text style={styles.sub}>사는 곳을 고르면 농기구·로컬푸드·이웃 소식을 한곳에서 볼 수 있어요.</Text>
 
           {/* 내 위치로 찾기 */}
           <Pressable style={styles.locateBtn} onPress={handleLocate} disabled={locating}>
@@ -200,7 +201,7 @@ export default function HubScreen() {
             <TextInput
               value={query}
               onChangeText={(t) => { setQuery(t); setByLocation(false) }}
-              placeholder="지역 이름으로 찾기 — 예: 강원, 강릉"
+              placeholder="지역 이름으로 찾기 — 예: 강원도, 강릉"
               placeholderTextColor="#9ca3af"
               style={styles.searchInput}
             />
@@ -210,8 +211,6 @@ export default function HubScreen() {
               </Pressable>
             )}
           </View>
-
-          <Text style={styles.statLine}>전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림</Text>
         </View>
 
         {loading ? (
@@ -222,7 +221,7 @@ export default function HubScreen() {
             {featured ? (
               <>
                 <Text style={styles.kicker}>
-                  {byLocation ? "📍 가까운 지역이에요" : trimmed ? `🔍 “${trimmed}” 검색 결과` : "우리 동네"}
+                  {byLocation ? "📍 가까운 지역이에요" : trimmed ? `🔍 “${trimmed}” 검색 결과` : "내 지역"}
                 </Text>
                 <BigCard plaza={featured} onEnter={() => enterPlaza(featured)} />
               </>
@@ -240,10 +239,10 @@ export default function HubScreen() {
                   <View style={styles.liveDotPing} />
                   <View style={styles.liveDotCore} />
                 </View>
-                <Text style={styles.liveLabel}>지금 마을</Text>
+                <Text style={styles.liveLabel}>이웃 소식</Text>
                 <Text style={styles.liveText} numberOfLines={1}>
-                  <Text style={{ fontWeight: "800" }}>{firstOpen?.name ?? "전원일기"}</Text>
-                  {stats.open > 1 ? ` 외 ${stats.open - 1}곳` : ""}에서 이웃들이 활동 중
+                  <Text style={{ fontWeight: "800" }}>{provinceName(firstOpen?.id, firstOpen?.name)}</Text>
+                  에서 이웃들이 이야기 나누고 있어요
                 </Text>
               </View>
             )}
@@ -251,7 +250,7 @@ export default function HubScreen() {
             {/* ─── 다른 열린 지역 ───────────────────────────────── */}
             {otherOpen.length > 0 && (
               <>
-                <Text style={styles.sectionTitle}>다른 열린 지역</Text>
+                <Text style={styles.sectionTitle}>다른 지역</Text>
                 <View style={styles.grid}>
                   {otherOpen.map((p) => (
                     <RegionTile key={p.id} plaza={p} onPress={() => enterPlaza(p)} />
@@ -292,25 +291,16 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
           colors={["rgba(34,90,57,0.35)", "rgba(31,61,42,0.72)", "rgba(23,53,36,0.94)"]}
           style={styles.bigCardOverlay}
         >
-          <View style={styles.bigCardTopRow}>
-            {isOpen ? (
-              <View style={styles.openBadge}>
-                <View style={styles.liveDot}>
-                  <View style={styles.liveDotPing} />
-                  <View style={styles.liveDotCore} />
-                </View>
-                <Text style={styles.openBadgeText}>지금 열림</Text>
-              </View>
-            ) : (
+          {!isOpen && (
+            <View style={styles.bigCardTopRow}>
               <View style={styles.soonBadge}>
                 <Ionicons name="lock-closed" size={11} color="#fff" />
-                <Text style={styles.soonBadgeText}>오픈예정</Text>
+                <Text style={styles.soonBadgeText}>곧 열려요</Text>
               </View>
-            )}
-            {plaza.parent_region && <Text style={styles.regionText}>{plaza.parent_region}</Text>}
-          </View>
+            </View>
+          )}
 
-          <Text style={styles.bigCardTitle}>{plaza.name}</Text>
+          <Text style={styles.bigCardTitle}>{provinceName(plaza.id, plaza.name)}</Text>
 
           {coverage.length > 0 && (
             <View style={styles.chips}>
@@ -328,7 +318,7 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
                 <Ionicons name="arrow-forward" size={22} color={GREEN} />
               </>
             ) : (
-              <Text style={[styles.enterBtnText, { color: "#fff" }]}>오픈예정</Text>
+              <Text style={[styles.enterBtnText, { color: "#fff" }]}>곧 열려요</Text>
             )}
           </Pressable>
         </LinearGradient>
@@ -347,10 +337,10 @@ function RegionTile({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) {
     >
       <View style={styles.tileTop}>
         {isOpen ? <View style={styles.tileDot} /> : <Ionicons name="lock-closed" size={14} color="#a8a29e" />}
-        <Text style={[styles.tileName, !isOpen && { color: "#a8a29e" }]} numberOfLines={1}>{plaza.name}</Text>
+        <Text style={[styles.tileName, !isOpen && { color: "#a8a29e" }]} numberOfLines={1}>{provinceName(plaza.id, plaza.name)}</Text>
       </View>
       <Text style={[styles.tileHint, !isOpen && { color: "#a8a29e" }]}>
-        {isOpen ? "눌러서 입장 →" : "오픈예정"}
+        {isOpen ? "눌러서 입장 →" : "곧 열려요"}
       </Text>
     </Pressable>
   )

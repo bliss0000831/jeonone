@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { MapPin, LocateFixed, ArrowRight, Sprout, Search, X, Lock } from 'lucide-react'
 import { buildPlazaUrl } from '@/lib/plaza/client'
+import { provinceName } from '@/lib/plaza/city-name'
 import { cn } from '@/lib/utils'
 
 type Plaza = {
@@ -75,9 +76,10 @@ export function HubLanding({
     const q = trimmed.toLowerCase()
     return sorted.filter((p) => {
       const inName = p.name.toLowerCase().includes(q)
+      const inProvince = provinceName(p.id, p.name).toLowerCase().includes(q)
       const inRegion = (p.parent_region || '').toLowerCase().includes(q)
       const inCoverage = (p.coverage || []).some((c) => c.toLowerCase().includes(q))
-      return inName || inRegion || inCoverage
+      return inName || inProvince || inRegion || inCoverage
     })
   }, [sorted, trimmed])
 
@@ -165,10 +167,10 @@ export function HubLanding({
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-[#225a39] leading-tight">
-            어느 지역에 사세요?
+            어디에 사세요?
           </h1>
           <p className="mt-3 text-lg sm:text-xl text-stone-600 font-medium">
-            우리 동네를 고르면 농기구·로컬푸드·이웃 소식을 한 곳에서 볼 수 있어요.
+            사는 곳을 고르면 농기구·로컬푸드·이웃 소식을 한곳에서 볼 수 있어요.
           </p>
 
           {/* 큰 '내 위치로 찾기' 버튼 */}
@@ -192,7 +194,7 @@ export function HubLanding({
                 type="text"
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setByLocation(false) }}
-                placeholder="지역 이름으로 찾기 — 예: 강원, 강릉"
+                placeholder="지역 이름으로 찾기 — 예: 강원도, 강릉"
                 className="flex-1 min-w-0 py-3.5 px-2 text-base sm:text-lg bg-transparent focus:outline-none text-stone-900 placeholder:text-stone-400"
               />
               {query && (
@@ -202,10 +204,6 @@ export function HubLanding({
               )}
             </div>
           </div>
-
-          <p className="mt-4 text-sm text-stone-500 font-medium">
-            전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림
-          </p>
         </div>
       </section>
 
@@ -219,7 +217,7 @@ export function HubLanding({
               ) : trimmed ? (
                 <span className="inline-flex items-center gap-1"><Search className="w-4 h-4" /> “{trimmed}” 검색 결과</span>
               ) : (
-                '우리 동네'
+                '내 지역'
               )}
             </p>
             <BigRegionCard plaza={featured} onEnter={() => goPlaza(featured.id)} />
@@ -241,7 +239,7 @@ export function HubLanding({
         {/* ─── 다른 열린 지역 ──────────────────────────────────── */}
         {otherOpen.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-3 text-xl sm:text-2xl font-black text-[#225a39]">다른 열린 지역</h2>
+            <h2 className="mb-3 text-xl sm:text-2xl font-black text-[#225a39]">다른 지역</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {otherOpen.map((p) => (
                 <RegionTile key={p.id} plaza={p} onClick={() => goPlaza(p.id)} />
@@ -283,26 +281,15 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
       <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/92 via-[#1f3d2a]/70 to-[#225a39]/35" />
       <div className="relative p-6 sm:p-8">
-        <div className="flex items-center gap-2 mb-2">
-          {isOpen ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/25 border border-emerald-300/50 text-emerald-50 text-xs font-bold">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300" />
-              </span>
-              지금 열림
-            </span>
-          ) : (
+        {!isOpen && (
+          <div className="flex items-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 border border-white/30 text-white/90 text-xs font-bold">
-              <Lock className="w-3 h-3" /> 오픈예정
+              <Lock className="w-3 h-3" /> 곧 열려요
             </span>
-          )}
-          {plaza.parent_region && (
-            <span className="text-white/80 text-sm font-semibold">{plaza.parent_region}</span>
-          )}
-        </div>
+          </div>
+        )}
 
-        <h3 className="text-3xl sm:text-4xl font-black text-white drop-shadow mb-2">{plaza.name}</h3>
+        <h3 className="text-3xl sm:text-4xl font-black text-white drop-shadow mb-2">{provinceName(plaza.id, plaza.name)}</h3>
 
         {coverage.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-5">
@@ -353,13 +340,13 @@ function RegionTile({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) {
           <Lock className="w-3.5 h-3.5 text-stone-400 shrink-0" />
         )}
         <span className={cn('text-lg font-black truncate', isOpen ? 'text-stone-900' : 'text-stone-400')}>
-          {plaza.name}
+          {provinceName(plaza.id, plaza.name)}
         </span>
       </div>
       <span className={cn('text-sm font-semibold', isOpen ? 'text-[#225a39]' : 'text-stone-400')}>
         {isOpen ? (
           <span className="inline-flex items-center gap-0.5">눌러서 입장 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" /></span>
-        ) : '오픈예정'}
+        ) : '곧 열려요'}
       </span>
     </button>
   )
@@ -400,20 +387,19 @@ function LiveActivityBar({
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
       </span>
-      <span className="font-bold flex-shrink-0">지금 마을</span>
+      <span className="font-bold flex-shrink-0">이웃 소식</span>
       <span className="text-white/30 hidden sm:inline">·</span>
       <span key={index} className="text-white/90 truncate text-left flex-1 min-w-0 animate-in fade-in slide-in-from-right-2 duration-500">
         {current ? (
           <>
-            <span className="font-semibold">{current.plaza_name}</span>
+            <span className="font-semibold">{provinceName(current.plaza_id, current.plaza_name)}</span>
             <span className="text-white/40 mx-1.5">·</span>
             <span className="text-white/90">{current.author_nickname}님 “{current.title}”</span>
           </>
         ) : (
           <>
-            <span className="font-semibold">{openPlazas[0]?.name ?? '전원일기'}</span>
-            {openPlazas.length > 1 && <span className="text-white/60"> 외 {openPlazas.length - 1}곳</span>}
-            <span className="text-white/60">에서 이웃들이 활동 중</span>
+            <span className="font-semibold">{provinceName(openPlazas[0]?.id, openPlazas[0]?.name)}</span>
+            <span className="text-white/60"> 이웃들이 이야기 나누고 있어요</span>
           </>
         )}
       </span>

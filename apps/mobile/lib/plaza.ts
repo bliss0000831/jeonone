@@ -188,6 +188,28 @@ export function plazaCityName(plazaIdOrName: string): string {
   return plazaIdOrName.replace(/광장$/, "")
 }
 
+/**
+ * 도(道) id → 정식 지명. 허브/카드에서 "강원 전원일기" 대신 "강원도" 로 표시.
+ * (DB name 은 그대로, 표시만 변환 — 웹 provinceName 과 동일 매핑)
+ */
+const PROVINCE_NAMES: Record<string, string> = {
+  gangwon: "강원도",
+  gyeonggi: "경기도",
+  chungbuk: "충청북도",
+  chungnam: "충청남도",
+  jeonbuk: "전라북도",
+  jeonnam: "전라남도",
+  gyeongbuk: "경상북도",
+  gyeongnam: "경상남도",
+  jeju: "제주도",
+}
+
+export function provinceName(id?: string | null, fallbackName?: string | null): string {
+  if (id && PROVINCE_NAMES[id]) return PROVINCE_NAMES[id]
+  if (fallbackName) return fallbackName.replace(/\s*전원일기$/, "").replace(/광장$/, "").trim() || "전원일기"
+  return "전원일기"
+}
+
 /** 전원일기 웹 도메인 (단일 도메인 — 지역 구분은 ?plaza= 쿼리). env 로 오버라이드 가능. */
 const WEB_BASE = (process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app").replace(/\/$/, "")
 
