@@ -233,6 +233,28 @@ export function provinceColors(id?: string | null) {
   return DEFAULT_PROVINCE_COLOR
 }
 
+/**
+ * 도별 배경 사진 — 허브 카드용 (require 로 번들됨).
+ * 나중에 도별 실사진 준비되면 여기만 교체.
+ */
+const PROVINCE_PHOTO_MAP: Record<string, any> = {
+  gangwon:   require("../assets/images/gangwon-bg.jpg"),
+  gyeonggi:  require("../assets/images/card-local-food.jpg"),
+  chungbuk:  require("../assets/images/card-farm-equipment.jpg"),
+  chungnam:  require("../assets/images/banner-news.jpg"),
+  jeonbuk:   require("../assets/images/card-auction.jpg"),
+  jeonnam:   require("../assets/images/card-workers.jpg"),
+  gyeongbuk: require("../assets/images/card-farm-equipment.jpg"),
+  gyeongnam: require("../assets/images/gangwon-bg.jpg"),
+  jeju:      require("../assets/images/card-local-food.jpg"),
+}
+const DEFAULT_PHOTO = require("../assets/images/gangwon-bg.jpg")
+
+export function provincePhoto(id?: string | null): any {
+  if (id && PROVINCE_PHOTO_MAP[id]) return PROVINCE_PHOTO_MAP[id]
+  return DEFAULT_PHOTO
+}
+
 /** 전원일기 웹 도메인 (단일 도메인 — 지역 구분은 ?plaza= 쿼리). env 로 오버라이드 가능. */
 const WEB_BASE = (process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app").replace(/\/$/, "")
 

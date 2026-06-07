@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { MapPin, LocateFixed, ArrowRight, Sprout, Search, X, Lock, Users, MessageCircle } from 'lucide-react'
 import { buildPlazaUrl } from '@/lib/plaza/client'
-import { provinceName, provinceColors } from '@/lib/plaza/city-name'
+import { provinceName, provinceColors, provincePhoto } from '@/lib/plaza/city-name'
 import { cn } from '@/lib/utils'
 
 type Plaza = {
@@ -292,27 +292,22 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
   const c = provinceColors(plaza.id)
   return (
     <div className="rounded-3xl overflow-hidden shadow-xl bg-white">
-      {/* 헤더 — 도별 자연색 그라데이션 + 큰 도명 */}
-      <div
-        className="relative h-[170px] sm:h-[200px] overflow-hidden"
-        style={{ background: `linear-gradient(to bottom right, ${c.from}, ${c.mid}, ${c.to})` }}
-      >
-        {/* 은은한 빛 효과 */}
-        <div aria-hidden className="absolute -top-16 -right-16 w-56 h-56 rounded-full blur-2xl" style={{ background: `${c.chip}33` }} />
-        <div aria-hidden className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full blur-3xl" style={{ background: `${c.chip}22` }} />
+      {/* 헤더 — 도별 농촌 사진 + 어두운 오버레이 */}
+      <div className="relative h-[170px] sm:h-[200px] overflow-hidden">
+        <Image src={provincePhoto(plaza.id)} alt="" fill className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/90 via-[#1f3d2a]/60 to-[#225a39]/30" />
         {/* 좌상단 칩 */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
           {isOpen ? (
             <span
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[#173524] text-sm font-bold shadow"
-              style={{ backgroundColor: c.chip }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/90 text-white text-sm font-bold shadow"
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#173524] opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#173524]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
               </span>
               지금 열림
-              {plaza.parent_region && <span className="text-[#173524]/75">· {plaza.parent_region}</span>}
+              {plaza.parent_region && <span className="text-white/85">· {plaza.parent_region}</span>}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 text-stone-700 text-sm font-bold shadow">
@@ -378,16 +373,13 @@ function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) 
       onClick={onClick}
       className="snap-start shrink-0 w-[220px] sm:w-[240px] bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
     >
-      <div
-        className="relative h-[110px] overflow-hidden flex items-end px-4 pb-3"
-        style={{ background: `linear-gradient(to bottom right, ${c.from}, ${c.mid}, ${c.to})` }}
-      >
-        <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl" style={{ background: `${c.chip}33` }} />
+      <div className="relative h-[110px] overflow-hidden flex items-end px-4 pb-3">
+        <Image src={provincePhoto(plaza.id)} alt="" fill className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/85 via-[#1f3d2a]/50 to-transparent" />
         <span
-          className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[#173524] text-xs font-bold shadow"
-          style={{ backgroundColor: c.chip }}
+          className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#173524]" /> 열림
+          <span className="w-1.5 h-1.5 rounded-full bg-white" /> 열림
         </span>
         <p className="relative text-2xl font-black text-white drop-shadow tracking-tight">{province}</p>
       </div>

@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -28,7 +29,7 @@ import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import * as Location from "expo-location"
 import { getSupabase } from "@/lib/supabase"
-import { setSelectedPlaza, loadSelectedPlaza, provinceName, provinceColors } from "@/lib/plaza"
+import { setSelectedPlaza, loadSelectedPlaza, provinceName, provinceColors, provincePhoto } from "@/lib/plaza"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1b4a2f"
@@ -341,18 +342,22 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
   const c = provinceColors(plaza.id)
   return (
     <View style={styles.bigCardWrap}>
-      {/* 헤더 — 도별 자연색 그라데이션 + 큰 도명 */}
-      <LinearGradient colors={[c.from, c.mid, c.to]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.bigHeader}>
+      {/* 헤더 — 도별 농촌 사진 + 어두운 오버레이 */}
+      <ImageBackground source={provincePhoto(plaza.id)} style={styles.bigHeader} imageStyle={{ resizeMode: "cover" }}>
+        <LinearGradient
+          colors={["rgba(34,90,57,0.3)", "rgba(31,61,42,0.6)", "rgba(23,53,36,0.9)"]}
+          style={StyleSheet.absoluteFill as any}
+        />
         {/* 좌상단 칩 */}
         <View style={styles.bigCardTopRow}>
           {isOpen ? (
-            <View style={[styles.openBadgeMockup, { backgroundColor: c.chip }]}>
+            <View style={styles.openBadgeMockup}>
               <View style={styles.liveDot}>
-                <View style={styles.liveDotPingDark} />
-                <View style={styles.liveDotCoreDark} />
+                <View style={styles.liveDotPing} />
+                <View style={styles.liveDotCore} />
               </View>
-              <Text style={styles.openBadgeMockupText}>지금 열림</Text>
-              {plaza.parent_region && <Text style={styles.openBadgeMockupSub}> · {plaza.parent_region}</Text>}
+              <Text style={styles.openBadgeMockupTextWhite}>지금 열림</Text>
+              {plaza.parent_region && <Text style={styles.openBadgeMockupSubWhite}> · {plaza.parent_region}</Text>}
             </View>
           ) : (
             <View style={styles.soonBadge}>
@@ -363,7 +368,7 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
         </View>
         {/* 좌하단 도명 */}
         <Text style={styles.bigCardProvince}>{province}</Text>
-      </LinearGradient>
+      </ImageBackground>
 
       {/* 통계 행 */}
       <View style={styles.statsRow}>
@@ -409,13 +414,17 @@ function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) 
   const c = provinceColors(plaza.id)
   return (
     <Pressable style={styles.village} onPress={onPress}>
-      <LinearGradient colors={[c.from, c.mid, c.to]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.villagePhoto}>
-        <View style={[styles.villageBadge, { backgroundColor: c.chip }]}>
+      <ImageBackground source={provincePhoto(plaza.id)} style={styles.villagePhoto} imageStyle={{ resizeMode: "cover" }}>
+        <LinearGradient
+          colors={["rgba(23,53,36,0)", "rgba(23,53,36,0.7)"]}
+          style={StyleSheet.absoluteFill as any}
+        />
+        <View style={styles.villageBadge}>
           <View style={styles.villageBadgeDot} />
-          <Text style={styles.villageBadgeText}>열림</Text>
+          <Text style={styles.villageBadgeTextWhite}>열림</Text>
         </View>
         <Text style={styles.villagePhotoTitle}>{province}</Text>
-      </LinearGradient>
+      </ImageBackground>
       <View style={styles.villageBody}>
         <Text style={styles.villageSnippet} numberOfLines={1}>{snippet}</Text>
         <View style={styles.villageStats}>
@@ -505,9 +514,11 @@ const styles = StyleSheet.create({
   bigCardWrap: { backgroundColor: "#fff", borderRadius: 24, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
   bigHeader: { height: 180, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14, justifyContent: "space-between" },
   bigCardTopRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  openBadgeMockup: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(110,231,183,0.95)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  openBadgeMockup: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(16,185,129,0.9)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   openBadgeMockupText: { color: "#173524", fontSize: 13, fontWeight: "900" },
+  openBadgeMockupTextWhite: { color: "#ffffff", fontSize: 13, fontWeight: "900" },
   openBadgeMockupSub: { color: "rgba(23,53,36,0.75)", fontSize: 13, fontWeight: "700" },
+  openBadgeMockupSubWhite: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "700" },
   liveDotPingDark: { position: "absolute", width: 8, height: 8, borderRadius: 4, backgroundColor: "rgba(23,53,36,0.55)" },
   liveDotCoreDark: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#173524" },
   soonBadge: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(255,255,255,0.95)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
@@ -533,9 +544,10 @@ const styles = StyleSheet.create({
   village: { width: 230, backgroundColor: "#fff", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "#e7e5e4", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   villagePhoto: { height: 100, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 12, justifyContent: "flex-end" },
   villagePhotoTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: -0.3, textShadowColor: "rgba(0,0,0,0.3)", textShadowRadius: 4 },
-  villageBadge: { position: "absolute", top: 10, left: 10, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(110,231,183,0.95)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
-  villageBadgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#173524" },
+  villageBadge: { position: "absolute", top: 10, left: 10, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(16,185,129,0.9)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
+  villageBadgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#ffffff" },
   villageBadgeText: { color: "#173524", fontSize: 11, fontWeight: "900" },
+  villageBadgeTextWhite: { color: "#ffffff", fontSize: 11, fontWeight: "900" },
   villageBody: { paddingHorizontal: 12, paddingVertical: 12, gap: 4 },
   villageSnippet: { fontSize: 13, color: "#78716c", fontWeight: "500" },
   villageStats: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4 },

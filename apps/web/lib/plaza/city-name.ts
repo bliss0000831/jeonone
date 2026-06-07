@@ -72,3 +72,24 @@ export function provinceColors(id?: string | null) {
   if (id && PROVINCE_COLORS[id]) return PROVINCE_COLORS[id]
   return DEFAULT_PROVINCE_COLOR
 }
+
+/**
+ * 도별 배경 사진 — 허브 카드에 농촌 사진 배경으로 사용.
+ * 웹: /images/xxx.jpg, 앱: require() 로 매핑 (앱은 별도 상수)
+ */
+const PROVINCE_PHOTOS: Record<string, string> = {
+  gangwon:   '/images/gangwon-bg.jpg',
+  gyeonggi:  '/images/card-local-food.jpg',
+  chungbuk:  '/images/card-farm-equipment.jpg',
+  chungnam:  '/images/banner-news.jpg',
+  jeonbuk:   '/images/card-auction.jpg',
+  jeonnam:   '/images/card-workers.jpg',
+  gyeongbuk: '/images/card-farm-equipment.jpg',
+  gyeongnam: '/images/gangwon-bg.jpg',
+  jeju:      '/images/card-local-food.jpg',
+}
+
+export function provincePhoto(id?: string | null): string {
+  if (id && PROVINCE_PHOTOS[id]) return PROVINCE_PHOTOS[id]
+  return '/images/gangwon-bg.jpg'
+}
