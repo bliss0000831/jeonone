@@ -23,7 +23,7 @@ const GREEN_DARK = "#1c4e31"
 const BROWN = "#8a6d3b"
 
 const IMG = {
-  logo: require("../../assets/images/logo-farmer.jpg"),
+  logo: require("../../assets/images/logo-farmer.png"),
   bg: require("../../assets/images/gangwon-bg.jpg"),
   equipment: require("../../assets/images/card-farm-equipment.jpg"),
   food: require("../../assets/images/card-local-food.jpg"),

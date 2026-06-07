@@ -163,7 +163,7 @@ export function HubLanding({
         <div className="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
           <div className="flex items-center justify-center gap-2.5 mb-5">
             <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow">
-              <Image src="/images/logo-farmer.jpg" alt="전원일기" fill className="object-cover" priority />
+              <Image src="/images/logo-farmer.png" alt="전원일기" fill className="object-cover" priority />
             </div>
             <span className="inline-flex items-center gap-1.5 text-[#225a39] font-bold text-base">
               <Sprout className="w-4 h-4" /> 전원일기

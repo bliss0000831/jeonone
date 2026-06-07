@@ -34,7 +34,7 @@ const GREEN = "#225a39"
 const GREEN_DARK = "#1b4a2f"
 const CREAM = "#f7f6f0"
 
-const LOGO = require("../assets/images/logo-farmer.jpg")
+const LOGO = require("../assets/images/logo-farmer.png")
 const SCENERY = require("../assets/images/gangwon-bg.jpg")
 
 interface Plaza {

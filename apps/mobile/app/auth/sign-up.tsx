@@ -227,7 +227,7 @@ export default function SignUpScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.card}>
             <View style={styles.logoBox}>
-              <Image source={require("../../assets/images/logo-farmer.jpg")} style={styles.logoImg} contentFit="cover" />
+              <Image source={require("../../assets/images/logo-farmer.png")} style={styles.logoImg} contentFit="cover" />
             </View>
             <Text style={styles.title}>{plaza.name} 회원가입</Text>
             <Text style={styles.subtitle}>더 나은 집, 더 가까운 이웃</Text>

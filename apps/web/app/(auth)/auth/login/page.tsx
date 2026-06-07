@@ -98,7 +98,7 @@ function LoginPageContent() {
         <Card className="w-full shadow-sm">
           <CardHeader className="text-center pb-3">
             <div className="mx-auto w-16 h-16 rounded-full overflow-hidden mb-3 ring-2 ring-primary/20 shadow-sm">
-              <Image src="/images/logo-farmer.jpg" alt={plazaName} width={64} height={64} className="w-full h-full object-cover" priority />
+              <Image src="/images/logo-farmer.png" alt={plazaName} width={64} height={64} className="w-full h-full object-cover" priority />
             </div>
             <CardTitle className="text-2xl text-primary">로그인</CardTitle>
             <CardDescription>이메일로 로그인하세요</CardDescription>

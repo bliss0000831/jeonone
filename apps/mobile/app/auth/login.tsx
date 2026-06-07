@@ -104,7 +104,7 @@ export default function LoginScreen() {
           <View style={styles.card}>
             {/* Logo box */}
             <View style={styles.logoBox}>
-              <Image source={require("../../assets/images/logo-farmer.jpg")} style={styles.logoImg} contentFit="cover" />
+              <Image source={require("../../assets/images/logo-farmer.png")} style={styles.logoImg} contentFit="cover" />
             </View>
 
             <Text style={styles.title}>로그인</Text>

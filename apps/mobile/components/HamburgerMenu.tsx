@@ -27,7 +27,7 @@ import { useAuth } from "@/lib/auth-context"
 import { useCurrentPlazaState } from "@/lib/plaza"
 
 const GREEN = "#225a39"
-const LOGO = require("../assets/images/logo-farmer.jpg")
+const LOGO = require("../assets/images/logo-farmer.png")
 
 interface Props {
   visible: boolean
