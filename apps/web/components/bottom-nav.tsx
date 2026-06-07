@@ -132,7 +132,7 @@ export function BottomNav() {
       type: isServicePro ? ("link" as const) : ("sheet" as const),
     },
     { href: "/chat", icon: MessageCircle, label: "채팅", type: "link" as const },
-    { href: "/mypage", icon: User, label: "MY", type: "link" as const },
+    { href: "/mypage", icon: User, label: "내정보", type: "link" as const },
   ]
 
   // 마운트 전에는 빈 네비게이션 셸 렌더링

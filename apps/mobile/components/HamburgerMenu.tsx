@@ -40,6 +40,7 @@ const MAIN: { icon: any; label: string; route: string }[] = [
   { icon: "construct", label: "농기구/자재 사고팔기", route: "/secondhand" },
   { icon: "leaf", label: "강원 로컬푸드", route: "/local-food" },
   { icon: "hammer", label: "만물 경매장", route: "/auction" },
+  { icon: "build", label: "농기구 대여", route: "/rental" },
   { icon: "people", label: "일손 찾기", route: "/jobs" },
   { icon: "newspaper", label: "전원 소식통", route: "/board" },
 ]

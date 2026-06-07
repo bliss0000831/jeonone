@@ -83,27 +83,18 @@ export default function SignUpPage() {
 
     setSendingCode(true)
     setError(null)
-
-    // 임시: 6자리 인증번호 생성 (실제로는 SMS API 사용)
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
-    setSentCode(code)
-    setIsCodeSent(true)
     setSendingCode(false)
 
-    // TODO: SMS 서비스 연동 후 실제 SMS 발송으로 교체
+    // SMS API 미연동 — 정식 출시 전까지 이메일/SMS 가입은 비활성 (카카오 가입만 지원)
     if (process.env.NODE_ENV === "development") {
+      // 개발 환경에서만 임시 인증번호 발급 (테스트용)
+      const code = Math.floor(100000 + Math.random() * 900000).toString()
+      setSentCode(code)
+      setIsCodeSent(true)
       setError(`[개발 모드] 인증번호: ${code}`)
-    } else {
-      // SMS 미연동 — 자동 인증 처리 + 번호 형식 검증 강화
-      const digits = phone.replace(/[^\d]/g, '')
-      if (!/^01[016789]\d{7,8}$/.test(digits)) {
-        setError("올바른 한국 휴대폰 번호를 입력해주세요 (010-XXXX-XXXX)")
-        setSendingCode(false)
-        return
-      }
-      setIsPhoneVerified(true)
-      setError(null)
+      return
     }
+    setError("휴대폰 인증이 점검 중이에요. 카카오로 가입해주세요.")
   }
 
   // 인증번호 확인
@@ -261,16 +252,12 @@ export default function SignUpPage() {
               카카오로 간편 가입
             </Button>
 
-            {/* 구분선 */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">또는 이메일로 가입</span>
-              </div>
-            </div>
+            {/* 시범 운영 중 — 휴대폰 인증 미연동이라 카카오 가입만 안내 */}
+            <p className="mt-5 text-sm text-center text-muted-foreground">
+              현재 시범 운영 중이라 <strong className="text-foreground">카카오로 가입</strong>만 가능해요. 휴대폰·이메일 가입은 정식 출시 후 열립니다.
+            </p>
 
+            <div className="hidden">
             <form onSubmit={handleSignUp} className="space-y-4">
               {notice && (
                 <div
@@ -528,6 +515,7 @@ export default function SignUpPage() {
                 )}
               </Button>
             </form>
+            </div>
             <div className="mt-6 text-center text-sm text-muted-foreground">
               이미 계정이 있으신가요?{' '}
               <Link href="/auth/login" className="text-primary font-medium hover:underline">

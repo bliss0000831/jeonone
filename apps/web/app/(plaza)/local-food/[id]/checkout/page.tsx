@@ -491,11 +491,13 @@ export default function LocalFoodCheckoutPage({
           </div>
         </div>
 
-        {/* 안내 */}
-        <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-3 mb-5">
-          <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-            🚧 <strong>개발 단계 안내</strong> — 현재는 실 결제가 아닌 테스트 결제로 진행됩니다.
-            사업자 등록·PortOne 연동 후 실제 결제로 전환됩니다.
+        {/* 안내 — 정식 출시 전 결제 비활성 */}
+        <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-900/10 p-4 mb-5">
+          <p className="text-base font-bold text-rose-800 dark:text-rose-300 mb-1">
+            ⚠ 결제는 정식 출시 후 가능해요
+          </p>
+          <p className="text-sm text-rose-700 dark:text-rose-300/90 leading-relaxed">
+            지금은 시범 운영 기간이라 결제를 받지 않아요. 농산물·연락처는 둘러보시고, 정식 출시 후 다시 방문해 주세요.
           </p>
         </div>
 
@@ -526,12 +528,10 @@ export default function LocalFoodCheckoutPage({
       <div className="fixed bottom-0 left-0 right-0 md:relative md:max-w-2xl md:mx-auto bg-background border-t border-border md:border-0 px-4 py-3 md:py-0 md:pb-6 z-40">
         <Button
           size="lg"
-          onClick={submit}
-          disabled={submitting || !agreedPurchase}
-          className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 gap-2"
+          disabled
+          className="w-full h-12 text-base font-medium gap-2"
         >
-          {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-          {submitting ? "결제 진행 중..." : `${total.toLocaleString()}원 결제하기`}
+          정식 출시 후 결제 가능
         </Button>
       </div>
 

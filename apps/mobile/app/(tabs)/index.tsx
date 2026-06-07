@@ -242,7 +242,7 @@ export default function HomeTab() {
               </View>
             ))
           )}
-          <Pressable onPress={go("/notice")}><Text style={styles.more}>더보기 →</Text></Pressable>
+          <Pressable onPress={go("/support/notice")}><Text style={styles.more}>더보기 →</Text></Pressable>
         </View>
 
         {/* 농사 꿀팁 */}

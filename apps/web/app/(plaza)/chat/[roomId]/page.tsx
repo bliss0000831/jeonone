@@ -915,20 +915,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
                   >
                     대화방 나가기
                   </button>
-                  <button
-                    onClick={() => setShowMenuModal(false)}
-                    disabled
-                    className="w-full p-4 text-left rounded-lg transition-colors text-muted-foreground opacity-60 cursor-not-allowed"
-                  >
-                    알림 설정 <span className="text-xs ml-1">(준비 중)</span>
-                  </button>
-                  <button
-                    onClick={() => setShowMenuModal(false)}
-                    disabled
-                    className="w-full p-4 text-left rounded-lg transition-colors text-muted-foreground opacity-60 cursor-not-allowed"
-                  >
-                    대화 내보내기 <span className="text-xs ml-1">(준비 중)</span>
-                  </button>
                 </div>
               </div>
             </div>

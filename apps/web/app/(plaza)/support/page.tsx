@@ -167,18 +167,24 @@ export default async function SupportPage() {
           1:1 이메일 문의 보내기
         </a>
 
-        {/* 사업자 안내 */}
+        {/* 시범 운영 안내 */}
         <section className="pt-2">
-          <div className="rounded-2xl bg-card border border-border p-4 text-xs text-muted-foreground space-y-1">
+          <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 mb-3">
+            <p className="text-base font-bold text-amber-900 mb-1">시범 운영 중이에요</p>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              지금은 정식 출시 전이라 일부 거래·결제 기능이 점검 중입니다. 사업자 등록과 결제 연동이 완료되면 안내드릴게요.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-card border border-border p-4 text-sm text-muted-foreground space-y-1">
             <div className="flex items-center gap-1.5 mb-1">
-              <Info className="w-3.5 h-3.5" />
-              <span className="font-semibold text-foreground">사업자 정보</span>
+              <Info className="w-4 h-4" />
+              <span className="font-bold text-foreground">사업자 정보</span>
             </div>
-            <p>· 상호: [추후 등록]</p>
-            <p>· 대표: [추후 등록]</p>
-            <p>· 사업자등록번호: [추후 등록]</p>
-            <p>· 통신판매업신고: [추후 등록]</p>
-            <p>· 주소: [추후 등록]</p>
+            <p>· 상호: 등록 예정 (정식 출시 시)</p>
+            <p>· 대표: 등록 예정</p>
+            <p>· 사업자등록번호: 등록 예정</p>
+            <p>· 통신판매업신고: 등록 예정</p>
+            <p>· 주소: 등록 예정</p>
             <p>· 이메일: {SUPPORT_EMAIL}</p>
           </div>
           <p className="text-center text-xs text-muted-foreground mt-4">{plazaName} v1.0.0</p>

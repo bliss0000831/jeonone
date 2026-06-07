@@ -33,6 +33,7 @@ const SERVICES = [
 ]
 
 const TX_MENU = [
+  { label: "내 글 관리", icon: FileText, href: "/mypage/profile?tab=posts" },
   { label: "내 거래", icon: Tractor, href: "/mypage/trades" },
   { label: "판매 내역", icon: Receipt, href: "/mypage/sales" },
   { label: "구매 내역", icon: ShoppingCart, href: "/mypage/orders" },

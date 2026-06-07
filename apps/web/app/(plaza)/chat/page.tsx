@@ -150,11 +150,10 @@ export default function ChatListPage() {
     }
   }
 
-  // 카테고리 분류 헬퍼
+  // 카테고리 분류 헬퍼 — 전원일기: 농기구/일손/나눔/로컬푸드/공지
   const getFilterCategory = (postType?: string) => {
-    if (!postType || postType === "property") return "property"
+    if (!postType) return "direct"
     if (postType === "admin_notice") return "notice"
-    if (["interior", "moving", "cleaning", "repair"].includes(postType)) return "service"
     return postType
   }
 
@@ -169,29 +168,26 @@ export default function ChatListPage() {
 
   const counts = useMemo(() => ({
     all: visibleRooms.length,
-    property: visibleRooms.filter((r) => getFilterCategory(r.post_type) === "property").length,
     sharing: visibleRooms.filter((r) => r.post_type === "sharing").length,
-    new_store: visibleRooms.filter((r) => r.post_type === "new_store").length,
     local_food: visibleRooms.filter((r) => r.post_type === "local_food").length,
-    service: visibleRooms.filter((r) => getFilterCategory(r.post_type) === "service").length,
+    secondhand: visibleRooms.filter((r) => r.post_type === "secondhand").length,
+    jobs: visibleRooms.filter((r) => r.post_type === "jobs").length,
     notice: visibleRooms.filter((r) => r.post_type === "admin_notice").length,
   }), [visibleRooms])
 
   const directSectionsMemo = useMemo(() => [
-    { key: "property", label: "부동산 채팅", rooms: filteredRooms.filter((r) => getFilterCategory(r.post_type) === "property") },
     { key: "sharing", label: "나눔 채팅", rooms: filteredRooms.filter((r) => r.post_type === "sharing") },
-    { key: "new_store", label: "신장개업 채팅", rooms: filteredRooms.filter((r) => r.post_type === "new_store") },
     { key: "local_food", label: "로컬푸드 채팅", rooms: filteredRooms.filter((r) => r.post_type === "local_food") },
-    { key: "service", label: "서비스 채팅", rooms: filteredRooms.filter((r) => getFilterCategory(r.post_type) === "service") },
+    { key: "secondhand", label: "농기구 채팅", rooms: filteredRooms.filter((r) => r.post_type === "secondhand") },
+    { key: "jobs", label: "일손 채팅", rooms: filteredRooms.filter((r) => r.post_type === "jobs") },
   ], [filteredRooms])
 
   const FILTER_TABS: { key: string; label: string }[] = [
     { key: "all", label: "전체" },
-    { key: "property", label: "부동산" },
     { key: "sharing", label: "나눔" },
-    { key: "new_store", label: "신장개업" },
     { key: "local_food", label: "로컬푸드" },
-    { key: "service", label: "서비스" },
+    { key: "secondhand", label: "농기구" },
+    { key: "jobs", label: "일손" },
     { key: "notice", label: "공지" },
   ]
 
