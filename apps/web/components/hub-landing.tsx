@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { MapPin, LocateFixed, ArrowRight, Sprout, Search, X, Lock, Users, MessageCircle } from 'lucide-react'
 import { buildPlazaUrl } from '@/lib/plaza/client'
-import { provinceName } from '@/lib/plaza/city-name'
+import { provinceName, provinceColors } from '@/lib/plaza/city-name'
 import { cn } from '@/lib/utils'
 
 type Plaza = {
@@ -289,17 +289,24 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
   const province = provinceName(plaza.id, plaza.name)
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
+  const c = provinceColors(plaza.id)
   return (
     <div className="rounded-3xl overflow-hidden shadow-xl bg-white">
-      {/* 헤더 — 녹색 그라데이션 + 큰 도명 (사진 X) */}
-      <div className="relative h-[170px] sm:h-[200px] overflow-hidden bg-gradient-to-br from-[#2f7d4f] via-[#225a39] to-[#173524]">
-        {/* 은은한 패턴(빛 효과) */}
-        <div aria-hidden className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-emerald-300/15 blur-2xl" />
-        <div aria-hidden className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full bg-emerald-200/10 blur-3xl" />
+      {/* 헤더 — 도별 자연색 그라데이션 + 큰 도명 */}
+      <div
+        className="relative h-[170px] sm:h-[200px] overflow-hidden"
+        style={{ background: `linear-gradient(to bottom right, ${c.from}, ${c.mid}, ${c.to})` }}
+      >
+        {/* 은은한 빛 효과 */}
+        <div aria-hidden className="absolute -top-16 -right-16 w-56 h-56 rounded-full blur-2xl" style={{ background: `${c.chip}33` }} />
+        <div aria-hidden className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full blur-3xl" style={{ background: `${c.chip}22` }} />
         {/* 좌상단 칩 */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
           {isOpen ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/95 text-[#173524] text-sm font-bold shadow">
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[#173524] text-sm font-bold shadow"
+              style={{ backgroundColor: c.chip }}
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#173524] opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#173524]" />
@@ -364,15 +371,22 @@ function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) 
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
   const snippet = plaza.recent_post_title ?? '이웃들이 모이고 있어요'
+  const c = provinceColors(plaza.id)
   return (
     <button
       type="button"
       onClick={onClick}
       className="snap-start shrink-0 w-[220px] sm:w-[240px] bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
     >
-      <div className="relative h-[110px] overflow-hidden bg-gradient-to-br from-[#2f7d4f] via-[#225a39] to-[#173524] flex items-end px-4 pb-3">
-        <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-300/15 blur-2xl" />
-        <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-400/95 text-[#173524] text-xs font-bold shadow">
+      <div
+        className="relative h-[110px] overflow-hidden flex items-end px-4 pb-3"
+        style={{ background: `linear-gradient(to bottom right, ${c.from}, ${c.mid}, ${c.to})` }}
+      >
+        <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl" style={{ background: `${c.chip}33` }} />
+        <span
+          className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[#173524] text-xs font-bold shadow"
+          style={{ backgroundColor: c.chip }}
+        >
           <span className="w-1.5 h-1.5 rounded-full bg-[#173524]" /> 열림
         </span>
         <p className="relative text-2xl font-black text-white drop-shadow tracking-tight">{province}</p>

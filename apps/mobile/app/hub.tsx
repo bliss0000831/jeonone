@@ -28,7 +28,7 @@ import { useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import * as Location from "expo-location"
 import { getSupabase } from "@/lib/supabase"
-import { setSelectedPlaza, loadSelectedPlaza, provinceName } from "@/lib/plaza"
+import { setSelectedPlaza, loadSelectedPlaza, provinceName, provinceColors } from "@/lib/plaza"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1b4a2f"
@@ -338,14 +338,15 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
   const province = provinceName(plaza.id, plaza.name)
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
+  const c = provinceColors(plaza.id)
   return (
     <View style={styles.bigCardWrap}>
-      {/* 헤더 — 녹색 그라데이션 + 큰 도명 (사진 X) */}
-      <LinearGradient colors={["#2f7d4f", "#225a39", "#173524"]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.bigHeader}>
+      {/* 헤더 — 도별 자연색 그라데이션 + 큰 도명 */}
+      <LinearGradient colors={[c.from, c.mid, c.to]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.bigHeader}>
         {/* 좌상단 칩 */}
         <View style={styles.bigCardTopRow}>
           {isOpen ? (
-            <View style={styles.openBadgeMockup}>
+            <View style={[styles.openBadgeMockup, { backgroundColor: c.chip }]}>
               <View style={styles.liveDot}>
                 <View style={styles.liveDotPingDark} />
                 <View style={styles.liveDotCoreDark} />
@@ -405,10 +406,11 @@ function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) 
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
   const snippet = plaza.recent_post_title ?? "이웃들이 모이고 있어요"
+  const c = provinceColors(plaza.id)
   return (
     <Pressable style={styles.village} onPress={onPress}>
-      <LinearGradient colors={["#2f7d4f", "#225a39", "#173524"]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.villagePhoto}>
-        <View style={styles.villageBadge}>
+      <LinearGradient colors={[c.from, c.mid, c.to]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.villagePhoto}>
+        <View style={[styles.villageBadge, { backgroundColor: c.chip }]}>
           <View style={styles.villageBadgeDot} />
           <Text style={styles.villageBadgeText}>열림</Text>
         </View>

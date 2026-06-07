@@ -39,3 +39,36 @@ export function provinceName(
   if (id && PROVINCE_NAMES[id]) return PROVINCE_NAMES[id]
   return plazaCityName(fallbackName)
 }
+
+/**
+ * 도(道)별 자연색 — 허브 카드 그라데이션 배경.
+ * 농촌 톤 (산·논·황토·바다·유채) — 단조로운 진녹 통일 대신 도별 정체감.
+ * 각 도는 [from, mid, to] 다크 그라데이션 (흰 글씨 대비 충분).
+ */
+const PROVINCE_COLORS: Record<string, { from: string; mid: string; to: string; chip: string }> = {
+  // 강원 — 솔잎/산악 짙은 녹
+  gangwon:   { from: "#3a7a4d", mid: "#225a39", to: "#143524", chip: "#6ee7b7" },
+  // 경기 — 논 노란 황금
+  gyeonggi:  { from: "#c19143", mid: "#8e6526", to: "#4f3815", chip: "#fde68a" },
+  // 충북 — 황토/내륙
+  chungbuk:  { from: "#c08758", mid: "#8a5a32", to: "#52341a", chip: "#fed7aa" },
+  // 충남 — 서해 청록
+  chungnam:  { from: "#4f8492", mid: "#345b66", to: "#1d343a", chip: "#a5d8e0" },
+  // 전북 — 벼 익은 황금
+  jeonbuk:   { from: "#b88a3b", mid: "#84621f", to: "#473511", chip: "#fcd34d" },
+  // 전남 — 대나무/소나무
+  jeonnam:   { from: "#5a9050", mid: "#3a6c33", to: "#1f3f1c", chip: "#bbf7d0" },
+  // 경북 — 안동 짙은 녹
+  gyeongbuk: { from: "#2f6135", mid: "#1f4225", to: "#102214", chip: "#86efac" },
+  // 경남 — 남해 청록
+  gyeongnam: { from: "#4d8a7e", mid: "#326056", to: "#1a3631", chip: "#99e9d3" },
+  // 제주 — 유채/감귤
+  jeju:      { from: "#d9a93b", mid: "#a87b1f", to: "#5e430f", chip: "#fed94f" },
+}
+
+const DEFAULT_PROVINCE_COLOR = PROVINCE_COLORS.gangwon
+
+export function provinceColors(id?: string | null) {
+  if (id && PROVINCE_COLORS[id]) return PROVINCE_COLORS[id]
+  return DEFAULT_PROVINCE_COLOR
+}

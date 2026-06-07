@@ -210,6 +210,29 @@ export function provinceName(id?: string | null, fallbackName?: string | null): 
   return "전원일기"
 }
 
+/**
+ * 도(道)별 자연색 — 허브 카드 그라데이션 (웹 provinceColors() 와 동일 매핑).
+ * 농촌 톤: 산·논·황토·바다·유채. 다크 톤이라 흰 글씨 대비 OK.
+ */
+const PROVINCE_COLORS: Record<string, { from: string; mid: string; to: string; chip: string }> = {
+  gangwon:   { from: "#3a7a4d", mid: "#225a39", to: "#143524", chip: "#6ee7b7" },
+  gyeonggi:  { from: "#c19143", mid: "#8e6526", to: "#4f3815", chip: "#fde68a" },
+  chungbuk:  { from: "#c08758", mid: "#8a5a32", to: "#52341a", chip: "#fed7aa" },
+  chungnam:  { from: "#4f8492", mid: "#345b66", to: "#1d343a", chip: "#a5d8e0" },
+  jeonbuk:   { from: "#b88a3b", mid: "#84621f", to: "#473511", chip: "#fcd34d" },
+  jeonnam:   { from: "#5a9050", mid: "#3a6c33", to: "#1f3f1c", chip: "#bbf7d0" },
+  gyeongbuk: { from: "#2f6135", mid: "#1f4225", to: "#102214", chip: "#86efac" },
+  gyeongnam: { from: "#4d8a7e", mid: "#326056", to: "#1a3631", chip: "#99e9d3" },
+  jeju:      { from: "#d9a93b", mid: "#a87b1f", to: "#5e430f", chip: "#fed94f" },
+}
+
+const DEFAULT_PROVINCE_COLOR = PROVINCE_COLORS.gangwon
+
+export function provinceColors(id?: string | null) {
+  if (id && PROVINCE_COLORS[id]) return PROVINCE_COLORS[id]
+  return DEFAULT_PROVINCE_COLOR
+}
+
 /** 전원일기 웹 도메인 (단일 도메인 — 지역 구분은 ?plaza= 쿼리). env 로 오버라이드 가능. */
 const WEB_BASE = (process.env.EXPO_PUBLIC_API_BASE ?? "https://jeonwondiary.vercel.app").replace(/\/$/, "")
 
