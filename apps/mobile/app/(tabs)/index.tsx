@@ -109,7 +109,6 @@ export default function HomeTab() {
       {/* 상단 바 */}
       <View style={styles.topbar}>
         <View style={styles.brandRow}>
-          <Image source={IMG.logo} style={styles.brandLogo} contentFit="cover" />
           <Text style={styles.brand} numberOfLines={1}>{plaza.name}</Text>
           <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
             <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
