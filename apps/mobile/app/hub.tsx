@@ -48,6 +48,10 @@ interface Plaza {
   is_open_soon: boolean
   sort_order: number
   coverage?: string[] | null
+  // 통계 (목업 카드의 "142명 · 8개 글 · 18개 동네")
+  member_count?: number
+  posts_today?: number
+  recent_post_title?: string | null
 }
 
 function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
@@ -83,7 +87,45 @@ export default function HubScreen() {
           .from("plazas")
           .select("id, name, parent_region, center_lat, center_lng, is_active, is_open_soon, sort_order, coverage")
           .order("sort_order", { ascending: true })
-        setPlazas((data ?? []) as Plaza[])
+        const base = (data ?? []) as Plaza[]
+
+        // 통계 fetch — 회원수·오늘 글수·최근글 (웹과 동일 로직)
+        const memberMap = new Map<string, number>()
+        const postCountMap = new Map<string, number>()
+        const snippetMap = new Map<string, string>()
+        try {
+          const { data: members } = await (supabase.from("plaza_profiles") as any)
+            .select("plaza_id")
+            .eq("is_active", true)
+          for (const r of (members as any[]) ?? []) {
+            memberMap.set(r.plaza_id, (memberMap.get(r.plaza_id) ?? 0) + 1)
+          }
+        } catch {}
+        try {
+          const openIds = base.filter((p) => p.is_active).map((p) => p.id)
+          if (openIds.length > 0) {
+            const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+            const { data: posts } = await (supabase.from("board_posts") as any)
+              .select("title, plaza_id, created_at")
+              .in("plaza_id", openIds)
+              .eq("status", "published")
+              .gte("created_at", sinceIso)
+              .order("created_at", { ascending: false })
+              .limit(60)
+            for (const p of (posts as any[]) ?? []) {
+              postCountMap.set(p.plaza_id, (postCountMap.get(p.plaza_id) ?? 0) + 1)
+              if (!snippetMap.has(p.plaza_id)) snippetMap.set(p.plaza_id, p.title)
+            }
+          }
+        } catch {}
+
+        const enriched = base.map((p) => ({
+          ...p,
+          member_count: memberMap.get(p.id) ?? 0,
+          posts_today: postCountMap.get(p.id) ?? 0,
+          recent_post_title: snippetMap.get(p.id) ?? null,
+        }))
+        setPlazas(enriched)
       } finally {
         setLoading(false)
       }
@@ -211,18 +253,36 @@ export default function HubScreen() {
               </Pressable>
             )}
           </View>
+
+          <Text style={styles.statLine}>전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림</Text>
         </View>
 
         {loading ? (
           <View style={{ paddingVertical: 40 }}><ActivityIndicator color={GREEN} /></View>
         ) : (
           <View style={styles.body}>
+            {/* ─── LIVE 칩 바 (목업 상단) ────────────────────── */}
+            {!trimmed && stats.open > 0 && (
+              <View style={styles.liveChip}>
+                <View style={styles.liveDot}>
+                  <View style={styles.liveDotPing} />
+                  <View style={styles.liveDotCore} />
+                </View>
+                <Text style={styles.liveChipText} numberOfLines={1}>
+                  지금 <Text style={styles.liveChipBold}>{stats.open}</Text>곳 마을에서 이웃들이 모이고 있어요
+                </Text>
+              </View>
+            )}
+
             {/* ─── 우리 동네 큰 카드 ───────────────────────────── */}
             {featured ? (
               <>
-                <Text style={styles.kicker}>
-                  {byLocation ? "📍 가까운 지역이에요" : trimmed ? `🔍 “${trimmed}” 검색 결과` : "내 지역"}
-                </Text>
+                <View style={styles.kickerRow}>
+                  <View style={styles.kickerBar} />
+                  <Text style={styles.kicker}>
+                    {byLocation ? "📍 가까운 지역이에요" : trimmed ? `🔍 “${trimmed}” 검색 결과` : "우리 동네"}
+                  </Text>
+                </View>
                 <BigCard plaza={featured} onEnter={() => enterPlaza(featured)} />
               </>
             ) : (
@@ -232,37 +292,29 @@ export default function HubScreen() {
               </View>
             )}
 
-            {/* ─── 지금 마을 (LIVE) ─────────────────────────────── */}
-            {!trimmed && stats.open > 0 && (
-              <View style={styles.liveBar}>
-                <View style={styles.liveDot}>
-                  <View style={styles.liveDotPing} />
-                  <View style={styles.liveDotCore} />
-                </View>
-                <Text style={styles.liveLabel}>이웃 소식</Text>
-                <Text style={styles.liveText} numberOfLines={1}>
-                  <Text style={{ fontWeight: "800" }}>{provinceName(firstOpen?.id, firstOpen?.name)}</Text>
-                  에서 이웃들이 이야기 나누고 있어요
-                </Text>
-              </View>
-            )}
-
-            {/* ─── 다른 열린 지역 ───────────────────────────────── */}
+            {/* ─── 열린 마을 둘러보기 (가로 슬라이드) ───────────── */}
             {otherOpen.length > 0 && (
               <>
-                <Text style={styles.sectionTitle}>다른 지역</Text>
-                <View style={styles.grid}>
-                  {otherOpen.map((p) => (
-                    <RegionTile key={p.id} plaza={p} onPress={() => enterPlaza(p)} />
-                  ))}
+                <View style={styles.browseHeader}>
+                  <Text style={styles.sectionTitle}>열린 마을 둘러보기</Text>
+                  <Text style={styles.browseAll}>전체 {stats.open}곳 →</Text>
                 </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.hScroll}
+                >
+                  {otherOpen.map((p) => (
+                    <VillageCard key={p.id} plaza={p} onPress={() => enterPlaza(p)} />
+                  ))}
+                </ScrollView>
               </>
             )}
 
             {/* ─── 곧 열릴 지역 ─────────────────────────────────── */}
             {comingSoon.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: "#78716c" }]}>곧 열릴 지역</Text>
+                <Text style={[styles.sectionTitle, { color: "#78716c", marginTop: 24, marginBottom: 12 }]}>곧 열릴 지역</Text>
                 <View style={styles.grid}>
                   {comingSoon.map((p) => (
                     <RegionTile key={p.id} plaza={p} onPress={() => {}} />
@@ -284,46 +336,110 @@ export default function HubScreen() {
 function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
   const isOpen = plaza.is_active
   const coverage = plaza.coverage ?? []
+  const province = provinceName(plaza.id, plaza.name)
+  const members = plaza.member_count ?? 0
+  const postsToday = plaza.posts_today ?? 0
   return (
-    <View style={styles.bigCard}>
-      <ImageBackground source={SCENERY} style={styles.bigCardBg} imageStyle={{ borderRadius: 24 }}>
-        <LinearGradient
-          colors={["rgba(34,90,57,0.35)", "rgba(31,61,42,0.72)", "rgba(23,53,36,0.94)"]}
-          style={styles.bigCardOverlay}
-        >
-          {!isOpen && (
-            <View style={styles.bigCardTopRow}>
-              <View style={styles.soonBadge}>
-                <Ionicons name="lock-closed" size={11} color="#fff" />
-                <Text style={styles.soonBadgeText}>곧 열려요</Text>
-              </View>
-            </View>
-          )}
-
-          <Text style={styles.bigCardTitle}>{provinceName(plaza.id, plaza.name)}</Text>
-
-          {coverage.length > 0 && (
-            <View style={styles.chips}>
-              {coverage.slice(0, 6).map((c) => (
-                <View key={c} style={styles.chip}><Text style={styles.chipText}>{c}</Text></View>
-              ))}
-              {coverage.length > 6 && <Text style={styles.chipMore}>+{coverage.length - 6}</Text>}
-            </View>
-          )}
-
-          <Pressable style={[styles.enterBtn, !isOpen && styles.enterBtnDisabled]} onPress={onEnter} disabled={!isOpen}>
+    <View style={styles.bigCardWrap}>
+      {/* 사진 영역 */}
+      <View style={styles.bigPhoto}>
+        <ImageBackground source={SCENERY} style={styles.bigPhotoBg} imageStyle={{ resizeMode: "cover" }}>
+          <LinearGradient
+            colors={["rgba(23,53,36,0)", "rgba(23,53,36,0.4)", "rgba(23,53,36,0.85)"]}
+            style={StyleSheet.absoluteFill as any}
+          />
+          {/* 좌상단 칩 */}
+          <View style={styles.bigCardTopRow}>
             {isOpen ? (
-              <>
-                <Text style={styles.enterBtnText}>들어가기</Text>
-                <Ionicons name="arrow-forward" size={22} color={GREEN} />
-              </>
+              <View style={styles.openBadgeMockup}>
+                <View style={styles.liveDot}>
+                  <View style={styles.liveDotPing} />
+                  <View style={styles.liveDotCore} />
+                </View>
+                <Text style={styles.openBadgeMockupText}>지금 열림</Text>
+                {plaza.parent_region && <Text style={styles.openBadgeMockupSub}> · {plaza.parent_region}</Text>}
+              </View>
             ) : (
-              <Text style={[styles.enterBtnText, { color: "#fff" }]}>곧 열려요</Text>
+              <View style={styles.soonBadge}>
+                <Ionicons name="lock-closed" size={11} color="#44403c" />
+                <Text style={styles.soonBadgeTextDark}>곧 열려요</Text>
+              </View>
             )}
-          </Pressable>
-        </LinearGradient>
-      </ImageBackground>
+          </View>
+          {/* 좌하단 도명 */}
+          <Text style={styles.bigCardProvince}>{province}</Text>
+        </ImageBackground>
+      </View>
+
+      {/* 통계 행 */}
+      <View style={styles.statsRow}>
+        <View style={styles.statCell}>
+          <Ionicons name="people" size={18} color={GREEN} />
+          <Text style={styles.statValue}>{members.toLocaleString()}</Text>
+          <Text style={styles.statLabel}>명</Text>
+        </View>
+        <Text style={styles.statSep}>·</Text>
+        <View style={styles.statCell}>
+          <Ionicons name="chatbubble-ellipses" size={18} color={GREEN} />
+          <Text style={styles.statValue}>{postsToday}</Text>
+          <Text style={styles.statLabel}>개 글 오늘</Text>
+        </View>
+        <Text style={styles.statSep}>·</Text>
+        <View style={styles.statCell}>
+          <Ionicons name="location" size={18} color={GREEN} />
+          <Text style={styles.statValue}>{coverage.length}</Text>
+          <Text style={styles.statLabel}>개 동네</Text>
+        </View>
+      </View>
+
+      {/* CTA */}
+      <Pressable style={[styles.enterBtn, !isOpen && styles.enterBtnDisabled]} onPress={onEnter} disabled={!isOpen}>
+        {isOpen ? (
+          <>
+            <Text style={styles.enterBtnText}>{province} 들어가기</Text>
+            <Ionicons name="arrow-forward" size={22} color={GREEN} />
+          </>
+        ) : (
+          <Text style={[styles.enterBtnText, { color: "#a8a29e" }]}>곧 열려요</Text>
+        )}
+      </Pressable>
     </View>
+  )
+}
+
+function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) {
+  const province = provinceName(plaza.id, plaza.name)
+  const members = plaza.member_count ?? 0
+  const postsToday = plaza.posts_today ?? 0
+  const snippet = plaza.recent_post_title ?? "이웃들이 모이고 있어요"
+  return (
+    <Pressable style={styles.village} onPress={onPress}>
+      <View style={styles.villagePhoto}>
+        <ImageBackground source={SCENERY} style={StyleSheet.absoluteFill as any} imageStyle={{ resizeMode: "cover" }}>
+          <LinearGradient
+            colors={["rgba(23,53,36,0)", "rgba(23,53,36,0.3)"]}
+            style={StyleSheet.absoluteFill as any}
+          />
+          <View style={styles.villageBadge}>
+            <View style={styles.villageBadgeDot} />
+            <Text style={styles.villageBadgeText}>열림</Text>
+          </View>
+        </ImageBackground>
+      </View>
+      <View style={styles.villageBody}>
+        <Text style={styles.villageTitle}>{province}</Text>
+        <Text style={styles.villageSnippet} numberOfLines={1}>{snippet}</Text>
+        <View style={styles.villageStats}>
+          <Ionicons name="people" size={14} color={GREEN} />
+          <Text style={styles.villageStatValue}>{members.toLocaleString()}</Text>
+          <Text style={styles.villageStatLabel}>명</Text>
+          <Text style={styles.statSep}>·</Text>
+          <Ionicons name="chatbubble-ellipses" size={14} color={GREEN} />
+          <Text style={styles.villageStatValue}>{postsToday}</Text>
+          <Text style={styles.villageStatLabel}>개 글</Text>
+        </View>
+      </View>
+    </Pressable>
   )
 }
 
@@ -379,48 +495,68 @@ const styles = StyleSheet.create({
 
   body: { paddingHorizontal: 16, paddingTop: 8 },
 
-  kicker: { fontSize: 15, fontWeight: "800", color: "#57534e", marginBottom: 8 },
-
-  bigCard: { borderRadius: 24, overflow: "hidden", minHeight: 230 },
-  bigCardBg: { width: "100%", minHeight: 230, justifyContent: "flex-end" },
-  bigCardOverlay: { padding: 22, borderRadius: 24, justifyContent: "flex-end", minHeight: 230 },
-  bigCardTopRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
-  openBadge: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(16,185,129,0.25)", borderWidth: 1, borderColor: "rgba(110,231,183,0.5)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  openBadgeText: { color: "#ecfdf5", fontSize: 12, fontWeight: "800" },
-  soonBadge: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(255,255,255,0.2)", borderWidth: 1, borderColor: "rgba(255,255,255,0.3)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  soonBadgeText: { color: "#fff", fontSize: 12, fontWeight: "800" },
-  regionText: { color: "rgba(255,255,255,0.85)", fontSize: 14, fontWeight: "700" },
-
-  bigCardTitle: { color: "#fff", fontSize: 32, fontWeight: "900", marginBottom: 10, textShadowColor: "rgba(0,0,0,0.35)", textShadowRadius: 6 },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 18 },
-  chip: { backgroundColor: "rgba(255,255,255,0.22)", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  chipText: { color: "#fff", fontSize: 12, fontWeight: "600" },
-  chipMore: { color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: "600", alignSelf: "center" },
-
-  enterBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    backgroundColor: "#fff", borderRadius: 16, paddingVertical: 16,
-  },
-  enterBtnDisabled: { backgroundColor: "rgba(255,255,255,0.18)" },
-  enterBtnText: { color: GREEN, fontSize: 21, fontWeight: "900" },
-
-  liveBar: {
+  // LIVE 칩
+  liveChip: {
     flexDirection: "row", alignItems: "center", gap: 10,
-    backgroundColor: "#1f3d2a", borderRadius: 999, paddingHorizontal: 18, paddingVertical: 14, marginTop: 14,
+    backgroundColor: "rgba(220,252,231,0.7)", borderColor: "#bbf7d0", borderWidth: 1,
+    borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, marginTop: 6,
   },
-  liveDot: { width: 8, height: 8, alignItems: "center", justifyContent: "center" },
-  liveDotPing: { position: "absolute", width: 8, height: 8, borderRadius: 4, backgroundColor: "rgba(52,211,153,0.6)" },
-  liveDotCore: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#34d399" },
-  liveLabel: { color: "#fff", fontSize: 14, fontWeight: "800" },
-  liveText: { color: "rgba(255,255,255,0.9)", fontSize: 14, flex: 1 },
+  liveChipText: { color: "#44403c", fontSize: 15, fontWeight: "600", flex: 1 },
+  liveChipBold: { color: GREEN, fontWeight: "900" },
+  liveDot: { width: 10, height: 10, alignItems: "center", justifyContent: "center" },
+  liveDotPing: { position: "absolute", width: 10, height: 10, borderRadius: 5, backgroundColor: "rgba(52,211,153,0.6)" },
+  liveDotCore: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#10b981" },
 
-  sectionTitle: { fontSize: 21, fontWeight: "900", color: GREEN, marginTop: 26, marginBottom: 12 },
+  // 우리 동네 라벨
+  kickerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 18, marginBottom: 8 },
+  kickerBar: { width: 4, height: 18, borderRadius: 2, backgroundColor: GREEN },
+  kicker: { fontSize: 16, fontWeight: "900", color: "#1c1917" },
 
+  // 큰 카드 (사진 + 통계행 + CTA)
+  bigCardWrap: { backgroundColor: "#fff", borderRadius: 24, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
+  bigPhoto: { height: 180, overflow: "hidden" },
+  bigPhotoBg: { width: "100%", height: "100%", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12 },
+  bigCardTopRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  openBadgeMockup: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(16,185,129,0.95)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  openBadgeMockupText: { color: "#fff", fontSize: 13, fontWeight: "900" },
+  openBadgeMockupSub: { color: "rgba(255,255,255,0.9)", fontSize: 13, fontWeight: "700" },
+  soonBadge: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(255,255,255,0.95)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
+  soonBadgeTextDark: { color: "#44403c", fontSize: 12, fontWeight: "800" },
+  bigCardProvince: { color: "#fff", fontSize: 32, fontWeight: "900", textShadowColor: "rgba(0,0,0,0.45)", textShadowRadius: 6 },
+
+  // 통계 행
+  statsRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10 },
+  statCell: { flexDirection: "row", alignItems: "center", gap: 5 },
+  statValue: { color: GREEN, fontSize: 16, fontWeight: "900" },
+  statLabel: { color: "#78716c", fontSize: 14, fontWeight: "600" },
+  statSep: { color: "#d6d3d1", fontSize: 16 },
+
+  // CTA
+  enterBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginHorizontal: 12, marginBottom: 14, marginTop: 2, backgroundColor: "#fff", borderRadius: 16, paddingVertical: 16, borderWidth: 2, borderColor: "rgba(34,90,57,0.15)" },
+  enterBtnDisabled: { backgroundColor: "#f5f5f4", borderColor: "#e7e5e4" },
+  enterBtnText: { color: GREEN, fontSize: 19, fontWeight: "900" },
+
+  // 열린 마을 둘러보기
+  browseHeader: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 24, marginBottom: 10 },
+  browseAll: { fontSize: 14, fontWeight: "700", color: "#78716c" },
+  hScroll: { paddingRight: 16, paddingVertical: 4, gap: 12 },
+  village: { width: 230, backgroundColor: "#fff", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "#e7e5e4", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  villagePhoto: { height: 110, position: "relative" },
+  villageBadge: { position: "absolute", top: 10, left: 10, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(16,185,129,0.95)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
+  villageBadgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#fff" },
+  villageBadgeText: { color: "#fff", fontSize: 11, fontWeight: "900" },
+  villageBody: { paddingHorizontal: 12, paddingVertical: 12, gap: 4 },
+  villageTitle: { fontSize: 18, fontWeight: "900", color: "#1c1917" },
+  villageSnippet: { fontSize: 13, color: "#78716c", fontWeight: "500" },
+  villageStats: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4 },
+  villageStatValue: { color: GREEN, fontSize: 13, fontWeight: "900" },
+  villageStatLabel: { color: "#a8a29e", fontSize: 12, fontWeight: "600" },
+
+  sectionTitle: { fontSize: 21, fontWeight: "900", color: GREEN },
+
+  // 곧 열릴 지역 그리드 (남겨둠)
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  tile: {
-    width: "47.5%", flexGrow: 1, backgroundColor: "#fff", borderRadius: 16, borderWidth: 2, borderColor: "rgba(34,90,57,0.15)",
-    paddingHorizontal: 14, paddingVertical: 14,
-  },
+  tile: { width: "47.5%", flexGrow: 1, backgroundColor: "#fff", borderRadius: 16, borderWidth: 2, borderColor: "rgba(34,90,57,0.15)", paddingHorizontal: 14, paddingVertical: 14 },
   tileDisabled: { backgroundColor: "#fafaf9", borderColor: "#e7e5e4" },
   tileTop: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 3 },
   tileDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#2f7d4f" },

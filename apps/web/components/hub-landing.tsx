@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { MapPin, LocateFixed, ArrowRight, Sprout, Search, X, Lock } from 'lucide-react'
+import { MapPin, LocateFixed, ArrowRight, Sprout, Search, X, Lock, Users, MessageCircle } from 'lucide-react'
 import { buildPlazaUrl } from '@/lib/plaza/client'
 import { provinceName } from '@/lib/plaza/city-name'
 import { cn } from '@/lib/utils'
@@ -17,6 +17,10 @@ type Plaza = {
   is_open_soon: boolean
   sort_order: number
   coverage?: string[] | null
+  // page.tsx 에서 부착하는 통계 (목업의 회원수·오늘 글수·최근글)
+  member_count?: number
+  posts_today?: number
+  recent_post_title?: string | null
 }
 
 export interface HubBackgroundConfig {
@@ -204,20 +208,30 @@ export function HubLanding({
               )}
             </div>
           </div>
+
+          <p className="mt-4 text-sm text-stone-500 font-medium">
+            전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림
+          </p>
         </div>
       </section>
 
       <main className="max-w-3xl mx-auto px-4 pb-12">
+        {/* ─── LIVE 칩 바 (목업) ──────────────────────────────── */}
+        {!trimmed && stats.open > 0 && (
+          <LiveChip openCount={stats.open} activities={liveActivities} />
+        )}
+
         {/* ─── 내 지역 큰 카드 ─────────────────────────────────── */}
         {featured ? (
-          <section id="my-region" className="scroll-mt-4">
-            <p className="mb-2 text-base font-bold text-stone-500">
+          <section id="my-region" className="scroll-mt-4 mt-5">
+            <p className="mb-2 text-base font-bold text-stone-500 flex items-center gap-1.5">
+              <span className="w-1 h-5 rounded-full bg-[#225a39]" />
               {byLocation ? (
                 <span className="inline-flex items-center gap-1 text-[#225a39]"><MapPin className="w-4 h-4" /> 가까운 지역이에요</span>
               ) : trimmed ? (
                 <span className="inline-flex items-center gap-1"><Search className="w-4 h-4" /> “{trimmed}” 검색 결과</span>
               ) : (
-                '내 지역'
+                '우리 동네'
               )}
             </p>
             <BigRegionCard plaza={featured} onEnter={() => goPlaza(featured.id)} />
@@ -229,26 +243,22 @@ export function HubLanding({
           </div>
         )}
 
-        {/* ─── LIVE 알림 ───────────────────────────────────────── */}
-        {!trimmed && stats.open > 0 && (
-          <div className="mt-5">
-            <LiveActivityBar openPlazas={sorted.filter((p) => p.is_active)} activities={liveActivities} />
-          </div>
-        )}
-
-        {/* ─── 다른 열린 지역 ──────────────────────────────────── */}
+        {/* ─── 열린 마을 둘러보기 (가로 슬라이드) ──────────────── */}
         {otherOpen.length > 0 && (
-          <section className="mt-10">
-            <h2 className="mb-3 text-xl sm:text-2xl font-black text-[#225a39]">다른 지역</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <section className="mt-9">
+            <div className="flex items-end justify-between mb-3">
+              <h2 className="text-xl sm:text-2xl font-black text-[#225a39]">열린 마을 둘러보기</h2>
+              <span className="text-sm font-bold text-stone-500">전체 {stats.open}곳 →</span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 scrollbar-thin">
               {otherOpen.map((p) => (
-                <RegionTile key={p.id} plaza={p} onClick={() => goPlaza(p.id)} />
+                <VillageCard key={p.id} plaza={p} onClick={() => goPlaza(p.id)} />
               ))}
             </div>
           </section>
         )}
 
-        {/* ─── 오픈예정 ────────────────────────────────────────── */}
+        {/* ─── 곧 열릴 지역 ────────────────────────────────────── */}
         {comingSoon.length > 0 && (
           <section className="mt-10">
             <h2 className="mb-3 text-lg font-bold text-stone-500">곧 열릴 지역</h2>
@@ -272,48 +282,128 @@ export function HubLanding({
   )
 }
 
-// ─── 큰 지역 카드 ──────────────────────────────────────────────
+// ─── 큰 지역 카드 (목업: 사진형 + 통계행) ──────────────────────
 function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
   const isOpen = plaza.is_active
   const coverage = plaza.coverage ?? []
+  const province = provinceName(plaza.id, plaza.name)
+  const members = plaza.member_count ?? 0
+  const postsToday = plaza.posts_today ?? 0
   return (
-    <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[230px] sm:min-h-[260px] flex flex-col justify-end">
-      <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/92 via-[#1f3d2a]/70 to-[#225a39]/35" />
-      <div className="relative p-6 sm:p-8">
-        {!isOpen && (
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 border border-white/30 text-white/90 text-xs font-bold">
-              <Lock className="w-3 h-3" /> 곧 열려요
+    <div className="rounded-3xl overflow-hidden shadow-xl bg-white">
+      {/* 사진 영역 */}
+      <div className="relative h-[170px] sm:h-[200px] overflow-hidden">
+        <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/85 via-[#1f3d2a]/40 to-transparent" />
+        {/* 좌상단 칩: 지금 열림 · 강원권 */}
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          {isOpen ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/90 text-white text-sm font-bold shadow">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+              지금 열림
+              {plaza.parent_region && <span className="text-white/85">· {plaza.parent_region}</span>}
             </span>
-          </div>
-        )}
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 text-stone-700 text-sm font-bold shadow">
+              <Lock className="w-3.5 h-3.5" /> 곧 열려요
+            </span>
+          )}
+        </div>
+        {/* 좌하단 도명 */}
+        <h3 className="absolute left-5 bottom-3 text-3xl sm:text-4xl font-black text-white drop-shadow-lg">{province}</h3>
+      </div>
 
-        <h3 className="text-3xl sm:text-4xl font-black text-white drop-shadow mb-2">{provinceName(plaza.id, plaza.name)}</h3>
+      {/* 통계 행 */}
+      <div className="px-5 pt-4 pb-3 flex items-center justify-between text-stone-700">
+        <div className="flex items-center gap-1.5 text-base font-bold">
+          <Users className="w-5 h-5 text-[#225a39]" />
+          <span className="text-[#225a39] tabular-nums">{members.toLocaleString()}</span>
+          <span className="text-stone-500 font-semibold">명</span>
+        </div>
+        <span className="text-stone-300">·</span>
+        <div className="flex items-center gap-1.5 text-base font-bold">
+          <MessageCircle className="w-5 h-5 text-[#225a39]" />
+          <span className="text-[#225a39] tabular-nums">{postsToday}</span>
+          <span className="text-stone-500 font-semibold">개 글 오늘</span>
+        </div>
+        <span className="text-stone-300">·</span>
+        <div className="flex items-center gap-1.5 text-base font-bold">
+          <MapPin className="w-5 h-5 text-[#225a39]" />
+          <span className="text-[#225a39] tabular-nums">{coverage.length}</span>
+          <span className="text-stone-500 font-semibold">개 동네</span>
+        </div>
+      </div>
 
-        {coverage.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {coverage.slice(0, 6).map((c) => (
-              <span key={c} className="px-2 py-0.5 rounded bg-white/20 text-white text-xs font-medium">{c}</span>
-            ))}
-            {coverage.length > 6 && <span className="text-white/70 text-xs font-medium self-center">+{coverage.length - 6}</span>}
-          </div>
-        )}
-
+      {/* CTA */}
+      <div className="px-4 pb-4 pt-1">
         <button
           type="button"
           onClick={onEnter}
           disabled={!isOpen}
           className={cn(
-            'w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl text-xl font-black shadow-lg transition-colors',
+            'w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl text-lg sm:text-xl font-black transition-colors',
             isOpen
-              ? 'bg-white text-[#225a39] hover:bg-[#225a39] hover:text-white'
-              : 'bg-white/15 text-white/70 cursor-not-allowed',
+              ? 'bg-white border-2 border-[#225a39]/15 text-[#225a39] hover:bg-[#225a39] hover:text-white hover:border-[#225a39]'
+              : 'bg-stone-100 text-stone-400 cursor-not-allowed',
           )}
         >
-          {isOpen ? (<>들어가기 <ArrowRight className="w-6 h-6" /></>) : '오픈예정'}
+          {isOpen ? (<>{province} 들어가기 <ArrowRight className="w-6 h-6" /></>) : '오픈예정'}
         </button>
       </div>
+    </div>
+  )
+}
+
+// ─── 가로 슬라이드용 작은 마을 카드 (목업) ─────────────────────
+function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) {
+  const province = provinceName(plaza.id, plaza.name)
+  const members = plaza.member_count ?? 0
+  const postsToday = plaza.posts_today ?? 0
+  const snippet = plaza.recent_post_title ?? '이웃들이 모이고 있어요'
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="snap-start shrink-0 w-[220px] sm:w-[240px] bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
+    >
+      <div className="relative h-[120px] overflow-hidden">
+        <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/30 to-transparent" />
+        <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow">
+          <span className="w-1.5 h-1.5 rounded-full bg-white" /> 열림
+        </span>
+      </div>
+      <div className="px-3 pt-2.5 pb-3">
+        <p className="text-lg font-black text-stone-900">{province}</p>
+        <p className="text-sm text-stone-500 line-clamp-1 mt-0.5">{snippet}</p>
+        <div className="flex items-center gap-2 mt-2 text-sm font-bold text-stone-700">
+          <Users className="w-4 h-4 text-[#225a39]" />
+          <span className="tabular-nums">{members.toLocaleString()}</span><span className="text-stone-400 font-semibold">명</span>
+          <span className="text-stone-300">·</span>
+          <MessageCircle className="w-4 h-4 text-[#225a39]" />
+          <span className="tabular-nums">{postsToday}</span><span className="text-stone-400 font-semibold">개 글</span>
+        </div>
+      </div>
+    </button>
+  )
+}
+
+// ─── LIVE 칩 바 (목업 상단) ────────────────────────────────────
+function LiveChip({ openCount, activities }: { openCount: number; activities: LiveActivity[] }) {
+  const distinctPlazas = new Set(activities.map((a) => a.plaza_id)).size
+  const villages = distinctPlazas > 0 ? distinctPlazas : openCount
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 text-sm sm:text-base text-stone-700 font-semibold">
+      <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+      </span>
+      <span>
+        지금 <span className="font-black text-[#225a39] tabular-nums">{villages}</span>곳 마을에서 이웃들이 모이고 있어요
+      </span>
     </div>
   )
 }
@@ -352,60 +442,3 @@ function RegionTile({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) {
   )
 }
 
-// ─── LIVE 알림 바 (5초 rotate) ─────────────────────────────────
-function LiveActivityBar({
-  openPlazas,
-  activities,
-}: {
-  openPlazas: Plaza[]
-  activities: LiveActivity[]
-}) {
-  const hasActivities = activities.length > 0
-  const [index, setIndex] = useState(0)
-
-  useEffect(() => {
-    if (activities.length <= 1) return
-    const id = setInterval(() => setIndex((i) => (i + 1) % activities.length), 5000)
-    return () => clearInterval(id)
-  }, [activities.length])
-
-  const current = hasActivities ? activities[index % activities.length] : null
-
-  const handleClick = () => {
-    if (current) {
-      window.location.href = buildPlazaUrl(current.plaza_id as any, '/board')
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="w-full rounded-full bg-[#1f3d2a] hover:bg-[#274d35] text-white px-5 py-3.5 flex items-center gap-3 text-sm shadow-lg transition-colors group"
-    >
-      <span className="relative flex h-2 w-2 flex-shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-      </span>
-      <span className="font-bold flex-shrink-0">이웃 소식</span>
-      <span className="text-white/30 hidden sm:inline">·</span>
-      <span key={index} className="text-white/90 truncate text-left flex-1 min-w-0 animate-in fade-in slide-in-from-right-2 duration-500">
-        {current ? (
-          <>
-            <span className="font-semibold">{provinceName(current.plaza_id, current.plaza_name)}</span>
-            <span className="text-white/40 mx-1.5">·</span>
-            <span className="text-white/90">{current.author_nickname}님 “{current.title}”</span>
-          </>
-        ) : (
-          <>
-            <span className="font-semibold">{provinceName(openPlazas[0]?.id, openPlazas[0]?.name)}</span>
-            <span className="text-white/60"> 이웃들이 이야기 나누고 있어요</span>
-          </>
-        )}
-      </span>
-      {current && (
-        <span className="ml-auto text-xs text-white/60 group-hover:text-white whitespace-nowrap flex-shrink-0">보러 가기 →</span>
-      )}
-    </button>
-  )
-}

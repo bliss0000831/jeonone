@@ -77,12 +77,26 @@ export default async function Page() {
       hubBackground = typeof v === 'string' ? JSON.parse(v) : v
     }
 
-    // 오픈된 광장의 최근 게시글
+    // 광장별 통계: 회원수·오늘 글수·최근글 (목업 카드의 "142명 · 8 곳 활동중" 같은 실데이터)
+    const memberCountByPlaza = new Map<string, number>()
+    const postsTodayByPlaza = new Map<string, number>()
+    const recentSnippetByPlaza = new Map<string, string>()
     let liveActivities: any[] = []
     try {
       const openPlazaIds = (plazasData ?? [])
         .filter((p: any) => p.is_active)
         .map((p: any) => p.id)
+
+      // 회원수 — plaza_profiles (active) GROUP BY plaza_id
+      const { data: memberRows } = await supabase
+        .from('plaza_profiles')
+        .select('plaza_id')
+        .eq('is_active', true)
+      for (const r of memberRows ?? []) {
+        const pid = (r as any).plaza_id
+        memberCountByPlaza.set(pid, (memberCountByPlaza.get(pid) ?? 0) + 1)
+      }
+
       if (openPlazaIds.length > 0) {
         const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
         const { data: posts } = await supabase
@@ -92,12 +106,18 @@ export default async function Page() {
           .eq('status', 'published')
           .gte('created_at', sinceIso)
           .order('created_at', { ascending: false })
-          .limit(30)
+          .limit(60)
 
         const plazaNameMap = new Map<string, string>(
           (plazasData ?? []).map((p: any) => [p.id, p.name]),
         )
-        liveActivities = (posts || []).map((p: any) => ({
+        for (const p of (posts as any[] | null) ?? []) {
+          postsTodayByPlaza.set(p.plaza_id, (postsTodayByPlaza.get(p.plaza_id) ?? 0) + 1)
+          if (!recentSnippetByPlaza.has(p.plaza_id)) {
+            recentSnippetByPlaza.set(p.plaza_id, p.title)
+          }
+        }
+        liveActivities = ((posts as any[] | null) || []).map((p: any) => ({
           plaza_id: p.plaza_id,
           plaza_name: plazaNameMap.get(p.plaza_id) ?? '전원일기',
           author_nickname: p.profiles?.nickname ?? '이웃',
@@ -106,12 +126,20 @@ export default async function Page() {
         }))
       }
     } catch (e) {
-      console.warn('[hub] live activities fetch failed:', e)
+      console.warn('[hub] stats fetch failed:', e)
     }
+
+    // plaza 객체에 통계 부착 (HubLanding 에서 카드 채울 용도)
+    const enrichedPlazas = (plazasData ?? []).map((p: any) => ({
+      ...p,
+      member_count: memberCountByPlaza.get(p.id) ?? 0,
+      posts_today: postsTodayByPlaza.get(p.id) ?? 0,
+      recent_post_title: recentSnippetByPlaza.get(p.id) ?? null,
+    }))
 
     return (
       <HubLanding
-        plazas={plazasData ?? []}
+        plazas={enrichedPlazas}
         background={hubBackground}
         liveActivities={liveActivities}
       />
