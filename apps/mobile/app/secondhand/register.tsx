@@ -174,6 +174,7 @@ export default function SecondhandRegisterScreen() {
     if (!title.trim()) errors.push("제목을 입력해주세요")
     if (!description.trim()) errors.push("설명을 입력해주세요")
     if (Number.isNaN(priceNum) || priceNum < 0) errors.push("올바른 가격을 입력해주세요 (0 이상의 숫자)")
+    if (images.length === 0) errors.push("사진을 1장 이상 올려주세요 — 농기구는 사진이 있어야 거래가 됩니다")
     if (listingType === "auction" && priceNum <= 0) errors.push("경매 시작가를 입력해주세요")
     if (listingType === "rental" && priceNum <= 0) errors.push("일 대여료를 입력해주세요")
     if (errors.length > 0) {

@@ -14,13 +14,13 @@ export function PlatformDisclaimerBand({ className = '' }: { className?: string 
   return (
     <Link
       href="/terms"
-      className={`mx-3 my-4 flex items-start gap-2 rounded-lg border border-border bg-muted/60 p-3 text-xs text-muted-foreground hover:bg-muted transition-colors md:mx-0 ${className}`}
+      className={`mx-3 my-4 flex items-start gap-2 rounded-lg border border-border bg-muted/60 p-4 text-sm text-stone-600 hover:bg-muted transition-colors md:mx-0 ${className}`}
     >
-      <Info className="w-4 h-4 mt-0.5 shrink-0" />
+      <Info className="w-5 h-5 mt-0.5 shrink-0" />
       <span className="leading-relaxed">
         본 플랫폼은 통신판매중개자로서 거래 당사자가 아닙니다.{' '}
-        <span className="text-primary font-semibold">자세히 →</span>
-        <span className="block mt-0.5 text-muted-foreground/80">
+        <span className="text-primary font-bold">자세히 →</span>
+        <span className="block mt-1 text-stone-600">
           게시 상품·매물·서비스의 정확성·적법성 및 거래 이행의 책임은 등록자에게 있습니다.
         </span>
       </span>

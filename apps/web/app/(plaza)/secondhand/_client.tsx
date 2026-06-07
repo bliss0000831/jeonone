@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Calendar, Tractor, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
+import { formatPriceKR, formatDateKR } from "@/lib/format-price"
 
 // 농기구/자재 카테고리 (레퍼런스 동일)
 const CATEGORIES = ["전체", "트랙터", "경운기", "이양기", "수확기", "관리기", "하우스자재", "부품", "기타"]
@@ -29,12 +30,7 @@ interface Post {
   likes?: number
   views?: number
   status?: string
-}
-
-function formatPrice(price: number) {
-  if (!price) return "가격제안"
-  if (price >= 10000) return `${(price / 10000).toLocaleString()}만원`
-  return `${price.toLocaleString()}원`
+  created_at?: string | null
 }
 
 function SecondhandContent() {
@@ -111,13 +107,13 @@ function SecondhandContent() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="검색어를 입력하세요"
+              placeholder="트랙터, 경운기 이름으로 찾기"
               className="w-full pl-12 pr-4 py-3.5 text-base rounded-xl border-2 border-border bg-card focus:outline-none focus:border-primary"
             />
           </div>
           {user && (
             <Link href="/secondhand/register" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold px-5 py-3.5 hover:bg-primary/90">
-              <Plus className="w-5 h-5" /> 물건 올리기
+              <Plus className="w-5 h-5" /> 농기구 올리기
             </Link>
           )}
         </div>
@@ -149,7 +145,7 @@ function SecondhandContent() {
             <p className="text-base text-muted-foreground mt-1">우리 동네 첫 이웃이 되어 올려보세요!</p>
             {user && (
               <Link href="/secondhand/register" className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-6 py-3 text-base">
-                <Plus className="w-5 h-5" /> 첫 농기구 올리기
+                <Plus className="w-5 h-5" /> 농기구 올리기
               </Link>
             )}
           </div>
@@ -163,9 +159,14 @@ function SecondhandContent() {
                 </div>
                 <div className="p-4">
                   <h3 className="text-lg font-bold mb-1 line-clamp-1">{item.title}</h3>
-                  <p className="text-xl font-black text-primary mb-2">{formatPrice(item.price)}</p>
+                  <p className="text-xl font-black text-primary mb-2">{formatPriceKR(item.price)}</p>
                   <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                    {item.location && <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{item.location}</div>}
+                    {item.location && (
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4" />
+                        <span>{item.location}{item.created_at ? ` · ${formatDateKR(item.created_at)}` : ""}</span>
+                      </div>
+                    )}
                     {(item.model_year || item.condition) && (
                       <div className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{[item.model_year && `${item.model_year}년식`, item.condition && `상태 ${item.condition}`].filter(Boolean).join(" / ")}</div>
                     )}

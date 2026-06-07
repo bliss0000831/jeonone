@@ -72,6 +72,10 @@ export default function SecondhandRegisterPage() {
       focusField(descRef)
       return
     }
+    if (images.length === 0) {
+      toast("사진을 1장 이상 올려주세요 — 농기구는 사진이 있어야 거래가 됩니다")
+      return
+    }
 
     const priceNum = listingType === "auction"
       ? parseInt(auctionStartPrice || "0", 10)

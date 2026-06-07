@@ -55,6 +55,7 @@ import { PlatformDisclaimerBand } from "@/components/legal/PlatformDisclaimerBan
 import { usePlazaBusinessInfo } from "@/lib/plaza-business-info"
 import { HeaderActions } from "@/components/HeaderActions"
 import { DomainTabBar } from "@/components/DomainTabBar"
+import { formatPriceKR, formatDateKR } from "@/lib/format-price"
 
 
 export type SortKey =
@@ -547,12 +548,13 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         {config.registerPath && canRegister ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="등록하기"
+            accessibilityLabel="올리기"
             onPress={() => router.push(config.registerPath as any)}
-            hitSlop={6}
-            style={styles.heroAddBtn}
+            hitSlop={8}
+            style={styles.heroAddBtnLabeled}
           >
-            <Ionicons name="add-circle" size={32} color={config.heroColor} />
+            <Ionicons name="add" size={20} color="#ffffff" />
+            <Text style={styles.heroAddBtnText}>올리기</Text>
           </Pressable>
         ) : null}
       </View>
@@ -614,35 +616,6 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
       <View style={styles.toolbar}>
         <Text style={styles.count}>{config.title} {filtered.length}개</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        {/* 보기 모드 세그먼트 pill — 리스트 / 카드 */}
-        <View style={styles.viewSeg}>
-          <Pressable
-            style={[styles.viewSegBtn, viewMode === "list" && styles.viewSegBtnActive]}
-            onPress={() => setViewMode("list")}
-          >
-            <Ionicons
-              name="list-outline"
-              size={13}
-              color={viewMode === "list" ? "#ffffff" : lightColors.ink700}
-            />
-            <Text style={[styles.viewSegText, viewMode === "list" && styles.viewSegTextActive]}>
-              리스트
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.viewSegBtn, viewMode === "grid" && styles.viewSegBtnActive]}
-            onPress={() => setViewMode("grid")}
-          >
-            <Ionicons
-              name="grid-outline"
-              size={13}
-              color={viewMode === "grid" ? "#ffffff" : lightColors.ink700}
-            />
-            <Text style={[styles.viewSegText, viewMode === "grid" && styles.viewSegTextActive]}>
-              카드
-            </Text>
-          </Pressable>
-        </View>
         <View style={styles.sortAnchor}>
           <Pressable accessibilityRole="button" accessibilityLabel="정렬 변경" style={styles.toolBtn} onPress={() => setSortOpen((v) => !v)}>
             <Ionicons name="swap-vertical-outline" size={14} color={lightColors.ink900} />
@@ -997,12 +970,12 @@ function GridCard({
                   {Math.round(((item.original_price - item.group_price) / item.original_price) * 100)}%
                 </Text>
                 <Text style={styles.originalPrice}>
-                  {Number(item.original_price).toLocaleString()}원
+                  {formatPriceKR(Number(item.original_price))}
                 </Text>
               </View>
             )}
             <Text style={styles.listPrice}>
-              {Number(price).toLocaleString()}원
+              {formatPriceKR(Number(price))}
             </Text>
           </View>
         )}
@@ -1050,18 +1023,9 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 }
 
 function timeAgoKo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const min = Math.floor(diff / 60000)
-  if (min < 1) return "방금"
-  if (min < 60) return `${min}분 전`
-  const hr = Math.floor(min / 60)
-  if (hr < 24) return `${hr}시간 전`
-  const day = Math.floor(hr / 24)
-  if (day < 7) return `${day}일 전`
-  if (day < 30) return `${Math.floor(day / 7)}주 전`
-  const mo = Math.floor(day / 30)
-  if (mo < 12) return `${mo}개월 전`
-  return `${Math.floor(mo / 12)}년 전`
+  // 어르신 친화: 7일 이내는 상대시간(빠른 판단), 그 외엔 절대 날짜(정확)
+  // formatDateKR 이 같은 로직 (분/시간/일 + 월/일 병기) 을 이미 제공
+  return formatDateKR(iso)
 }
 
 function stripRegionPrefix(addr: string): string {
@@ -1210,15 +1174,15 @@ function GridTwoColCard({
                   {Math.round(((item.original_price - item.group_price) / item.original_price) * 100)}%
                 </Text>
                 <Text style={styles.originalPrice}>
-                  {Number(item.original_price).toLocaleString()}원
+                  {formatPriceKR(Number(item.original_price))}
                 </Text>
                 <Text style={styles.gridPrice} numberOfLines={1}>
-                  {Number(price).toLocaleString()}원
+                  {formatPriceKR(Number(price))}
                 </Text>
               </View>
             ) : (
               <Text style={styles.gridPrice} numberOfLines={1}>
-                {Number(price).toLocaleString()}원
+                {formatPriceKR(Number(price))}
               </Text>
             )}
           </View>
@@ -1272,6 +1236,20 @@ function makeStyles(colors: any) {
   },
   heroRegionChipText: { fontSize: 12, fontWeight: "700", color: "#3f3f46", lineHeight: 16, includeFontPadding: false },
   heroAddBtn: { justifyContent: "center", alignItems: "center", height: 40 },
+  heroAddBtnLabeled: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    height: 44,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: colors.primary,
+  },
+  heroAddBtnText: {
+    color: "#ffffff",
+    fontSize: fontSize.sm,
+    fontWeight: "800",
+  },
 
   // Category chips — web ListingMobileTabs 정확 매핑
   // (bg-background sticky / px-3 py-2.5 / chip px-3.5 py-2 rounded-full text-[13px] / min-h-[36px])

@@ -65,18 +65,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing[3],
   },
   text: {
-    fontSize: fontSize.xs,
-    color: lightColors.ink700,
-    lineHeight: 18,
+    fontSize: fontSize.sm,
+    color: lightColors.ink900,
+    lineHeight: 20,
+    fontWeight: "500",
   },
   sub: {
-    fontSize: fontSize.xs,
-    color: lightColors.ink500,
-    lineHeight: 17,
-    marginTop: 4,
+    fontSize: fontSize.sm,
+    color: lightColors.ink700,
+    lineHeight: 19,
+    marginTop: 5,
   },
   link: {
     color: lightColors.primary,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 })
