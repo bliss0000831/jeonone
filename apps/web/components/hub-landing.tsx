@@ -63,6 +63,7 @@ export function HubLanding({
   const trimmed = query.trim()
   const [locating, setLocating] = useState(false)
   const [byLocation, setByLocation] = useState(false)
+  const [hasVisited, setHasVisited] = useState(false)
 
   const sorted = useMemo(
     () => [...plazas].sort((a, b) => a.sort_order - b.sort_order),
@@ -72,6 +73,15 @@ export function HubLanding({
   const [detectedId, setDetectedId] = useState<string | null>(null)
 
   useEffect(() => {
+    // 최근 방문한 동네가 있으면 "최근 동네", 없으면 "추천 동네"
+    try {
+      const saved = localStorage.getItem('selected-plaza')
+      if (saved) {
+        setHasVisited(true)
+        setDetectedId(saved)
+        return
+      }
+    } catch {}
     if (!detectedId && firstOpen) setDetectedId(firstOpen.id)
   }, [firstOpen, detectedId])
 
@@ -135,13 +145,17 @@ export function HubLanding({
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const n = nearestPlaza(pos.coords.latitude, pos.coords.longitude)
-        if (n) {
+        setLocating(false)
+        if (n && n.is_active) {
+          // 바로 입장 — 고르는 단계 없이
+          try { localStorage.setItem('selected-plaza', n.id) } catch {}
+          goPlaza(n.id)
+        } else if (n) {
           setQuery('')
           setDetectedId(n.id)
           setByLocation(true)
+          setTimeout(() => document.getElementById('my-region')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
         }
-        setLocating(false)
-        setTimeout(() => document.getElementById('my-region')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
       },
       () => {
         setLocating(false)
@@ -231,7 +245,7 @@ export function HubLanding({
               ) : trimmed ? (
                 <span className="inline-flex items-center gap-1"><Search className="w-4 h-4" /> “{trimmed}” 검색 결과</span>
               ) : (
-                '우리 동네'
+                hasVisited ? '최근 동네' : '추천 동네'
               )}
             </p>
             <BigRegionCard plaza={featured} onEnter={() => goPlaza(featured.id)} />

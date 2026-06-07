@@ -72,11 +72,23 @@ export default function HubScreen() {
   const [locating, setLocating] = useState(false)
   const [byLocation, setByLocation] = useState(false)
   const [featuredId, setFeaturedId] = useState<string | null>(null)
+  const [hasVisited, setHasVisited] = useState(false)
   const trimmed = query.trim()
 
-  // 최근 접속한 전원일기 = 우리 동네 기본값
+  // 최근 접속한 전원일기 = 기본값. AsyncStorage에 저장돼있으면 "최근 동네", 없으면 "추천 동네"
   useEffect(() => {
-    loadSelectedPlaza().then((p) => setFeaturedId((cur) => cur ?? p.id))
+    ;(async () => {
+      try {
+        const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default
+        const saved = await AsyncStorage.getItem("selected.plaza")
+        if (saved && saved.length > 0) {
+          setHasVisited(true)
+          setFeaturedId((cur) => cur ?? saved)
+        }
+      } catch {}
+      // fallback
+      loadSelectedPlaza().then((p) => setFeaturedId((cur) => cur ?? p.id))
+    })()
   }, [])
 
   useEffect(() => {
@@ -197,12 +209,16 @@ export default function HubScreen() {
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low })
       const n = nearestPlaza(pos.coords.latitude, pos.coords.longitude)
-      if (n) {
+      setLocating(false)
+      if (n && n.is_active) {
+        // 바로 입장 — 고르는 단계 없이
+        await setSelectedPlaza(n.id, n.name)
+        router.replace("/(tabs)" as any)
+      } else if (n) {
         setQuery("")
         setFeaturedId(n.id)
         setByLocation(true)
       }
-      setLocating(false)
     } catch {
       setLocating(false)
       Alert.alert("위치 확인 실패", "잠시 후 다시 시도하거나, 아래에서 지역을 직접 골라주세요.")
@@ -280,7 +296,7 @@ export default function HubScreen() {
                 <View style={styles.kickerRow}>
                   <View style={styles.kickerBar} />
                   <Text style={styles.kicker}>
-                    {byLocation ? "📍 가까운 지역이에요" : trimmed ? `🔍 “${trimmed}” 검색 결과` : "우리 동네"}
+                    {byLocation ? “📍 가까운 지역이에요” : trimmed ? `🔍 “${trimmed}” 검색 결과` : hasVisited ? “최근 동네” : “추천 동네”}
                   </Text>
                 </View>
                 <BigCard plaza={featured} onEnter={() => enterPlaza(featured)} />
