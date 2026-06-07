@@ -141,15 +141,11 @@ export default function HomeTab() {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
         <ImageBackground source={IMG.bg} style={{ width: "100%" }} imageStyle={{ opacity: 0.18 }}>
-          {/* 히어로 — 로고 좌측 + 텍스트 우측 (웹과 동일) */}
+          {/* 히어로 */}
           <View style={styles.hero}>
-            <View style={styles.heroRow}>
-              <Image source={IMG.logo} style={styles.heroLogo} contentFit="cover" />
-              <View style={styles.heroTextCol}>
-                <Text style={styles.heroTitle}>{plaza.name}</Text>
-                <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
-              </View>
-            </View>
+            <Image source={IMG.logo} style={styles.heroLogo} contentFit="cover" />
+            <Text style={styles.heroTitle}>{plaza.name}</Text>
+            <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
           </View>
 
           {/* 날씨 + 농사 팁 (날씨에 따라 팁 변경) */}
@@ -342,11 +338,9 @@ const styles = StyleSheet.create({
   loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
   loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
 
-  hero: { paddingTop: 16, paddingBottom: 10, paddingHorizontal: 20 },
-  heroRow: { flexDirection: "row", alignItems: "center", gap: 16 },
-  heroLogo: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: "rgba(22,101,52,0.25)" },
-  heroTextCol: { flex: 1 },
-  heroTitle: { fontSize: 26, fontWeight: "900", color: GREEN },
+  hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
+  heroLogo: { width: 130, height: 130, borderRadius: 65, marginBottom: 12, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
+  heroTitle: { fontSize: 30, fontWeight: "900", color: GREEN },
   heroSub: { fontSize: 14, fontWeight: "700", color: BROWN, marginTop: 4 },
   farmTipChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#f0fdf4", borderColor: "#bbf7d0", borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
   farmTipText: { fontSize: 13, fontWeight: "700", color: GREEN },
