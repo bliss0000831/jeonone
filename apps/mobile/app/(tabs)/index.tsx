@@ -106,20 +106,18 @@ export default function HomeTab() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      {/* 상단 바 */}
+      {/* 상단 바 — 로고·앱이름 제거, 홍천군 칩 좌측 시작 */}
       <View style={styles.topbar}>
-        <View style={styles.brandRow}>
-          <Text style={styles.brand} numberOfLines={1}>{plaza.name}</Text>
-          <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
-            <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
-            <Text style={styles.locText} numberOfLines={1}>{region}</Text>
-            <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
-          </Pressable>
-        </View>
+        <Pressable style={styles.locChip} onPress={() => setPlazaSelectorOpen(true)}>
+          <Ionicons name="location-outline" size={14} color={GREEN_DARK} />
+          <Text style={styles.locText} numberOfLines={1}>{region}</Text>
+          <Ionicons name="chevron-down" size={14} color={GREEN_DARK} />
+        </Pressable>
         <View style={styles.topRight}>
           {user ? (
-            <Pressable style={styles.iconBtn} onPress={() => router.push("/(tabs)/mypage-profile" as any)} hitSlop={6}>
-              <Ionicons name="person-circle-outline" size={26} color={GREEN_DARK} />
+            <Pressable style={styles.loginBtn} onPress={() => router.push("/(tabs)/mypage-profile" as any)}>
+              <Ionicons name="person-outline" size={14} color="#ffffff" />
+              <Text style={styles.loginBtnText}>{user.user_metadata?.nickname ?? user.user_metadata?.name ?? "마이"}님</Text>
             </Pressable>
           ) : (
             <Pressable style={styles.loginBtn} onPress={() => router.push("/auth/login" as any)}>
