@@ -78,18 +78,18 @@ export function provinceColors(id?: string | null) {
  * 웹: /images/xxx.jpg, 앱: require() 로 매핑 (앱은 별도 상수)
  */
 const PROVINCE_PHOTOS: Record<string, string> = {
-  gangwon:   '/images/gangwon-bg.jpg',
-  gyeonggi:  '/images/card-local-food.jpg',
-  chungbuk:  '/images/card-farm-equipment.jpg',
-  chungnam:  '/images/banner-news.jpg',
-  jeonbuk:   '/images/card-auction.jpg',
-  jeonnam:   '/images/card-workers.jpg',
-  gyeongbuk: '/images/card-farm-equipment.jpg',
-  gyeongnam: '/images/gangwon-bg.jpg',
-  jeju:      '/images/card-local-food.jpg',
+  gangwon:   '/images/province-gangwon.jpg',
+  gyeonggi:  '/images/province-gyeonggi.jpg',
+  chungbuk:  '/images/province-chungbuk.jpg',
+  chungnam:  '/images/province-chungnam.jpg',
+  jeonbuk:   '/images/province-jeonbuk.jpg',
+  jeonnam:   '/images/province-jeonnam.jpg',
+  gyeongbuk: '/images/province-gyeongbuk.jpg',
+  gyeongnam: '/images/province-gyeongnam.jpg',
+  jeju:      '/images/province-jeju.jpg',
 }
 
 export function provincePhoto(id?: string | null): string {
   if (id && PROVINCE_PHOTOS[id]) return PROVINCE_PHOTOS[id]
-  return '/images/gangwon-bg.jpg'
+  return '/images/province-gangwon.jpg'
 }

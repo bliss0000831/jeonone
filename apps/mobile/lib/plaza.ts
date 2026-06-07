@@ -238,17 +238,17 @@ export function provinceColors(id?: string | null) {
  * 나중에 도별 실사진 준비되면 여기만 교체.
  */
 const PROVINCE_PHOTO_MAP: Record<string, any> = {
-  gangwon:   require("../assets/images/gangwon-bg.jpg"),
-  gyeonggi:  require("../assets/images/card-local-food.jpg"),
-  chungbuk:  require("../assets/images/card-farm-equipment.jpg"),
-  chungnam:  require("../assets/images/banner-news.jpg"),
-  jeonbuk:   require("../assets/images/card-auction.jpg"),
-  jeonnam:   require("../assets/images/card-workers.jpg"),
-  gyeongbuk: require("../assets/images/card-farm-equipment.jpg"),
-  gyeongnam: require("../assets/images/gangwon-bg.jpg"),
-  jeju:      require("../assets/images/card-local-food.jpg"),
+  gangwon:   require("../assets/images/province-gangwon.jpg"),
+  gyeonggi:  require("../assets/images/province-gyeonggi.jpg"),
+  chungbuk:  require("../assets/images/province-chungbuk.jpg"),
+  chungnam:  require("../assets/images/province-chungnam.jpg"),
+  jeonbuk:   require("../assets/images/province-jeonbuk.jpg"),
+  jeonnam:   require("../assets/images/province-jeonnam.jpg"),
+  gyeongbuk: require("../assets/images/province-gyeongbuk.jpg"),
+  gyeongnam: require("../assets/images/province-gyeongnam.jpg"),
+  jeju:      require("../assets/images/province-jeju.jpg"),
 }
-const DEFAULT_PHOTO = require("../assets/images/gangwon-bg.jpg")
+const DEFAULT_PHOTO = require("../assets/images/province-gangwon.jpg")
 
 export function provincePhoto(id?: string | null): any {
   if (id && PROVINCE_PHOTO_MAP[id]) return PROVINCE_PHOTO_MAP[id]
