@@ -64,6 +64,12 @@ function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number): num
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
+function getKickerLabel(byLocation: boolean, trimmed: string, hasVisited: boolean): string {
+  if (byLocation) return '📍 가까운 지역이에요'
+  if (trimmed) return '🔍 ' + trimmed + ' 검색 결과'
+  return hasVisited ? '최근 동네' : '추천 동네'
+}
+
 export default function HubScreen() {
   const router = useRouter()
   const [plazas, setPlazas] = useState<Plaza[]>([])
@@ -296,7 +302,7 @@ export default function HubScreen() {
                 <View style={styles.kickerRow}>
                   <View style={styles.kickerBar} />
                   <Text style={styles.kicker}>
-                    {byLocation ? “📍 가까운 지역이에요” : trimmed ? “🔍 “ + trimmed + “ 검색 결과” : hasVisited ? “최근 동네” : “추천 동네”}
+                    {getKickerLabel(byLocation, trimmed, hasVisited)}
                   </Text>
                 </View>
                 <BigCard plaza={featured} onEnter={() => enterPlaza(featured)} />
