@@ -141,14 +141,18 @@ export default function HomeTab() {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
         <ImageBackground source={IMG.bg} style={{ width: "100%" }} imageStyle={{ opacity: 0.18 }}>
-          {/* 히어로 */}
+          {/* 히어로 — 로고 좌측 + 텍스트 우측 (웹과 동일) */}
           <View style={styles.hero}>
-            <Image source={IMG.logo} style={styles.heroLogo} contentFit="cover" />
-            <Text style={styles.heroTitle}>{plaza.name}</Text>
-            <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
+            <View style={styles.heroRow}>
+              <Image source={IMG.logo} style={styles.heroLogo} contentFit="cover" />
+              <View style={styles.heroTextCol}>
+                <Text style={styles.heroTitle}>{plaza.name}</Text>
+                <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
+              </View>
+            </View>
           </View>
 
-          {/* 날씨 — 실데이터가 있을 때만 표시 (없으면 행 자체를 렌더하지 않음) */}
+          {/* 날씨 + 농사 팁 (날씨에 따라 팁 변경) */}
           {weather && (
             <View style={styles.weatherRow}>
               <View style={styles.weatherChip}>
@@ -158,6 +162,16 @@ export default function HomeTab() {
                 <Text style={styles.weatherMuted}>{weather.condition}</Text>
                 <Ionicons name="water-outline" size={13} color="#64748b" />
                 <Text style={styles.weatherMuted}>{weather.humidity}%</Text>
+              </View>
+              <View style={styles.farmTipChip}>
+                <Ionicons name="leaf" size={14} color={GREEN} />
+                <Text style={styles.farmTipText}>
+                  {weather.temp >= 30 ? "폭염 주의 — 한낮 작업 피하기"
+                    : weather.temp >= 25 ? "하우스 환기 좋은 날"
+                    : weather.temp >= 15 ? "밭일 하기 좋은 날씨"
+                    : weather.temp >= 5 ? "아침 서리 주의"
+                    : "동파 주의 — 수도관 보온"}
+                </Text>
               </View>
             </View>
           )}
@@ -328,10 +342,14 @@ const styles = StyleSheet.create({
   loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
   loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
 
-  hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
-  heroLogo: { width: 130, height: 130, borderRadius: 65, marginBottom: 12, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
-  heroTitle: { fontSize: 30, fontWeight: "900", color: GREEN },
+  hero: { paddingTop: 16, paddingBottom: 10, paddingHorizontal: 20 },
+  heroRow: { flexDirection: "row", alignItems: "center", gap: 16 },
+  heroLogo: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: "rgba(22,101,52,0.25)" },
+  heroTextCol: { flex: 1 },
+  heroTitle: { fontSize: 26, fontWeight: "900", color: GREEN },
   heroSub: { fontSize: 14, fontWeight: "700", color: BROWN, marginTop: 4 },
+  farmTipChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#f0fdf4", borderColor: "#bbf7d0", borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  farmTipText: { fontSize: 13, fontWeight: "700", color: GREEN },
 
   weatherRow: { flexDirection: "row", justifyContent: "center", flexWrap: "wrap", gap: 8, paddingBottom: 14, paddingHorizontal: 16 },
   weatherChip: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(255,255,255,0.85)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },

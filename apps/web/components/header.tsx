@@ -164,22 +164,9 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
     <header className="safe-top sticky top-0 z-50 bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
-          {/* Logo + Location */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
-            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
-              <div className="w-8 sm:w-9 h-8 sm:h-9 flex-shrink-0 rounded-lg overflow-hidden mt-[1px]">
-                <img
-                  key={siteBranding.logo}
-                  src={siteBranding.logo}
-                  alt={`${siteBranding.name} 로고`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap">{siteBranding.name}</span>
-            </Link>
-            <span className="text-muted-foreground text-xs sm:text-sm flex-shrink-0">|</span>
-            {/* mt-0.5 — '춘천광장' 글자 베이스라인과 pill 중앙을 맞추기 위한 미세 조정 */}
-            <div className="flex-shrink-0 mt-[1px]">
+          {/* Location (로고·앱이름 제거 — 위치칩만 좌측) */}
+          <div className="flex items-center min-w-0">
+            <div className="flex-shrink-0">
               <LocationSelector
                 location={location ?? null}
                 onLocationChange={handleLocationChange}
