@@ -291,20 +291,21 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
   const postsToday = plaza.posts_today ?? 0
   return (
     <div className="rounded-3xl overflow-hidden shadow-xl bg-white">
-      {/* 사진 영역 */}
-      <div className="relative h-[170px] sm:h-[200px] overflow-hidden">
-        <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/85 via-[#1f3d2a]/40 to-transparent" />
-        {/* 좌상단 칩: 지금 열림 · 강원권 */}
+      {/* 헤더 — 녹색 그라데이션 + 큰 도명 (사진 X) */}
+      <div className="relative h-[170px] sm:h-[200px] overflow-hidden bg-gradient-to-br from-[#2f7d4f] via-[#225a39] to-[#173524]">
+        {/* 은은한 패턴(빛 효과) */}
+        <div aria-hidden className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-emerald-300/15 blur-2xl" />
+        <div aria-hidden className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full bg-emerald-200/10 blur-3xl" />
+        {/* 좌상단 칩 */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
           {isOpen ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/90 text-white text-sm font-bold shadow">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/95 text-[#173524] text-sm font-bold shadow">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#173524] opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#173524]" />
               </span>
               지금 열림
-              {plaza.parent_region && <span className="text-white/85">· {plaza.parent_region}</span>}
+              {plaza.parent_region && <span className="text-[#173524]/75">· {plaza.parent_region}</span>}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 text-stone-700 text-sm font-bold shadow">
@@ -313,7 +314,7 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
           )}
         </div>
         {/* 좌하단 도명 */}
-        <h3 className="absolute left-5 bottom-3 text-3xl sm:text-4xl font-black text-white drop-shadow-lg">{province}</h3>
+        <h3 className="absolute left-6 bottom-4 text-4xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">{province}</h3>
       </div>
 
       {/* 통계 행 */}
@@ -369,16 +370,15 @@ function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) 
       onClick={onClick}
       className="snap-start shrink-0 w-[220px] sm:w-[240px] bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
     >
-      <div className="relative h-[120px] overflow-hidden">
-        <Image src="/images/gangwon-bg.jpg" alt="" fill className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/30 to-transparent" />
-        <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow">
-          <span className="w-1.5 h-1.5 rounded-full bg-white" /> 열림
+      <div className="relative h-[110px] overflow-hidden bg-gradient-to-br from-[#2f7d4f] via-[#225a39] to-[#173524] flex items-end px-4 pb-3">
+        <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-300/15 blur-2xl" />
+        <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-400/95 text-[#173524] text-xs font-bold shadow">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#173524]" /> 열림
         </span>
+        <p className="relative text-2xl font-black text-white drop-shadow tracking-tight">{province}</p>
       </div>
       <div className="px-3 pt-2.5 pb-3">
-        <p className="text-lg font-black text-stone-900">{province}</p>
-        <p className="text-sm text-stone-500 line-clamp-1 mt-0.5">{snippet}</p>
+        <p className="text-sm text-stone-500 line-clamp-1">{snippet}</p>
         <div className="flex items-center gap-2 mt-2 text-sm font-bold text-stone-700">
           <Users className="w-4 h-4 text-[#225a39]" />
           <span className="tabular-nums">{members.toLocaleString()}</span><span className="text-stone-400 font-semibold">명</span>
