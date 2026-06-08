@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
 
   hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
   brandRow: { alignItems: "center", marginBottom: 14 },
-  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff", marginTop: 6 },
+  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff", marginTop: 14 },
 
   h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center" },
   sub: { fontSize: 16, color: "#57534e", textAlign: "center", marginTop: 8, lineHeight: 23, fontWeight: "500" },
