@@ -167,6 +167,15 @@ export interface SecondhandCreateInput {
   images?: string[] | null
   location?: string | null
   condition?: string | null
+  /** 거래방식 — 미지정 시 서버가 'sale' 처리 (기존 동작 보존) */
+  listingType?: "sale" | "auction" | "rental"
+  /** 경매 부가 정보 (listingType='auction' 일 때) */
+  auctionStartPrice?: number
+  auctionDays?: number
+  auctionBidIncrement?: number
+  /** 대여 부가 정보 (listingType='rental' 일 때) */
+  rentalDailyPrice?: number
+  rentalDeposit?: number
 }
 
 interface SHFetchAdapter {
@@ -208,11 +217,28 @@ export async function createSecondhandPost(
 ): Promise<{
   ok: boolean
   postId?: string
+  /** 경매/대여 매물 id — 서버가 post 와 같은 요청에 원자적으로 생성 */
+  listingId?: string
   flagged?: boolean
   rateLimited?: boolean
   error?: string
 }> {
   try {
+    // listingType 이 auction/rental 이면 부가 정보를 함께 전송 — 서버가 같은
+    // 트랜잭션으로 매물을 생성하고 listingId 를 반환한다 (원자성).
+    const extra: Record<string, unknown> = {}
+    if (input.listingType && input.listingType !== "sale") {
+      extra.listing_type = input.listingType
+      if (input.listingType === "auction") {
+        extra.auction_start_price = input.auctionStartPrice ?? input.price
+        if (typeof input.auctionDays === "number") extra.auction_days = input.auctionDays
+        if (typeof input.auctionBidIncrement === "number")
+          extra.auction_bid_increment = input.auctionBidIncrement
+      } else if (input.listingType === "rental") {
+        extra.rental_daily_price = input.rentalDailyPrice ?? input.price
+        extra.rental_deposit = input.rentalDeposit ?? 0
+      }
+    }
     const r = await fetcher("/api/secondhand", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -225,6 +251,7 @@ export async function createSecondhandPost(
         images: input.images && input.images.length > 0 ? input.images : null,
         location: input.location || null,
         condition: input.condition?.trim() ? input.condition.trim() : null,
+        ...extra,
       }),
     })
     const data = await r.json().catch(() => ({}))
@@ -236,7 +263,7 @@ export async function createSecondhandPost(
       }
     }
     if (!r.ok) return { ok: false, error: data?.error || "처리에 실패했습니다" }
-    return { ok: true, postId: data?.post?.id, flagged: !!data?.flagged }
+    return { ok: true, postId: data?.post?.id, listingId: data?.listingId, flagged: !!data?.flagged }
   } catch (e: any) {
     return { ok: false, error: e?.message ?? "처리에 실패했습니다" }
   }

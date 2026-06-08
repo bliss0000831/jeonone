@@ -2,8 +2,6 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { getCurrentPlazaClient } from "@/lib/plaza/client"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {ArrowLeft, ShoppingBag, Gift} from "lucide-react"
 import { MediaUploader } from "@/components/media-uploader"
@@ -126,6 +124,20 @@ export default function SecondhandRegisterPage() {
             usage_hours: formData.usage_hours || null,
             listing_type: listingType,
             sub_region: subRegion || null,
+            // 경매/대여 부가 정보 — 서버에서 같은 트랜잭션으로 매물 생성 (원자성)
+            ...(listingType === "auction"
+              ? {
+                  auction_start_price: priceNum,
+                  auction_days: Math.max(1, parseInt(auctionDays || "7", 10)),
+                  auction_bid_increment: Math.max(1000, Math.round((priceNum * 0.05) / 1000) * 1000),
+                }
+              : {}),
+            ...(listingType === "rental"
+              ? {
+                  rental_daily_price: priceNum,
+                  rental_deposit: parseInt(rentalDeposit || "0", 10) || 0,
+                }
+              : {}),
           }
 
       const response = await fetch(endpoint, {
@@ -151,46 +163,17 @@ export default function SecondhandRegisterPage() {
         }
         setFormDirty(false)
         const postId = data.post?.id
+        // 경매/대여 매물은 서버(/api/secondhand)에서 post 와 같은 요청에 원자적으로
+        // 생성되며 listingId 를 돌려준다. 클라이언트는 별도 insert 하지 않는다.
+        const listingId = data.listingId
         if (shouldPostToSharing) {
           router.push(postId ? `/sharing/${postId}` : "/sharing")
-        } else if (listingType === "auction" && postId) {
-          // 경매 등록 — auction_listings 생성
-          try {
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            const days = Math.max(1, parseInt(auctionDays || "7", 10))
-            const endAt = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString()
-            const { data: au } = await (supabase as any).from("auction_listings").insert({
-              post_id: postId,
-              seller_id: user?.id,
-              plaza_id: getCurrentPlazaClient(),
-              start_price: priceNum,
-              current_price: priceNum,
-              bid_increment: Math.max(1000, Math.round(priceNum * 0.05 / 1000) * 1000),
-              end_at: endAt,
-            }).select("id").single()
-            toast.success("경매가 등록되었습니다 🔨")
-            router.push((au as any)?.id ? `/auction/${(au as any).id}` : "/auction")
-          } catch {
-            router.push("/auction")
-          }
-        } else if (listingType === "rental" && postId) {
-          // 대여 등록 — rental_listings 생성
-          try {
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            const { data: rl } = await (supabase as any).from("rental_listings").insert({
-              post_id: postId,
-              owner_id: user?.id,
-              plaza_id: getCurrentPlazaClient(),
-              daily_price: priceNum,
-              deposit: parseInt(rentalDeposit || "0", 10) || 0,
-            }).select("id").single()
-            toast.success("대여 상품이 등록되었습니다 🚜")
-            router.push((rl as any)?.id ? `/rental/${(rl as any).id}` : "/rental")
-          } catch {
-            router.push("/rental")
-          }
+        } else if (listingType === "auction") {
+          toast.success("경매가 등록되었습니다 🔨")
+          router.push(listingId ? `/auction/${listingId}` : "/auction")
+        } else if (listingType === "rental") {
+          toast.success("대여 상품이 등록되었습니다 🚜")
+          router.push(listingId ? `/rental/${listingId}` : "/rental")
         } else {
           router.push(postId ? `/secondhand/${postId}` : "/secondhand")
         }

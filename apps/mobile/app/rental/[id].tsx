@@ -42,23 +42,14 @@ export default function RentalDetailScreen() {
     if (!user) { Alert.alert("로그인 필요", "로그인이 필요합니다"); return }
     if (days <= 0) { Alert.alert("기간 확인", "대여 기간을 올바르게 입력해주세요 (YYYY-MM-DD)"); return }
     setSubmitting(true)
-    const { error } = await (sb as any).from("rental_bookings").insert({
-      rental_id: id, renter_id: user.id, start_date: start, end_date: end,
-      total_amount: total, deposit: r.deposit || 0, status: "requested",
+    // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
+    const { data, error } = await (sb as any).rpc("create_rental_booking", {
+      p_rental: id, p_start: start, p_end: end,
     })
     setSubmitting(false)
     if (error) { Alert.alert("신청 실패", error.message); return }
-    // 소유자에게 알림 (actor_id = 본인 → RLS 교차 INSERT 허용)
-    if (r.owner_id && r.owner_id !== user.id) {
-      try {
-        await sb.from("notifications").insert({
-          user_id: r.owner_id, type: "rental_request", title: "새 대여 신청",
-          message: `${r.post?.title || "농기구"} · ${start}~${end} (${days}일)`,
-          link: "/rental/manage", actor_id: user.id,
-          ...(r.plaza_id ? { plaza_id: r.plaza_id } : {}),
-        })
-      } catch { /* ignore */ }
-    }
+    const res = data as any
+    if (!res?.ok) { Alert.alert("신청 실패", res?.error || "오류"); return }
     Alert.alert("신청 완료", "대여 신청이 접수되었습니다. 소유자 승인을 기다려주세요.")
     setStart(""); setEnd("")
   }

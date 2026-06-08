@@ -133,6 +133,12 @@ export async function POST(request: Request) {
     usage_hours,
     horsepower,
     listing_type,
+    // 경매/대여 부가 정보 (listing_type 이 auction/rental 일 때만 사용)
+    auction_start_price,
+    auction_days,
+    auction_bid_increment,
+    rental_daily_price,
+    rental_deposit,
   } = body
 
   const toInt = (v: any): number | null => {
@@ -232,6 +238,68 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "처리에 실패했습니다" }, { status: 500 })
   }
 
+  // ─── 경매/대여 매물 원자적 생성 (H3) ─────────────────────────────────
+  // post 생성과 listing 생성을 한 요청에서 묶는다. listing 생성이 실패하면
+  // 방금 만든 post 를 삭제(롤백)하여 "고아 post"(입찰/대여신청 불가)를 방지.
+  const finalListingType = ["sale", "rental", "auction"].includes(listing_type) ? listing_type : "sale"
+  let listingId: string | null = null
+  if (finalListingType === "auction" || finalListingType === "rental") {
+    const { getAdminWriteClient } = await import("@/lib/services/admin-auth")
+    const admin = await getAdminWriteClient()
+    if (!admin) {
+      // listing 을 만들 수 없으면 고아 post 를 남기지 않도록 post 삭제 후 실패 반환
+      await writer.from("secondhand_posts").delete().eq("id", data.id)
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 })
+    }
+
+    const days = Math.max(1, parseInt(String(auction_days ?? "7"), 10) || 7)
+    const startPrice = price // 검증된 0 이상의 number
+    const rpcArgs =
+      finalListingType === "auction"
+        ? {
+            p_post_id: data.id,
+            p_owner: user.id,
+            p_kind: "auction",
+            p_start_price:
+              typeof auction_start_price === "number" && auction_start_price >= 0
+                ? auction_start_price
+                : startPrice,
+            p_bid_increment:
+              typeof auction_bid_increment === "number" && auction_bid_increment > 0
+                ? auction_bid_increment
+                : Math.max(1000, Math.round((startPrice * 0.05) / 1000) * 1000),
+            p_end_at: new Date(Date.now() + days * 86400000).toISOString(),
+          }
+        : {
+            p_post_id: data.id,
+            p_owner: user.id,
+            p_kind: "rental",
+            p_daily_price:
+              typeof rental_daily_price === "number" && rental_daily_price >= 0
+                ? rental_daily_price
+                : startPrice,
+            p_deposit:
+              typeof rental_deposit === "number" && rental_deposit >= 0 ? rental_deposit : 0,
+          }
+
+    const { data: rpcRes, error: rpcErr } = await admin.rpc(
+      "create_secondhand_listing",
+      rpcArgs as any,
+    )
+    const rpcOk = !rpcErr && rpcRes && (rpcRes as any).ok
+    if (!rpcOk) {
+      console.error("[secondhand] listing rpc failed:", rpcErr || rpcRes)
+      // 롤백 — post 삭제 (auction_listings/rental_listings 는 ON DELETE CASCADE 이므로
+      // 부분 생성분도 함께 정리됨)
+      await writer.from("secondhand_posts").delete().eq("id", data.id)
+      return NextResponse.json(
+        { error: (rpcRes as any)?.error || "매물 등록에 실패했습니다" },
+        { status: 500 },
+      )
+    }
+    listingId = (rpcRes as any).id ?? null
+  }
+
   // 포인트 적립 — flagged 가 아닐 때만 (자동 숨김 안 된 경우)
   if (decision.status !== "hidden") {
     const { awardPoints } = await import("@/lib/services/billing/award-helper")
@@ -250,6 +318,7 @@ export async function POST(request: Request) {
   return NextResponse.json(
     {
       post: data,
+      listingId,
       flagged: decision.status === "hidden",
       flagReason: decision.hiddenReason,
     },

@@ -49,31 +49,16 @@ export default function RentalDetailPage() {
     if (!start || !end || days <= 0) { toast.error("대여 기간을 선택해주세요"); return }
     setSubmitting(true)
     const supabase = createClient()
-    const { error } = await (supabase as any).from("rental_bookings").insert({
-      rental_id: id,
-      renter_id: user.id,
-      start_date: start,
-      end_date: end,
-      total_amount: total,
-      deposit: r.deposit || 0,
-      status: "requested",
+    // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
+    const { data, error } = await (supabase as any).rpc("create_rental_booking", {
+      p_rental: id,
+      p_start: start,
+      p_end: end,
     })
     setSubmitting(false)
     if (error) { toast.error("신청 실패: " + error.message); return }
-    // 소유자에게 알림 (actor_id = 본인 → RLS 교차 INSERT 허용)
-    if (r.owner_id && r.owner_id !== user.id) {
-      try {
-        await (supabase as any).from("notifications").insert({
-          user_id: r.owner_id,
-          type: "rental_request",
-          title: "새 대여 신청",
-          message: `${r.post?.title || "농기구"} · ${start}~${end} (${days}일)`,
-          link: "/rental/manage",
-          actor_id: user.id,
-          ...(r.plaza_id ? { plaza_id: r.plaza_id } : {}),
-        })
-      } catch { /* 알림 실패는 무시 */ }
-    }
+    const res = data as any
+    if (!res?.ok) { toast.error(res?.error || "신청 실패"); return }
     toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.")
     setStart(""); setEnd("")
   }

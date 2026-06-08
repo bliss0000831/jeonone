@@ -39,7 +39,7 @@ import {
   SECONDHAND_CONDITIONS,
 } from "@gwangjang/features/secondhand"
 import { createSharingPost } from "@gwangjang/features/sharing"
-import { gwangjangFetch, uploadImage, getSupabase } from "@/lib/supabase"
+import { gwangjangFetch, uploadImage } from "@/lib/supabase"
 import { useLocalSearchParams } from "expo-router"
 import { AddressSearch } from "@/components/AddressSearch"
 import { RegionFormField } from "@/components/RegionFormField"
@@ -231,6 +231,18 @@ export default function SecondhandRegisterScreen() {
         images,
         location: location.trim() || null,
         condition: condition || null,
+        // 경매/대여 — 서버가 post 와 같은 요청에 매물을 원자적으로 생성 (고아 post 방지)
+        listingType,
+        ...(listingType === "auction"
+          ? {
+              auctionStartPrice: priceNum,
+              auctionDays: Math.max(1, Number(auctionDays) || 7),
+              auctionBidIncrement: Math.max(1000, Math.round((priceNum * 0.05) / 1000) * 1000),
+            }
+          : {}),
+        ...(listingType === "rental"
+          ? { rentalDailyPrice: priceNum, rentalDeposit: Number(rentalDeposit) || 0 }
+          : {}),
       })
       if (r.rateLimited) {
         Alert.alert("등록 제한", r.error ?? "")
@@ -243,30 +255,15 @@ export default function SecondhandRegisterScreen() {
       if (r.postId) await setPostRegion("secondhand_posts", r.postId, regionId)
       setFormDirty(false)
 
-      // 경매/대여 등록 — 거래방식별 부가 테이블 생성
-      if (r.postId && listingType === "auction") {
-        try {
-          const days = Math.max(1, Number(auctionDays) || 7)
-          const { data: au } = await getSupabase().from("auction_listings").insert({
-            post_id: r.postId, seller_id: user?.id, plaza_id: plazaId,
-            start_price: priceNum, current_price: priceNum,
-            bid_increment: Math.max(1000, Math.round((priceNum * 0.05) / 1000) * 1000),
-            end_at: new Date(Date.now() + days * 86400000).toISOString(),
-          }).select("id").single()
-          Alert.alert("등록 완료", "경매가 등록되었습니다 🔨")
-          router.replace((au as any)?.id ? `/auction/${(au as any).id}` : "/auction" as any)
-        } catch { router.replace("/auction" as any) }
+      // 경매/대여 매물은 서버가 생성하여 listingId 를 돌려준다. 별도 insert 없음.
+      if (listingType === "auction") {
+        Alert.alert("등록 완료", "경매가 등록되었습니다 🔨")
+        router.replace((r.listingId ? `/auction/${r.listingId}` : "/auction") as any)
         return
       }
-      if (r.postId && listingType === "rental") {
-        try {
-          const { data: rl } = await getSupabase().from("rental_listings").insert({
-            post_id: r.postId, owner_id: user?.id, plaza_id: plazaId,
-            daily_price: priceNum, deposit: Number(rentalDeposit) || 0,
-          }).select("id").single()
-          Alert.alert("등록 완료", "대여 상품이 등록되었습니다 🚜")
-          router.replace((rl as any)?.id ? `/rental/${(rl as any).id}` : "/rental" as any)
-        } catch { router.replace("/rental" as any) }
+      if (listingType === "rental") {
+        Alert.alert("등록 완료", "대여 상품이 등록되었습니다 🚜")
+        router.replace((r.listingId ? `/rental/${r.listingId}` : "/rental") as any)
         return
       }
 
