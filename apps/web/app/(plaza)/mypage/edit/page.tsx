@@ -48,15 +48,13 @@ export default function EditProfilePage() {
     avatar_url: "",
     business_hours: "",
     specialties: "", // 콤마 구분 입력
-    service_areas: "", // 콤마 구분 입력 (춘천 동 추가 지역)
     website: "",
     kakao_id: "",
   })
   
   // 지역 선택 상태 (춘천시 동만 선택)
   const [selectedDong, setSelectedDong] = useState("")
-  const [isServiceProvider, setIsServiceProvider] = useState(false)
-  
+
   // 춘천시 동 목록 가져오기
   const chuncheonDongs = koreaRegions
     .find(r => r.name === "강원특별자치도")
@@ -80,11 +78,7 @@ export default function EditProfilePage() {
       
       if (profileData) {
         setProfile(profileData)
-        
-        // 서비스 제공자인지 확인
-        const serviceTypes = ['agent', 'interior', 'moving', 'cleaning', 'repair']
-        setIsServiceProvider(serviceTypes.includes(profileData.account_type || ''))
-        
+
         // 기존 location 파싱 (예: "강원특별자치도 춘천시 효자동")
         if (profileData.location) {
           const parts = profileData.location.split(" ")
@@ -98,7 +92,6 @@ export default function EditProfilePage() {
           avatar_url: profileData.avatar_url || "",
           business_hours: profileData.business_hours || "",
           specialties: (profileData.specialties || []).join(", "),
-          service_areas: (profileData.service_areas || []).join(", "),
           website: profileData.website || "",
           kakao_id: profileData.kakao_id || "",
         })
@@ -160,12 +153,6 @@ export default function EditProfilePage() {
       return
     }
 
-    // 서비스 제공자는 지역 필수
-    if (isServiceProvider && !selectedDong) {
-      toast.error("서비스 지역(동)을 선택해주세요.")
-      return
-    }
-
     setSaving(true)
 
     try {
@@ -189,7 +176,6 @@ export default function EditProfilePage() {
           avatar_url: formData.avatar_url || null,
           business_hours: formData.business_hours.trim() || null,
           specialties: splitTags(formData.specialties),
-          service_areas: splitTags(formData.service_areas),
           website: formData.website.trim() || null,
           kakao_id: formData.kakao_id.trim() || null,
           updated_at: new Date().toISOString(),
@@ -339,7 +325,7 @@ export default function EditProfilePage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <Label>{isServiceProvider ? "서비스 지역" : "내 지역"}</Label>
+              <Label>내 지역</Label>
             </div>
 
             <div className="flex gap-2 items-center">
@@ -369,9 +355,7 @@ export default function EditProfilePage() {
             )}
 
             <p className="text-xs text-muted-foreground">
-              {isServiceProvider
-                ? "서비스를 제공하는 동을 선택해주세요. 선택한 지역의 고객들에게 우선적으로 노출됩니다."
-                : "내 프로필에 표시될 동네를 선택해주세요. (선택)"}
+              내 프로필에 표시될 동네를 선택해주세요. (선택)
             </p>
           </div>
 
@@ -392,42 +376,22 @@ export default function EditProfilePage() {
             </div>
           )}
 
-          {/* 전문분야 (서비스 제공자 + 생산자) */}
-          {(isServiceProvider || profile?.account_type === "producer") && (
+          {/* 주요 작물·품목 (로컬푸드 생산자 전용) */}
+          {profile?.account_type === "producer" && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-muted-foreground" />
-                <Label htmlFor="specialties">전문분야</Label>
+                <Label htmlFor="specialties">주요 작물·품목</Label>
               </div>
               <Input
                 id="specialties"
                 value={formData.specialties}
                 onChange={(e) => setFormData((p) => ({ ...p, specialties: e.target.value }))}
-                placeholder="예: 원룸, 투룸, 전세 (콤마로 구분)"
+                placeholder="예: 사과, 감자, 고추 (콤마로 구분)"
                 className="bg-card"
               />
               <p className="text-xs text-muted-foreground">
-                최대 5~6개를 추천드려요. 콤마 또는 줄바꿈으로 구분합니다.
-              </p>
-            </div>
-          )}
-
-          {/* 추가 서비스 지역 (서비스 제공자) */}
-          {isServiceProvider && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <Label htmlFor="service_areas">추가 서비스 지역</Label>
-              </div>
-              <Input
-                id="service_areas"
-                value={formData.service_areas}
-                onChange={(e) => setFormData((p) => ({ ...p, service_areas: e.target.value }))}
-                placeholder="예: 효자동, 석사동, 후평동"
-                className="bg-card"
-              />
-              <p className="text-xs text-muted-foreground">
-                대표 지역 외 출장/영업 가능한 동을 콤마로 추가할 수 있어요.
+                키우시는 작물을 콤마 또는 줄바꿈으로 적어주세요. (최대 5~6개 추천)
               </p>
             </div>
           )}
@@ -484,9 +448,6 @@ export default function EditProfilePage() {
             "적용하기"
           )}
         </Button>
-        <p className="text-xs text-center text-muted-foreground mt-3">
-          공인중개사는 사업자 정보를 등록해주세요. <span className="underline cursor-pointer">자세히</span>
-        </p>
       </div>
     </div>
   )
