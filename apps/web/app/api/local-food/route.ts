@@ -13,6 +13,10 @@ export async function GET(request: NextRequest) {
   const offset = parseInt(searchParams.get("offset") || "0")
   const category = searchParams.get("category")
   const district = searchParams.get("district")
+  // 지역(시군) 필터 — region_id(uuid) 기준 (모바일과 동일). 기존 district(문자열) 와 별개·하위호환.
+  const region = searchParams.get("region")
+  // 정렬 — 미지정 시 기존 동작(effective_at desc) 보존
+  const sort = searchParams.get("sort")
 
   // Parallelize plaza lookup + auth — both are independent of each other
   const [plaza, { user }] = await Promise.all([
@@ -26,9 +30,28 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("local_food")
-    .select("id, title, description, category, unit, status, images, thumbnail, location, district, view_count, like_count, price, original_price, user_id, plaza_id, created_at, bumped_at, effective_at")
-    .order("effective_at", { ascending: false })
+    .select("id, title, description, category, unit, status, images, thumbnail, location, district, region_id, view_count, like_count, price, original_price, user_id, plaza_id, created_at, bumped_at, effective_at")
     .range(offset, offset + limit - 1)
+
+  // 정렬 — sort 미지정/잘못된 값이면 기존 동작(effective_at desc) 그대로.
+  // 로컬푸드는 좋아요/조회 컬럼명이 like_count/view_count.
+  // price 는 nullable → 가격 정렬 시 NULL(가격문의) 은 nullsLast 로 항상 뒤로.
+  switch (sort) {
+    case "popular":
+      query = query.order("like_count", { ascending: false }).order("view_count", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    case "price_asc":
+      query = query.order("price", { ascending: true, nullsFirst: false }).order("effective_at", { ascending: false })
+      break
+    case "price_desc":
+      query = query.order("price", { ascending: false, nullsFirst: false }).order("effective_at", { ascending: false })
+      break
+    case "views":
+      query = query.order("view_count", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    default:
+      query = query.order("effective_at", { ascending: false })
+  }
 
   query = query.eq("plaza_id", plaza)
   if (category && category !== "전체") {
@@ -38,6 +61,8 @@ export async function GET(request: NextRequest) {
   if (district && district !== "전체" && district !== "춘천시 전체") {
     query = query.eq("district", district)
   }
+  // 지역 필터 — region_id 일치
+  if (region && region !== "all") query = query.eq("region_id", region)
 
   const { data: posts, error } = await query
 

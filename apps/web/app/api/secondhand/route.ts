@@ -18,6 +18,10 @@ export async function GET(request: Request) {
   const offset = parseInt(searchParams.get("offset") || "0")
   const status = searchParams.get("status")
   const category = searchParams.get("category")
+  // 지역(시군) 필터 — region_id(uuid) 기준. 모바일 DomainListScreen 과 동일 필드.
+  const region = searchParams.get("region")
+  // 정렬 — 미지정 시 기존 동작(effective_at desc) 보존
+  const sort = searchParams.get("sort")
   // 검색어 — Supabase .or() filter injection 방지
   const q = searchParams
     .get("q")
@@ -35,16 +39,36 @@ export async function GET(request: Request) {
 
   let query = (supabase as any)
     .from("secondhand_posts")
-    .select("id, user_id, plaza_id, title, description, category, price, is_price_negotiable, images, location, condition, brand, model_name, model_year, usage_hours, horsepower, listing_type, status, effective_at, bumped_at, created_at, views, likes")
+    .select("id, user_id, plaza_id, region_id, title, description, category, price, is_price_negotiable, images, location, condition, brand, model_name, model_year, usage_hours, horsepower, listing_type, status, effective_at, bumped_at, created_at, views, likes")
     .neq("status", "hidden")
-    .order("effective_at", { ascending: false })
     .range(offset, offset + limit - 1)
+
+  // 정렬 — sort 미지정/잘못된 값이면 기존 동작(effective_at desc) 그대로.
+  // 가격 정렬: price 는 NOT NULL DEFAULT 0 → 가격제안(0)은 자연히 최저가로 정렬 (모바일과 동일).
+  switch (sort) {
+    case "popular":
+      query = query.order("likes", { ascending: false }).order("views", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    case "price_asc":
+      query = query.order("price", { ascending: true }).order("effective_at", { ascending: false })
+      break
+    case "price_desc":
+      query = query.order("price", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    case "views":
+      query = query.order("views", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    default:
+      query = query.order("effective_at", { ascending: false })
+  }
 
   query = query.eq("plaza_id", plaza)
   // 직거래 목록은 판매글만 (경매/대여는 전용 페이지에서 노출)
   query = query.or("listing_type.is.null,listing_type.eq.sale")
   if (status && status !== "all") query = query.eq("status", status)
   if (category && category !== "전체") query = query.eq("category", category)
+  // 지역 필터 — region_id 일치 (전체 지역 글 region_id=NULL 은 특정 지역 선택 시 제외)
+  if (region && region !== "all") query = query.eq("region_id", region)
   if (q) {
     const safeQ = q.replace(/[,()]/g, '').slice(0, 100)
     if (safeQ) query = query.or(`title.ilike.%${safeQ}%,description.ilike.%${safeQ}%`)

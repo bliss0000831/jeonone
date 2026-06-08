@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback, Suspense } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { BottomNav } from "@/components/bottom-nav"
@@ -17,7 +17,10 @@ import {
   ListingFilterSidebar,
   ListingMobileTabs,
   LoadMoreButton,
+  ListSortRegionBar,
+  usePlazaRegions,
   type ListingItem,
+  type ListSortKey,
 } from "@/components/listing"
 import { timeAgoKo } from "@/components/listing/time-ago"
 import { ListingActionsMenu } from "@/components/listing-actions-menu"
@@ -65,6 +68,17 @@ function SharingPageContent() {
   const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  // 정렬 + 지역(시군) 필터 — 서버 사이드 (region_id / sort 파라미터)
+  const [sort, setSort] = useState<ListSortKey>("latest")
+  const [region, setRegion] = useState("all")
+  const regions = usePlazaRegions()
+  // sort/region 을 URL 파라미터로 — 첫 페이지/추가 페이지 공통
+  const listQuery = useMemo(() => {
+    const p = new URLSearchParams()
+    if (sort !== "latest") p.set("sort", sort)
+    if (region !== "all") p.set("region", region)
+    return p.toString()
+  }, [sort, region])
 
   // 검색어 디바운스 — URL replace 빈도 제한 (목록 필터링 자체는 search 로 즉시 반영)
   const [debouncedSearch, setDebouncedSearch] = useState(search)
@@ -89,7 +103,7 @@ function SharingPageContent() {
       // Parallelize auth + posts fetch — posts don't depend on user
       const [{ data: { user } }, response] = await Promise.all([
         supabase.auth.getUser(),
-        fetch(`/api/sharing?limit=${PAGE_SIZE}&offset=0`),
+        fetch(`/api/sharing?limit=${PAGE_SIZE}&offset=0${listQuery ? `&${listQuery}` : ""}`),
       ])
       setUser(user)
 
@@ -119,13 +133,41 @@ function SharingPageContent() {
       const raw = localStorage.getItem("hiddenSharingIds")
       if (raw) setHiddenIds(new Set(JSON.parse(raw)))
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 정렬/지역 변경 시 첫 페이지부터 재조회 (마운트 시엔 위 effect 가 처리 → skip)
+  const didMountRef = useRef(false)
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      return
+    }
+    let cancelled = false
+    setIsLoading(true)
+    fetch(`/api/sharing?limit=${PAGE_SIZE}&offset=0${listQuery ? `&${listQuery}` : ""}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return
+        const newPosts: SharingPost[] = data.posts || []
+        setPosts(newPosts)
+        setHasMore(newPosts.length >= PAGE_SIZE)
+        setOffset(newPosts.length)
+      })
+      .catch(() => {
+        if (!cancelled) setPosts([])
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [listQuery])
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore) return
     setLoadingMore(true)
     try {
-      const res = await fetch(`/api/sharing?limit=${PAGE_SIZE}&offset=${offset}`)
+      const res = await fetch(`/api/sharing?limit=${PAGE_SIZE}&offset=${offset}${listQuery ? `&${listQuery}` : ""}`)
       const data = await res.json()
       const newPosts: SharingPost[] = data.posts || []
       setPosts(prev => [...prev, ...newPosts])
@@ -134,7 +176,7 @@ function SharingPageContent() {
     } finally {
       setLoadingMore(false)
     }
-  }, [loadingMore, hasMore, offset])
+  }, [loadingMore, hasMore, offset, listQuery])
 
   const filtered = useMemo(() => {
     let arr = [...posts]
@@ -150,9 +192,12 @@ function SharingPageContent() {
     if (filters.category !== "all") arr = arr.filter((p) => p.category === filters.category)
     if (filters.status !== "all") arr = arr.filter((p) => p.status === filters.status)
     if (hiddenIds.size > 0) arr = arr.filter((p) => !hiddenIds.has(p.id))
-    arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    // 최신순일 때만 클라이언트 재정렬 — 인기/조회순은 서버 정렬 순서 유지
+    if (sort === "latest") {
+      arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    }
     return arr
-  }, [posts, search, filters, hiddenIds])
+  }, [posts, search, filters, hiddenIds, sort])
 
   const items: ListingItem[] = useMemo(() => {
     return filtered.map((p) => {
@@ -239,6 +284,17 @@ function SharingPageContent() {
             ]}
             filterValues={filters}
             onFilterChange={setFilters}
+          />
+        }
+        toolbar={
+          <ListSortRegionBar
+            sort={sort}
+            onSortChange={setSort}
+            region={region}
+            onRegionChange={setRegion}
+            regions={regions}
+            priceSort={false}
+            count={items.length}
           />
         }
         items={items}

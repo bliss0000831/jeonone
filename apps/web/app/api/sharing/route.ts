@@ -14,6 +14,10 @@ export async function GET(request: Request) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100)
   const offset = parseInt(searchParams.get("offset") || "0")
   const status = searchParams.get("status")
+  // 지역(시군) 필터 — region_id(uuid) 기준
+  const region = searchParams.get("region")
+  // 정렬 — 미지정 시 기존 동작(created_at desc) 보존
+  const sort = searchParams.get("sort")
 
   const supabase = await createClient()
   const plaza = await getCurrentPlaza()
@@ -24,14 +28,28 @@ export async function GET(request: Request) {
 
   let query = (supabase as any)
     .from("sharing_posts")
-    .select("id, user_id, plaza_id, title, description, category, status, images, location, views, likes, created_at")
-    .order("created_at", { ascending: false })
+    .select("id, user_id, plaza_id, region_id, title, description, category, status, images, location, views, likes, created_at")
     .range(offset, offset + limit - 1)
+
+  // 정렬 — sort 미지정/잘못된 값이면 기존 동작(created_at desc) 그대로.
+  // 나눔은 무료 → 가격 정렬 없음 (price_asc/desc 는 created_at 폴백).
+  switch (sort) {
+    case "popular":
+      query = query.order("likes", { ascending: false }).order("views", { ascending: false }).order("created_at", { ascending: false })
+      break
+    case "views":
+      query = query.order("views", { ascending: false }).order("created_at", { ascending: false })
+      break
+    default:
+      query = query.order("created_at", { ascending: false })
+  }
 
   query = query.eq("plaza_id", plaza)
   if (status) {
     query = query.eq("status", status)
   }
+  // 지역 필터 — region_id 일치
+  if (region && region !== "all") query = query.eq("region_id", region)
 
   const { data: posts, error } = await query
 

@@ -30,6 +30,7 @@ import { Ionicons } from "@expo/vector-icons"
 import * as Location from "expo-location"
 import { getSupabase } from "@/lib/supabase"
 import { setSelectedPlaza, loadSelectedPlaza, provinceName, provinceColors, provincePhoto } from "@/lib/plaza"
+import { TutorialOverlay } from "@/components/TutorialOverlay"
 
 const GREEN = "#225a39"
 const GREEN_DARK = "#1b4a2f"
@@ -233,6 +234,8 @@ export default function HubScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      {/* 첫 진입 튜토리얼 — 최초 1회만 전체화면 오버레이(Modal)로 표시. 본 적 있으면 자동 스킵 */}
+      <TutorialOverlay />
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         {/* ─── Hero ───────────────────────────────────────────── */}
         <View style={styles.heroBgWrap} pointerEvents="none">

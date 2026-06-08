@@ -18,6 +18,10 @@ export async function GET(request: Request) {
   const kind = searchParams.get("kind") // hiring | seeking
   const category = searchParams.get("category")
   const status = searchParams.get("status")
+  // 지역(시군) 필터 — region_id(uuid) 기준
+  const region = searchParams.get("region")
+  // 정렬 — 미지정 시 기존 동작(effective_at desc) 보존
+  const sort = searchParams.get("sort")
   // 검색어 — Supabase .or() filter injection 방지 (`,` `(` `)` `%` `_` `\` 차단)
   const q = searchParams
     .get("q")
@@ -35,15 +39,35 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("jobs_posts")
-    .select("id, title, category, status, images, created_at, effective_at, user_id, plaza_id")
+    .select("id, title, category, status, images, created_at, effective_at, user_id, plaza_id, region_id, kind, hourly_wage, work_type, work_days, work_hours, location, views, likes")
     .neq("status", "hidden")
-    .order("effective_at", { ascending: false })
     .range(offset, offset + limit - 1)
+
+  // 정렬 — sort 미지정/잘못된 값이면 기존 동작(effective_at desc) 그대로.
+  // 구인구직은 가격 컬럼이 시급(hourly_wage) → price_asc/desc 를 시급 기준으로 매핑.
+  switch (sort) {
+    case "popular":
+      query = query.order("likes", { ascending: false }).order("views", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    case "price_asc":
+      query = query.order("hourly_wage", { ascending: true }).order("effective_at", { ascending: false })
+      break
+    case "price_desc":
+      query = query.order("hourly_wage", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    case "views":
+      query = query.order("views", { ascending: false }).order("effective_at", { ascending: false })
+      break
+    default:
+      query = query.order("effective_at", { ascending: false })
+  }
 
   query = query.eq("plaza_id", plaza)
   if (kind) query = query.eq("kind", kind)
   if (category && category !== "전체") query = query.eq("category", category)
   if (status && status !== "all") query = query.eq("status", status)
+  // 지역 필터 — region_id 일치
+  if (region && region !== "all") query = query.eq("region_id", region)
   if (q) {
     // PostgREST .or() 가 ',' '(' ')' 를 syntax 로 해석 → 사용자 입력 sanitize
     const safeQ = q.replace(/[,()]/g, '').slice(0, 100)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Users, Clock, Loader2, ChevronRight } from "lucide-react"
+import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
 
 const KINDS = [
   { value: "all", label: "전체" },
@@ -43,6 +44,9 @@ function JobsContent() {
   const [kind, setKind] = useState("all")
   const [search, setSearch] = useState("")
   const [debounced, setDebounced] = useState("")
+  const [sort, setSort] = useState<ListSortKey>("latest")
+  const [region, setRegion] = useState("all")
+  const regions = usePlazaRegions()
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300)
@@ -54,14 +58,19 @@ function JobsContent() {
     createClient().auth.getUser().then(({ data }) => setUser(data.user))
   }, [])
 
-  useEffect(() => {
+  const fetchPosts = useCallback(() => {
     setLoading(true)
-    fetch(`/api/jobs?limit=50&offset=0`)
+    const params = new URLSearchParams({ limit: "50", offset: "0" })
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
+    fetch(`/api/jobs?${params.toString()}`)
       .then((r) => r.json())
       .then((d) => setPosts(d.posts || []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
-  }, [])
+  }, [sort, region])
+
+  useEffect(() => { fetchPosts() }, [fetchPosts])
 
   const filtered = posts.filter((p) => {
     const mk = kind === "all" || p.kind === kind
@@ -110,6 +119,16 @@ function JobsContent() {
             </button>
           ))}
         </div>
+
+        {/* 지역(시군) 필터 + 정렬 */}
+        <ListSortRegionBar
+          sort={sort}
+          onSortChange={setSort}
+          region={region}
+          onRegionChange={setRegion}
+          regions={regions}
+          count={loading ? undefined : filtered.length}
+        />
 
         {loading ? (
           <div className="py-20 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div>

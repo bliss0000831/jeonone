@@ -78,5 +78,24 @@ export async function PATCH(
     console.error("[ship]", error)
     return NextResponse.json({ error: "처리 실패" }, { status: 500 })
   }
+
+  // 구매자에게 발송 알림 (비동기, non-fatal — 알림 실패가 발송 처리를 막지 않음)
+  if (data.buyer_id) {
+    try {
+      const { createAdminClient } = await import("@/lib/supabase/admin")
+      const { notify } = await import("@/lib/services/notifications")
+      const admin = createAdminClient()
+      await notify(admin, {
+        user_id: data.buyer_id,
+        type: "order_shipped",
+        title: "상품이 발송되었어요",
+        message: "주문하신 상품이 발송되었어요. 배송 현황을 확인해보세요.",
+        link: "/mypage/orders",
+      }, user.id)
+    } catch (notifyErr) {
+      console.error("[ship] notify buyer failed (non-fatal):", notifyErr)
+    }
+  }
+
   return NextResponse.json({ order: data })
 }

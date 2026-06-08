@@ -29,6 +29,8 @@ interface Props {
   loading?: boolean
   /** 리스트 하단에 추가할 콘텐츠 (예: "더 보기" 버튼) */
   afterItems?: ReactNode
+  /** 컨텐츠 위(헤더 아래)에 표시할 툴바 (예: 정렬/지역 필터 바) */
+  toolbar?: ReactNode
 }
 
 export function ListingPageShell({
@@ -40,6 +42,7 @@ export function ListingPageShell({
   emptyState,
   loading = false,
   afterItems,
+  toolbar,
 }: Props) {
   return (
     <>
@@ -57,6 +60,9 @@ export function ListingPageShell({
                 {headerAction && <div>{headerAction}</div>}
               </div>
             )}
+
+            {/* 정렬/지역 툴바 — 컨텐츠 위 (모바일에서도 노출) */}
+            {toolbar && <div className="px-4 md:px-0">{toolbar}</div>}
 
             {/* 컨텐츠 */}
             {loading ? (

@@ -137,6 +137,24 @@ export async function POST(
     console.error("[confirm] reward exception", e)
   }
 
+  // 판매자에게 수령확인 알림 (비동기, non-fatal — 알림 실패가 구매확정을 막지 않음)
+  if (data.seller_id) {
+    try {
+      const { createAdminClient } = await import("@/lib/supabase/admin")
+      const { notify } = await import("@/lib/services/notifications")
+      const admin = createAdminClient()
+      await notify(admin, {
+        user_id: data.seller_id,
+        type: "order_received",
+        title: "구매자가 수령을 확인했어요",
+        message: "구매자가 상품 수령을 확인했어요. 거래가 완료되었습니다.",
+        link: "/mypage/sales",
+      }, user.id)
+    } catch (notifyErr) {
+      console.error("[confirm] notify seller failed (non-fatal):", notifyErr)
+    }
+  }
+
   // TODO: PortOne 도입 후 — 에스크로 해제 + 생산자 계좌 정산 큐 등록
   return NextResponse.json({ order: data })
 }

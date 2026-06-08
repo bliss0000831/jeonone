@@ -11,6 +11,7 @@ import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Calendar, Tractor, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
 import { formatPriceKR, formatDateKR } from "@/lib/format-price"
+import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
 
 // 농기구/자재 카테고리 (레퍼런스 동일)
 const CATEGORIES = ["전체", "트랙터", "경운기", "이양기", "수확기", "관리기", "하우스자재", "부품", "기타"]
@@ -42,6 +43,9 @@ function SecondhandContent() {
   const [category, setCategory] = useState(searchParams.get("category") ?? "전체")
   const [search, setSearch] = useState("")
   const [debounced, setDebounced] = useState("")
+  const [sort, setSort] = useState<ListSortKey>("latest")
+  const [region, setRegion] = useState("all")
+  const regions = usePlazaRegions()
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300)
@@ -64,12 +68,14 @@ function SecondhandContent() {
     params.set("status", "active")
     if (debounced.trim()) params.set("q", debounced.trim())
     if (category !== "전체") params.set("category", category)
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
     fetch(`/api/secondhand?${params.toString()}`)
       .then((r) => r.json())
       .then((d) => setPosts(d.posts || []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
-  }, [debounced, category])
+  }, [debounced, category, sort, region])
 
   useEffect(() => { fetchPosts() }, [fetchPosts])
 
@@ -132,6 +138,16 @@ function SecondhandContent() {
             </button>
           ))}
         </div>
+
+        {/* 지역(시군) 필터 + 정렬 */}
+        <ListSortRegionBar
+          sort={sort}
+          onSortChange={setSort}
+          region={region}
+          onRegionChange={setRegion}
+          regions={regions}
+          count={loading ? undefined : posts.length}
+        />
 
         {/* 목록 */}
         {loading ? (

@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Carrot, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
+import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
 
 const DEFAULT_CATEGORIES = ["전체", "채소", "과일", "쌀/잡곡", "축산물", "수산물", "가공식품", "기타"]
 const FALLBACK_IMG = "/images/card-local-food.jpg"
@@ -42,6 +43,9 @@ function LocalFoodContent() {
   const [category, setCategory] = useState("전체")
   const [search, setSearch] = useState("")
   const [debounced, setDebounced] = useState("")
+  const [sort, setSort] = useState<ListSortKey>("latest")
+  const [region, setRegion] = useState("all")
+  const regions = usePlazaRegions()
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300)
@@ -74,12 +78,14 @@ function LocalFoodContent() {
     const params = new URLSearchParams({ limit: "50" })
     if (category !== "전체") params.set("category", category)
     if (debounced.trim()) params.set("q", debounced.trim())
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
     fetch(`/api/local-food?${params}`)
       .then((r) => r.json())
       .then((d) => setPosts(d.posts || []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
-  }, [category, debounced])
+  }, [category, debounced, sort, region])
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-20 md:pb-0">
@@ -122,6 +128,16 @@ function LocalFoodContent() {
             </button>
           ))}
         </div>
+
+        {/* 지역(시군) 필터 + 정렬 */}
+        <ListSortRegionBar
+          sort={sort}
+          onSortChange={setSort}
+          region={region}
+          onRegionChange={setRegion}
+          regions={regions}
+          count={loading ? undefined : posts.length}
+        />
 
         {loading ? (
           <div className="py-20 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div>

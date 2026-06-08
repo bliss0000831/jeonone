@@ -43,6 +43,8 @@ export type NotificationType =
   | "club_full"            // 모임 정원 마감 → 모임장
   | "admin_notice"         // 관리자 브로드캐스트
   | "account_type_review"  // 계정 유형 신청 심사 결과 (승인/반려) → 신청자
+  | "order_shipped"        // 판매자 발송 처리 → 구매자
+  | "order_received"       // 구매자 수령확인 → 판매자
 
 export interface NotificationInput {
   user_id: string
