@@ -487,9 +487,9 @@ const styles = StyleSheet.create({
   heroBgWrap: { position: "absolute", top: 0, left: 0, right: 0, height: 320, overflow: "hidden" },
   heroBgImg: { width: "100%", height: "100%", opacity: 0.14 },
 
-  hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
+  hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 6, paddingBottom: 8 },
   brandRow: { alignItems: "center", marginBottom: 6 },
-  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff", marginTop: 14 },
+  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff", marginTop: 6 },
 
   h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center" },
   sub: { fontSize: 16, color: "#57534e", textAlign: "center", marginTop: 8, lineHeight: 23, fontWeight: "500" },
