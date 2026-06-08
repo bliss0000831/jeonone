@@ -185,7 +185,7 @@ export function HubLanding({
             어디에 사세요?
           </h1>
           <p className="mt-3 text-lg sm:text-xl text-stone-600 font-medium">
-            사는 곳을 고르면 농기구·로컬푸드·이웃 소식을 한곳에서 볼 수 있어요.
+            사는 곳을 고르면 농기구·농산물 직거래부터 일손 구하기, 마을 소식까지 한곳에서 볼 수 있어요.
           </p>
 
           {/* 큰 '내 위치로 찾기' 버튼 */}
