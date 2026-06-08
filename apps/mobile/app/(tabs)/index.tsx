@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   menuBtnText: { fontSize: 13, fontWeight: "800", color: GREEN_DARK },
 
   hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
-  heroLogo: { width: 130, height: 130, borderRadius: 65, marginBottom: 12, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
+  heroLogo: { width: 90, height: 90, borderRadius: 45, marginBottom: 12, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
   heroTitle: { fontSize: 30, fontWeight: "900", color: GREEN },
   heroSub: { fontSize: 14, fontWeight: "700", color: BROWN, marginTop: 4 },
   farmTipChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#f0fdf4", borderColor: "#bbf7d0", borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },

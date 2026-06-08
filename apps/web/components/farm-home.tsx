@@ -67,7 +67,7 @@ export function FarmHome({ user, userRole, userAccountType, plazaName, notices =
           <section className="relative z-10 pt-6 pb-4 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 mb-6">
-                <Image src="/images/logo-farmer.png" alt={`${plazaName} 로고`} width={160} height={160} className="flex-shrink-0 rounded-full object-cover" priority />
+                <Image src="/images/logo-farmer.png" alt={`${plazaName} 로고`} width={112} height={112} className="flex-shrink-0 rounded-full object-cover" priority />
                 <div className="text-center md:text-left">
                   <h1 className="text-3xl md:text-5xl font-black text-primary mb-2">{plazaName}</h1>
                   <p className="text-lg md:text-xl text-secondary font-bold">강원도 농업인을 위한 따뜻한 마을 장터</p>
