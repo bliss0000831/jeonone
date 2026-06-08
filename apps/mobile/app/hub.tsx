@@ -243,7 +243,6 @@ export default function HubScreen() {
         <View style={styles.hero}>
           <View style={styles.brandRow}>
             <Image source={LOGO} style={styles.brandLogo} contentFit="cover" />
-            <Text style={styles.brandText}>전원일기</Text>
           </View>
 
           <Text style={styles.h1}>어디에 사세요?</Text>
@@ -489,9 +488,8 @@ const styles = StyleSheet.create({
   heroBgImg: { width: "100%", height: "100%", opacity: 0.14 },
 
   hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 14 },
-  brandLogo: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: "#fff" },
-  brandText: { fontSize: 20, fontWeight: "900", color: GREEN },
+  brandRow: { alignItems: "center", marginBottom: 14 },
+  brandLogo: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: "#fff" },
 
   h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center" },
   sub: { fontSize: 16, color: "#57534e", textAlign: "center", marginTop: 8, lineHeight: 23, fontWeight: "500" },
