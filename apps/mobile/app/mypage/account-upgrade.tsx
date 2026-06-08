@@ -1,6 +1,6 @@
 /**
- * 계정 유형 신청 — 광장 web /mypage/account-upgrade 1:1 미러.
- * 7개 역할 (agent / business / producer / interior / moving / cleaning / repair).
+ * 계정 유형 신청 — 전원일기 계정 유형.
+ * 2개 역할 (business 사장님 / producer 로컬푸드 생산자).
  *
  * 보안 강화: 모바일에서도 웹 API (/api/account-upgrade) 를 사용하여
  * R2 URL 소유권 검증, rate limit, ban guard 등 서버사이드 보안 로직 적용.
@@ -48,13 +48,6 @@ interface RoleMeta {
 
 const ROLES: RoleMeta[] = [
   {
-    type: "agent", label: "공인중개사",
-    description: "전문 매물 등록 및 부동산 중개 업무",
-    icon: "business-outline", color: "#2563eb", bg: "rgba(59,130,246,0.1)",
-    benefits: ["전문 매물 등록", "중개사 뱃지", "신뢰 지수 가점"],
-    requiresLicense: true, licenseLabel: "공인중개사 자격증",
-  },
-  {
     type: "business", label: "사장님",
     description: "메뉴·상품 등록, 공동구매 운영",
     icon: "storefront-outline", color: "#f97316", bg: "rgba(249,115,22,0.1)",
@@ -66,43 +59,14 @@ const ROLES: RoleMeta[] = [
     icon: "leaf-outline", color: "#22c55e", bg: "rgba(34,197,94,0.1)",
     benefits: ["로컬푸드 등록", "제철 예약주문", "농장일지 기능"],
   },
-  {
-    type: "interior", label: "인테리어",
-    description: "인테리어·리모델링 포트폴리오",
-    icon: "color-palette-outline", color: "#a855f7", bg: "rgba(168,85,247,0.1)",
-    benefits: ["포트폴리오 등록", "견적 문의 채팅", "전후 비교 쇼케이스"],
-  },
-  {
-    type: "moving", label: "이사 전문가",
-    description: "이사 서비스 견적·예약",
-    icon: "car-outline", color: "#eab308", bg: "rgba(234,179,8,0.1)",
-    benefits: ["이사 서비스 등록", "견적 요청 수신", "서비스 지역 지정"],
-  },
-  {
-    type: "cleaning", label: "청소 전문가",
-    description: "청소 서비스 견적·예약",
-    icon: "sparkles-outline", color: "#ec4899", bg: "rgba(236,72,153,0.1)",
-    benefits: ["청소 서비스 등록", "견적 요청 수신", "정기/단건 선택"],
-  },
-  {
-    type: "repair", label: "수리 전문가",
-    description: "가전·배관·전기·긴급 수리",
-    icon: "construct-outline", color: "#ea580c", bg: "rgba(234,88,12,0.1)",
-    benefits: ["수리 서비스 등록", "긴급 출동 배지", "전문분야 노출"],
-  },
 ]
 
 /** account_type 영문 → 한글 라벨 */
 const TYPE_LABEL: Record<string, string> = {
   user: "일반 회원",
   individual: "일반 회원",
-  agent: "공인중개사",
   business: "사장님",
   producer: "로컬푸드 생산자",
-  interior: "인테리어",
-  moving: "이사 전문가",
-  cleaning: "청소 전문가",
-  repair: "수리 전문가",
 }
 
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
@@ -227,10 +191,6 @@ export default function AccountUpgradeScreen() {
       Alert.alert("입력 필요", "상호 / 사업장명을 입력해 주세요")
       return
     }
-    if (selectedDef.type === "agent" && !form.registration_number.trim()) {
-      Alert.alert("입력 필요", "공인중개사 등록번호를 입력해 주세요")
-      return
-    }
     if (!form.office_address.trim()) {
       Alert.alert("입력 필요", "사업장 주소를 입력해 주세요")
       return
@@ -261,7 +221,7 @@ export default function AccountUpgradeScreen() {
           requested_type: selectedDef.type,
           business_name: form.business_name.trim(),
           business_number: form.business_number.trim() || null,
-          registration_number: selectedDef.type === "agent" ? (form.registration_number.trim() || null) : null,
+          registration_number: null,
           office_address: form.office_address.trim(),
           contact_phone: form.contact_phone.trim() || null,
           intro: form.intro.trim() || null,
@@ -338,7 +298,7 @@ export default function AccountUpgradeScreen() {
               <View style={styles.hintCard}>
                 <Text style={styles.hintTitle}>현재 계정 유형: {TYPE_LABEL[currentType] || currentType}</Text>
                 <Text style={styles.hintBody}>
-                  계정 유형을 변경하면 추가 기능 (전문 매물 등록, 공동구매 운영 등) 을 사용할 수 있습니다.
+                  계정 유형을 변경하면 추가 기능 (메뉴·상품 등록, 공동구매 운영, 로컬푸드 직거래 등) 을 사용할 수 있습니다.
                   심사 후 즉시 변경됩니다.
                 </Text>
               </View>
@@ -460,7 +420,7 @@ export default function AccountUpgradeScreen() {
                       style={styles.input}
                       value={form.business_name}
                       onChangeText={(v) => setForm((p) => ({ ...p, business_name: v }))}
-                      placeholder="예: 광장 부동산"
+                      placeholder="예: 전원농원"
                       placeholderTextColor={lightColors.ink500}
                       maxLength={100}
                     />
@@ -476,18 +436,6 @@ export default function AccountUpgradeScreen() {
                       maxLength={20}
                     />
                   </Field>
-                  {selectedDef?.type === "agent" && (
-                    <Field label="중개사무소 등록번호 *">
-                      <TextInput
-                        style={styles.input}
-                        value={form.registration_number}
-                        onChangeText={(v) => setForm((p) => ({ ...p, registration_number: v }))}
-                        placeholder="예: 2020-강원춘천-00001"
-                        placeholderTextColor={lightColors.ink500}
-                        maxLength={50}
-                      />
-                    </Field>
-                  )}
                   <Field label="사업장 주소 *">
                     <TextInput
                       style={styles.input}

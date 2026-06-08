@@ -5,13 +5,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   ChevronLeft,
-  Building2,
   Store,
   Leaf,
-  Paintbrush,
-  Truck,
-  SprayCan,
-  Wrench,
   CheckCircle2,
   Clock,
   XCircle,
@@ -26,9 +21,7 @@ import { Label } from "@/components/ui/label"
 import { ImageUpload } from "@/components/image-upload"
 import { cn } from "@/lib/utils"
 
-type RequestedType =
-  | "agent" | "business" | "producer"
-  | "interior" | "moving" | "cleaning" | "repair"
+type RequestedType = "business" | "producer"
 
 interface RoleMeta {
   type: RequestedType
@@ -44,17 +37,6 @@ interface RoleMeta {
 }
 
 const ROLES: RoleMeta[] = [
-  {
-    type: "agent",
-    label: "공인중개사",
-    description: "전문 매물 등록 및 부동산 중개 업무",
-    icon: Building2,
-    iconClass: "text-blue-600",
-    bgClass: "bg-blue-500/10",
-    benefits: ["전문 매물 등록", "중개사 뱃지", "신뢰 지수 가점"],
-    requiresLicense: true,
-    licenseLabel: "공인중개사 자격증",
-  },
   {
     type: "business",
     label: "사장님",
@@ -72,42 +54,6 @@ const ROLES: RoleMeta[] = [
     iconClass: "text-green-500",
     bgClass: "bg-green-500/10",
     benefits: ["로컬푸드 등록", "제철 예약주문", "농장일지 기능"],
-  },
-  {
-    type: "interior",
-    label: "인테리어",
-    description: "인테리어 · 리모델링 포트폴리오",
-    icon: Paintbrush,
-    iconClass: "text-purple-500",
-    bgClass: "bg-purple-500/10",
-    benefits: ["포트폴리오 등록", "견적 문의 채팅", "전후 비교 쇼케이스"],
-  },
-  {
-    type: "moving",
-    label: "이사 전문가",
-    description: "이사 서비스 견적 · 예약",
-    icon: Truck,
-    iconClass: "text-yellow-500",
-    bgClass: "bg-yellow-500/10",
-    benefits: ["이사 서비스 등록", "견적 요청 수신", "서비스 지역 지정"],
-  },
-  {
-    type: "cleaning",
-    label: "청소 전문가",
-    description: "청소 서비스 견적 · 예약",
-    icon: SprayCan,
-    iconClass: "text-pink-500",
-    bgClass: "bg-pink-500/10",
-    benefits: ["청소 서비스 등록", "견적 요청 수신", "정기/단건 선택"],
-  },
-  {
-    type: "repair",
-    label: "수리 전문가",
-    description: "가전 · 배관 · 전기 · 긴급 수리",
-    icon: Wrench,
-    iconClass: "text-orange-600",
-    bgClass: "bg-orange-600/10",
-    benefits: ["수리 서비스 등록", "긴급 출동 배지", "전문분야 노출"],
   },
 ]
 
@@ -372,9 +318,6 @@ function ApplicationModal({
     if (role.requiresLicense && licenseUrls.length === 0) {
       return setError(`${role.licenseLabel} 사진을 업로드해 주세요`)
     }
-    if (role.type === "agent" && !registrationNumber.trim()) {
-      return setError("공인중개사 등록번호를 입력해 주세요")
-    }
 
     setSubmitting(true)
     try {
@@ -444,34 +387,20 @@ function ApplicationModal({
             <Input
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="예: 춘천부동산"
+              placeholder="예: 우리농장"
               maxLength={100}
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label>
-              {role.type === "agent" ? "중개사 등록번호" : "사업자등록번호"}
-            </Label>
+            <Label>사업자등록번호</Label>
             <Input
               value={businessNumber}
               onChange={(e) => setBusinessNumber(e.target.value)}
-              placeholder={role.type === "agent" ? "예: 2020-강원춘천-00001" : "123-45-67890"}
+              placeholder="123-45-67890"
               maxLength={20}
             />
           </div>
-
-          {role.type === "agent" && (
-            <div className="space-y-1.5">
-              <Label>공인중개사 등록번호 <span className="text-red-500">*</span></Label>
-              <Input
-                value={registrationNumber}
-                onChange={(e) => setRegistrationNumber(e.target.value)}
-                placeholder="예: 2020-강원춘천-00001"
-                maxLength={50}
-              />
-            </div>
-          )}
 
           <div className="space-y-1.5">
             <Label>사무실 / 사업장 주소 <span className="text-red-500">*</span></Label>

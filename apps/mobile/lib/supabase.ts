@@ -104,9 +104,9 @@ export function getSupabase(): SupabaseClient<Database> {
  * 자동으로 Bearer token + Content-Type 부착.
  *
  * 사용:
- *   const res = await gwangjangFetch('/api/expert-invitations', {
+ *   const res = await gwangjangFetch('/api/account-upgrade', {
  *     method: 'POST',
- *     body: JSON.stringify({ chatRoomId, expertId }),
+ *     body: JSON.stringify({ requested_type, business_name }),
  *   })
  *   if (!res.ok) throw new Error(...)
  *   return res.json()

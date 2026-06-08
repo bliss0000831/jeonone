@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Search, PlusCircle, MessageCircle, User, Paintbrush, Truck, SprayCan, Wrench } from "lucide-react"
+import { Home, Search, PlusCircle, MessageCircle, User } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
 import { RegisterSheet } from "@/components/register-sheet"
 
 export function BottomNav() {
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const [currentPath, setCurrentPath] = useState("/")
-  const [accountType, setAccountType] = useState<string | null>(null)
   const [unreadTotal, setUnreadTotal] = useState(0)
   const [registerOpen, setRegisterOpen] = useState(false)
 
@@ -51,77 +49,11 @@ export function BottomNav() {
     }
   }, [mounted])
 
-  useEffect(() => {
-    if (!mounted) return
-
-    // account_type 은 거의 안 바뀜 → 세션 캐시 30분.
-    // 이전엔 모바일 페이지 이동 마다 getUser() + profiles 쿼리 → 부하 큼 (2026-04 audit, #4).
-    const cacheKey = "bottom_nav_account_type_v1"
-    const TTL = 30 * 60 * 1000
-    try {
-      const raw = sessionStorage.getItem(cacheKey)
-      if (raw) {
-        const cached = JSON.parse(raw)
-        if (cached?.fetchedAt && Date.now() - cached.fetchedAt < TTL) {
-          if (cached.accountType !== undefined) setAccountType(cached.accountType)
-          return
-        }
-      }
-    } catch {}
-
-    const fetchAccountType = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("account_type")
-          .eq("id", user.id)
-          .single()
-        if (profile) {
-          setAccountType(profile.account_type)
-          try {
-            sessionStorage.setItem(
-              cacheKey,
-              JSON.stringify({ accountType: profile.account_type, fetchedAt: Date.now() }),
-            )
-          } catch {}
-        }
-      } else {
-        // 비로그인 — 캐시에 null 박아 다음 페이지에서 또 안 부르게.
-        try {
-          sessionStorage.setItem(
-            cacheKey,
-            JSON.stringify({ accountType: null, fetchedAt: Date.now() }),
-          )
-        } catch {}
-      }
-    }
-    fetchAccountType()
-  }, [mounted])
-
-  // 서비스 전문가별 등록 경로 및 아이콘
-  const getRegisterConfig = () => {
-    const serviceConfig: Record<string, { path: string; icon: any; label: string }> = {
-      interior: { path: "/interior/register", icon: Paintbrush, label: "글등록" },
-      moving: { path: "/moving/register", icon: Truck, label: "글등록" },
-      cleaning: { path: "/cleaning/register", icon: SprayCan, label: "글등록" },
-      repair: { path: "/repair/register", icon: Wrench, label: "글등록" },
-    }
-    return accountType && serviceConfig[accountType] 
-      ? serviceConfig[accountType] 
-      : { path: "/register", icon: PlusCircle, label: "등록" }
-  }
-
-  const registerConfig = getRegisterConfig()
-
-  // 서비스 전문가(인테리어/이사/청소/수리)는 전용 등록 페이지로 바로 이동
-  const isServicePro = accountType
-    ? ["interior", "moving", "cleaning", "repair"].includes(accountType)
-    : false
+  // 등록 슬롯 — 등록 시트를 여는 버튼 (path 는 활성 표시용 키, 실제 라우팅 없음)
+  const registerConfig = { path: "#register", icon: PlusCircle, label: "등록" }
 
   // 하단 5개 슬롯: 홈 - 검색 - 등록 - 채팅 - MY
-  // (초대 요청은 채팅 헤더 버튼으로, 찜목록은 상단 프로필 메뉴로 이동)
+  // (찜목록은 상단 프로필 메뉴로 이동)
   const navItems = [
     { href: "/", icon: Home, label: "홈", type: "link" as const },
     { href: "/search", icon: Search, label: "검색", type: "link" as const },
@@ -129,7 +61,7 @@ export function BottomNav() {
       href: registerConfig.path,
       icon: registerConfig.icon,
       label: registerConfig.label,
-      type: isServicePro ? ("link" as const) : ("sheet" as const),
+      type: "sheet" as const,
     },
     { href: "/chat", icon: MessageCircle, label: "채팅", type: "link" as const },
     { href: "/mypage", icon: User, label: "내정보", type: "link" as const },

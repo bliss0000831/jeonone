@@ -37,7 +37,6 @@ import {
   listFavorites,
   listHighlights,
   listMyPosts,
-  listMyProperties,
   listReviews,
   updateProfile,
   type ProfileCardData,

@@ -118,17 +118,8 @@ export default function ChatListTab() {
   const [blockedManagerOpen, setBlockedManagerOpen] = useState(false)
   const [reportFor, setReportFor] = useState<RoomMenuTarget | null>(null)
 
-  // 전문가 계정 여부 — 5종(agent/interior/moving/cleaning/repair) 만 "초대요청" 진입
-  const [accountType, setAccountType] = useState<string | null>(null)
-  const [pendingInviteCount, setPendingInviteCount] = useState(0)
   // 알림 종(홈 헤더와 동일) — 읽지않음 카운트
   const [unreadNotif, setUnreadNotif] = useState(0)
-  const isExpert =
-    accountType === "agent" ||
-    accountType === "interior" ||
-    accountType === "moving" ||
-    accountType === "cleaning" ||
-    accountType === "repair"
 
   // 일괄편집
   const [bulkMode, setBulkMode] = useState(false)
@@ -155,37 +146,6 @@ export default function ChatListTab() {
       } catch { /* noop */ }
     })()
   }, [user, DEFAULT_PLAZA])
-
-  // 사용자 account_type 조회 + 대기 중 초대 카운트
-  useEffect(() => {
-    if (!user) return
-    const supabase = getSupabase()
-    ;(async () => {
-      try {
-        // 프로필 + 초대 카운트 병렬 조회 (초대 카운트는 expert 아니면 무시)
-        const [profRes, invRes] = await Promise.all([
-          supabase
-            .from("profiles")
-            .select("account_type")
-            .eq("id", user.id)
-            .single(),
-          supabase
-            .from("expert_invitations")
-            .select("id", { count: "exact", head: true })
-            .eq("expert_id", user.id)
-            .eq("status", "pending"),
-        ])
-        const t = profRes.data?.account_type ?? null
-        setAccountType(t)
-        if (
-          t === "agent" || t === "interior" || t === "moving" ||
-          t === "cleaning" || t === "repair"
-        ) {
-          setPendingInviteCount(invRes.count ?? 0)
-        }
-      } catch {}
-    })()
-  }, [user])
 
   const fetchAll = useCallback(async () => {
     if (!user) return
@@ -583,26 +543,8 @@ export default function ChatListTab() {
           </>
         ) : (
           <>
-            {/* 왼쪽 — 초대요청 (전문가만), 비전문가는 빈 spacer */}
-            {isExpert ? (
-              <Pressable
-                onPress={() => router.push("/invitations" as any)}
-                hitSlop={8}
-                style={styles.inviteBtn}
-              >
-                <Ionicons name="mail-outline" size={16} color={lightColors.primary} />
-                <Text style={styles.inviteBtnText}>초대요청</Text>
-                {pendingInviteCount > 0 && (
-                  <View style={styles.inviteBadge}>
-                    <Text style={styles.inviteBadgeText}>
-                      {pendingInviteCount > 99 ? "99+" : String(pendingInviteCount)}
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-            ) : (
-              <View style={{ width: 40 }} />
-            )}
+            {/* 왼쪽 — 빈 spacer (가운데 제목 정렬용) */}
+            <View style={{ width: 40 }} />
             {/* 가운데 — 채팅 (absolute centering 으로 화면 정중앙 고정) */}
             <View style={styles.headerCenter} pointerEvents="none">
               <Text style={styles.headerTitle}>채팅</Text>
@@ -895,41 +837,6 @@ const MemoDirectRow = React.memo(DirectRow)
 function makeStyles(colors: any) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  inviteBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: "rgba(59,130,246,0.08)",
-    borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.25)",
-    position: "relative",
-  },
-  inviteBtnText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  inviteBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 4,
-    borderRadius: 8,
-    backgroundColor: "#ef4444",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inviteBadgeText: {
-    color: "#ffffff",
-    fontSize: 9,
-    fontWeight: "700",
-    lineHeight: 12,
-  },
   center: {
     flex: 1,
     backgroundColor: colors.background,

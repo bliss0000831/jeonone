@@ -461,8 +461,6 @@ export default function ChatRoomScreen() {
     : (otherUser?.nickname ?? "이웃")
   const otherPhone = otherUser?.phone
   const isFirstMessage = messages.length === 0
-  // 부동산/서비스 전문가 도메인 제거 — 전문가 초대 비활성화
-  const canInviteExpert = false
 
   // 참가자 strip 데이터 변환
   const stripParticipants: StripParticipant[] = participants.map((p) => ({
@@ -720,19 +718,6 @@ export default function ChatRoomScreen() {
           <ChatComposer
             onSend={handleSend}
             onTyping={sendTyping}
-            leftSlot={
-              canInviteExpert ? (
-                <Pressable
-                  onPress={() => router.push(`/chat/${roomId}/invite-expert`)}
-                  style={({ pressed }) => [
-                    styles.composerLeft,
-                    pressed && styles.btnPressed,
-                  ]}
-                >
-                  <Ionicons name="add" size={22} color={lightColors.primary} />
-                </Pressable>
-              ) : null
-            }
           />
         )}
       </View>

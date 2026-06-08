@@ -4,10 +4,9 @@ import { useEffect, useMemo, useState, useRef, use } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Phone, MoreVertical, Plus, X, UserPlus, Users as UsersIcon } from "lucide-react"
+import { ArrowLeft, Phone, MoreVertical, X, Users as UsersIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
-import { ExpertSelectionModal } from "@/components/expert-selection-modal"
 import { useConfirm } from "@/components/confirm-provider"
 import { ChatShell } from "@/components/chat/chat-shell"
 import { ChatHeader } from "@/components/chat/chat-header"
@@ -96,7 +95,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
   const [isSending, setIsSending] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const currentUserIdRef = useRef<string | null>(null)
-  const [showExpertModal, setShowExpertModal] = useState(false)
   const [showParticipantsModal, setShowParticipantsModal] = useState(false)
   const [showPhoneModal, setShowPhoneModal] = useState(false)
   const [showMenuModal, setShowMenuModal] = useState(false)
@@ -554,18 +552,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
           </div>
         </button>
 
-        {/* 전문가 초대 — 부동산 & 여석 있을 때만 */}
-        {isPropertyChat && participantCount < 3 && (
-          <button
-            onClick={() => setShowExpertModal(true)}
-            className="shrink-0 flex items-center gap-1 text-xs text-primary hover:bg-primary/5 px-2 py-1 rounded-full transition-colors"
-            aria-label="전문가 초대"
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            전문가 초대
-          </button>
-        )}
-
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setShowPhoneModal(true)}
@@ -631,29 +617,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
       onSend={handleSend}
       sending={isSending}
       placeholder="메시지 보내기"
-      leftSlot={
-        isPropertyChat ? (
-          <button
-            onClick={() => {
-              if (participantCount >= 3) {
-                toast("채팅방 최대 인원(3명)에 도달했습니다")
-                return
-              }
-              setShowExpertModal(true)
-            }}
-            disabled={participantCount >= 3}
-            className={cn(
-              "shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-              participantCount >= 3
-                ? "bg-secondary text-muted-foreground cursor-not-allowed"
-                : "bg-primary text-primary-foreground hover:bg-primary/90",
-            )}
-            aria-label="전문가 초대"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        ) : undefined
-      }
       topSlot={
         messages.length === 0 ? (
           <QuickReplies items={QUICK_REPLIES} onPick={setNewMessage} />
@@ -670,18 +633,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
       composer={composer}
       overlays={
         <>
-          {showExpertModal && (
-            <ExpertSelectionModal
-              onClose={() => setShowExpertModal(false)}
-              propertyAddress={property?.address}
-              chatRoomId={roomId}
-              propertyId={property?.id}
-              excludeAgentTab={
-                participants.find((p) => p.role === "seller")?.account_type === "agent"
-              }
-            />
-          )}
-
           {showParticipantsModal && (
             <div
               className="fixed inset-0 z-50 bg-black/50 flex items-end md:items-center justify-center"
@@ -767,27 +718,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
                       </div>
                     </Link>
                   ))}
-                  {isPropertyChat && participantCount < 3 && (
-                    <button
-                      onClick={() => {
-                        setShowParticipantsModal(false)
-                        setShowExpertModal(true)
-                      }}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors border border-dashed border-border"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <UserPlus className="w-5 h-5 text-primary" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-medium text-primary">
-                          전문가 초대하기
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          공인중개사 · 인테리어 · 이사 · 청소 · 수리
-                        </div>
-                      </div>
-                    </button>
-                  )}
                 </div>
               </div>
             </div>

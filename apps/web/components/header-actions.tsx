@@ -17,7 +17,6 @@ import {
   Heart,
   MessageSquare,
   MessageCircle,
-  Mail,
   Settings,
   Shield,
   LogOut,
@@ -414,19 +413,6 @@ export function HeaderActions({
                   )}
                 </Link>
               </DropdownMenuItem>
-              {(() => {
-                const serviceTypes = ["agent", "interior", "moving", "cleaning", "repair"]
-                const isServiceProvider = effectiveAccountType && serviceTypes.includes(effectiveAccountType)
-                if (!isServiceProvider) return null
-                return (
-                  <DropdownMenuItem asChild>
-                    <Link href="/invitations" prefetch={false} className="cursor-pointer flex items-center gap-2 px-2.5 py-2">
-                      <Mail className="w-4 h-4 text-foreground" />
-                      <span className="text-sm font-medium">초대 요청</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )
-              })()}
               <DropdownMenuSeparator className="mx-3" />
               <DropdownMenuItem asChild>
                 <Link href="/mypage/orders" prefetch={false} className="cursor-pointer flex items-center gap-2 px-2.5 py-2">

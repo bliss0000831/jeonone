@@ -307,7 +307,6 @@ export default function NotificationsScreen() {
           "/mypage",
           "/news",
           "/support",
-          "/invitations",
         ]
         const ok = ALLOWED_PREFIXES.some((p) => raw === p || raw.startsWith(p))
         if (ok) router.push(raw as any)

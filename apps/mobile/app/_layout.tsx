@@ -467,16 +467,7 @@ function RootLayoutNav() {
           여기에 다시 등록하면 expo-router 가 워닝. 절대 추가하지 말 것.
           (subscription/settlement/credits/verify/account-upgrade/edit/...)
         */}
-        <Stack.Screen
-          name="chat/[roomId]/invite-expert"
-          options={{
-            headerShown: false,
-            presentation: "transparentModal",
-            animation: "fade",
-          }}
-        />
         <Stack.Screen name="bump-tickets" options={{ headerShown: false }} />
-        <Stack.Screen name="invitations" options={{ headerShown: false }} />
         <Stack.Screen name="gas-stations" options={{ headerShown: false }} />
         <Stack.Screen name="toilets" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />

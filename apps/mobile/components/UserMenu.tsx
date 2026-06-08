@@ -57,7 +57,6 @@ export function UserMenu({ visible, onClose }: Props) {
     points: number | null
     account_type: string | null
   }>({ nickname: null, avatar_url: null, points: null, account_type: null })
-  const [pendingInviteCount, setPendingInviteCount] = useState(0)
   const [registerOpen, setRegisterOpen] = useState(false)
 
   useEffect(() => {
@@ -86,21 +85,7 @@ export function UserMenu({ visible, onClose }: Props) {
         avatar_url: profRaw.avatar_url ?? null,
         account_type: ppRes?.data?.account_type ?? "user",
       }
-      // 5종 전문가면 대기 중 초대 카운트 조회
       const at = prof.account_type
-      if (
-        at === "agent" || at === "interior" || at === "moving" ||
-        at === "cleaning" || at === "repair"
-      ) {
-        const { count } = await supabase
-          .from("expert_invitations")
-          .select("id", { count: "exact", head: true })
-          .eq("expert_id", user.id)
-          .eq("status", "pending")
-        setPendingInviteCount(count ?? 0)
-      } else {
-        setPendingInviteCount(0)
-      }
       // 포인트 — 광장 격리 해제됨. user_id 만으로 조회 (전 광장 공유)
       let points: number | null = null
       {
@@ -134,26 +119,11 @@ export function UserMenu({ visible, onClose }: Props) {
     router.replace("/(tabs)" as any)
   }
 
-  const at = profile.account_type
-  const isExpert =
-    at === "agent" || at === "interior" || at === "moving" ||
-    at === "cleaning" || at === "repair"
-
   const menuItems: MenuItem[] = [
     { icon: "create-outline",       label: "글쓰기",         route: "/(tabs)/register" },
     { icon: "person-outline",       label: "마이페이지",     route: "/(tabs)/mypage" },
     { icon: "heart",                label: "찜 목록",        route: "/mypage/favorites" },
     { icon: "chatbubble-outline",   label: "채팅",           route: "/(tabs)/chat" },
-    ...(isExpert
-      ? [
-          {
-            icon: "mail-outline",
-            label: "초대 요청",
-            route: "/invitations",
-            badge: pendingInviteCount > 0 ? pendingInviteCount : undefined,
-          } as MenuItem,
-        ]
-      : []),
     { icon: "cart-outline",         label: "구매 내역",      route: "/mypage/orders", separatorBefore: true },
     { icon: "storefront-outline",   label: "판매 관리",      route: "/mypage/sales" },
     { icon: "shield-checkmark-outline", label: "계정 유형 신청", route: "/mypage/account-upgrade", separatorBefore: true },

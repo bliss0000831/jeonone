@@ -6,7 +6,6 @@ import Image from "next/image"
 import {
   ArrowLeft,
   MessageCircle,
-  Plus,
   LogOut,
   MoreVertical,
   BellOff,
@@ -20,8 +19,6 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BottomNav } from "@/components/bottom-nav"
-import { ExpertSelectionModal } from "@/components/expert-selection-modal"
-import { InvitationBell } from "@/components/invitation-bell"
 import { useConfirm } from "@/components/confirm-provider"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -80,8 +77,6 @@ export default function ChatListPage() {
   const confirm = useConfirm()
   const [rooms, setRooms] = useState<ChatRoom[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showExpertModal, setShowExpertModal] = useState(false)
-  const [isServiceProvider, setIsServiceProvider] = useState(false)
   const [leavingRoomId, setLeavingRoomId] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<string>("all")
   const router = useRouter()
@@ -121,16 +116,12 @@ export default function ChatListPage() {
         setAuthUserId(user.id)
         const { data: profile } = await supabase
           .from("profiles")
-          .select("notif_chat, account_type")
+          .select("notif_chat")
           .eq("id", user.id)
           .single()
         if (profile) {
           if (typeof profile.notif_chat === "boolean") {
             chatPrefs.setNotifOffAll(!profile.notif_chat)
-          }
-          const serviceTypes = ["agent", "interior", "moving", "cleaning", "repair"]
-          if (serviceTypes.includes(profile.account_type ?? "")) {
-            setIsServiceProvider(true)
           }
         }
       } catch {}
@@ -383,7 +374,6 @@ export default function ChatListPage() {
                 <Link href="/" className="p-2 -ml-2 hover:bg-secondary rounded-full" aria-label="뒤로가기">
                   <ArrowLeft className="w-5 h-5 text-foreground" />
                 </Link>
-                {isServiceProvider && <InvitationBell showLabel />}
               </div>
               <h1 className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold text-foreground pointer-events-none">
                 채팅
@@ -655,23 +645,6 @@ export default function ChatListPage() {
           </>
         )}
       </div>
-
-      {/* Floating + Button */}
-      <div className="fixed inset-x-0 bottom-20 pointer-events-none z-40">
-        <div className="max-w-2xl mx-auto px-4 flex justify-end">
-          <button
-            onClick={() => setShowExpertModal(true)}
-            aria-label="전문가 초대"
-            className="pointer-events-auto w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-200 flex items-center justify-center"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
-        </div>
-      </div>
-
-      {showExpertModal && (
-        <ExpertSelectionModal onClose={() => setShowExpertModal(false)} />
-      )}
 
       {/* ── 헤더 메뉴: 대화방 설정 (...) */}
       {showHeaderMenu && (
