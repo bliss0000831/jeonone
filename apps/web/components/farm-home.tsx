@@ -31,7 +31,7 @@ interface FarmHomeProps {
 
 const LOCATION_STORAGE_KEY = "user-location"
 
-export function FarmHome({ user, userRole, userAccountType, plazaName, notices = [] }: FarmHomeProps) {
+export function FarmHome({ user, userRole, userAccountType, plazaName, plazaCity, notices = [] }: FarmHomeProps) {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export function FarmHome({ user, userRole, userAccountType, plazaName, notices =
                 <Image src="/images/logo-farmer.png" alt={`${plazaName} 로고`} width={136} height={136} className="flex-shrink-0 rounded-full object-cover" priority />
                 <div className="text-center md:text-left">
                   <h1 className="text-3xl md:text-5xl font-black text-primary mb-2">{plazaName}</h1>
-                  <p className="text-lg md:text-xl text-secondary font-bold">강원도 농업인을 위한 따뜻한 마을 장터</p>
+                  <p className="text-lg md:text-xl text-secondary font-bold">{plazaCity} 농업인을 위한 따뜻한 마을 장터</p>
                 </div>
               </div>
 

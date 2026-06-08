@@ -146,7 +146,7 @@ export default function HomeTab() {
           <View style={styles.hero}>
             <Image source={IMG.logo} style={styles.heroLogo} contentFit="cover" />
             <Text style={styles.heroTitle}>{plaza.name}</Text>
-            <Text style={styles.heroSub}>강원도 농업인을 위한 따뜻한 마을 장터</Text>
+            <Text style={styles.heroSub}>{plaza.name.replace(/\s*전원일기$/, "")} 농업인을 위한 따뜻한 마을 장터</Text>
           </View>
 
           {/* 날씨 + 농사 팁 (날씨에 따라 팁 변경) */}
