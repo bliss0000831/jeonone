@@ -219,10 +219,6 @@ export function HubLanding({
               )}
             </div>
           </div>
-
-          <p className="mt-4 text-sm text-stone-500 font-medium">
-            전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림
-          </p>
         </div>
       </section>
 

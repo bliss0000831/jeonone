@@ -274,8 +274,6 @@ export default function HubScreen() {
               </Pressable>
             )}
           </View>
-
-          <Text style={styles.statLine}>전국 {stats.total}개 지역 · 지금 {stats.open}곳 열림</Text>
         </View>
 
         {loading ? (
