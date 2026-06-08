@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Sun, AlertTriangle, Droplets, Sprout, Search, Mic } from "lucide-react"
 import { useRegion } from "@/lib/region-context"
+import { getCurrentPlazaClient } from "@/lib/plaza/client"
 
 interface WeatherData {
   temp: number
@@ -59,7 +60,11 @@ export function WeatherWidget() {
 
   useEffect(() => {
     let alive = true
-    fetch(`/api/weather?region=${encodeURIComponent(selectedRegion)}`)
+    const plaza = getCurrentPlazaClient()
+    const wParams = new URLSearchParams()
+    wParams.set('region', selectedRegion)
+    if (plaza) wParams.set('plaza', plaza)
+    fetch(`/api/weather?${wParams}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!alive || !d || !d.ok) return

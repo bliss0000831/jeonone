@@ -646,6 +646,8 @@ export function ChuncheonNews({ preview = false }: { preview?: boolean }) {
     setLoadingWeather(true)
     const params = new URLSearchParams()
     if (selectedRegion) params.set('region', selectedRegion)
+    const wPlaza = getCurrentPlazaClient()
+    if (wPlaza) params.set('plaza', wPlaza)
     if (weatherKey) params.set('_', String(weatherKey))
     const qs = params.toString()
     fetch(`/api/weather${qs ? `?${qs}` : ''}`)
@@ -664,6 +666,8 @@ export function ChuncheonNews({ preview = false }: { preview?: boolean }) {
     setLoadingNews(true)
     const params = new URLSearchParams({ _: String(refreshKey) })
     if (selectedRegion) params.set('region', selectedRegion)
+    const nPlaza = getCurrentPlazaClient()
+    if (nPlaza) params.set('plaza', nPlaza)
     fetch(`/api/news?${params}`)
       .then((r) => r.json())
       .then((data) => {

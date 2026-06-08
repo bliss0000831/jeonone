@@ -161,10 +161,11 @@ export async function POST(request: NextRequest) {
   const fee_amount = calculateFee(amount)
   const merchant_uid = generateMerchantUid()
 
-  // ─── 포인트 사용 처리 (요청된 경우만) ──────────────────────────────────────
-  // 1) 사용 정책 (point_redemption_settings.local_food) 확인
-  // 2) 잔액·한도 검증 후 atomic spend RPC 호출
-  // 3) 환불·취소 시 회수할 수 있도록 tx_id 보관
+  // ─── 포인트 사용 정책 검증 (요청된 경우만) ────────────────────────────────
+  // 실제 차감(points_spend_atomic)은 주문 INSERT 성공 이후에 수행한다.
+  //   - idempotency_key UNIQUE 제약이 동시성 차단의 1차 게이트 역할을 하므로,
+  //     INSERT 가 성공한(=경쟁에서 이긴) 요청만 포인트를 차감하면 이중 차감이 원천 차단된다.
+  //   - 여기서는 정책/한도 검증과 pointsToUse 계산만 수행 (잔액 변동 없음).
   let pointsToUse = 0
   let pointsTxId: string | null = null
   if (requestedPoints > 0) {
@@ -189,33 +190,6 @@ export async function POST(request: NextRequest) {
     }
     // amount 보다 많이 쓰지 못하게
     pointsToUse = Math.min(requestedPoints, amount, maxByPct)
-
-    // atomic 차감
-    const { data: spendRes, error: spendErr } = await supabase.rpc("points_spend_atomic", {
-      p_user_id: user.id,
-      p_plaza_id: null as any,  // 광장 격리 해제 — RPC에서 무시됨
-      p_category: "local_food",
-      p_amount: pointsToUse,
-      p_payment_total: amount,
-      p_source_id: null as any,
-    })
-    if (spendErr) {
-      console.error("[order POST] points_spend_atomic error", spendErr)
-      return NextResponse.json({ error: "포인트 차감 실패" }, { status: 500 })
-    }
-    if (!spendRes || (spendRes as any).ok === false) {
-      const reason = (spendRes as any)?.reason || "unknown"
-      const msg =
-        reason === "insufficient_balance_or_suspended"
-          ? "포인트 잔액이 부족합니다"
-          : reason === "exceeds_redemption_pct"
-          ? "결제액의 30% 까지만 포인트 사용 가능합니다"
-          : reason === "category_disabled"
-          ? "포인트 사용이 비활성화되어 있습니다"
-          : "포인트 사용 실패"
-      return NextResponse.json({ error: msg }, { status: 400 })
-    }
-    pointsTxId = (spendRes as any).tx_id || null
     void exchangeRate // 향후 환전율 적용 자리
   }
 
@@ -230,6 +204,10 @@ export async function POST(request: NextRequest) {
   }
 
   // 주문 INSERT — 정산·PG 광장 = 판매자 광장
+  //   ※ 포인트 차감(points_spend_atomic)보다 INSERT 를 먼저 수행한다.
+  //     (buyer_id, idempotency_key) UNIQUE 제약이 동시 요청의 1차 게이트가 되어,
+  //     INSERT 에 성공한 단 하나의 요청만 이후 포인트를 차감 → 이중 차감 원천 차단.
+  //   이 시점에는 아직 차감 전이므로 points_tx_id 는 null 로 둔다.
   const { data: order, error: oErr } = await (writer as any)
     .from("local_food_orders")
     .insert({
@@ -241,7 +219,7 @@ export async function POST(request: NextRequest) {
       amount,
       fee_amount,
       points_used: pointsToUse,
-      points_tx_id: pointsTxId,
+      points_tx_id: null,
       delivery_addr,
       buyer_memo,
       pg_provider: "mock",     // TODO: PortOne 도입 시 'portone' 으로 교체
@@ -251,7 +229,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single()
 
-  // 포인트 롤백 헬퍼 — 주문 INSERT 실패 시 차감했던 포인트 회수
+  // 포인트 롤백 헬퍼 — 차감 후 후속 단계 실패 시 차감했던 포인트 회수
   const rollbackPoints = async () => {
     if (!pointsToUse || !pointsTxId) return
     try {
@@ -306,7 +284,8 @@ export async function POST(request: NextRequest) {
   }
 
   if (oErr || !order) {
-    // idempotency 동시 요청 — UNIQUE 위반은 기존 row 반환
+    // idempotency 동시 요청 — UNIQUE 위반은 기존 row 반환.
+    //   INSERT 가 차감보다 먼저이므로 패자 요청은 아직 포인트를 차감하지 않았다 → 롤백 불필요.
     if (oErr?.code === "23505" && idempotencyKey) {
       const { data: existing } = await supabase
         .from("local_food_orders")
@@ -315,12 +294,10 @@ export async function POST(request: NextRequest) {
         .eq("idempotency_key", idempotencyKey)
         .maybeSingle()
       if (existing) {
-        await rollbackPoints()  // 중복 요청이라 차감했던 포인트는 환원
         return NextResponse.json({ order: existing, idempotent: true })
       }
     }
     console.error("[local-food-orders POST] insert order", oErr)
-    await rollbackPoints()
     return NextResponse.json({ error: "주문 생성 실패" }, { status: 500 })
   }
 
@@ -330,11 +307,64 @@ export async function POST(request: NextRequest) {
     .insert(itemRows.map((r) => ({ ...r, order_id: order.id })))
 
   if (iErr) {
-    // 롤백 — 주문 삭제 + 포인트 복구
+    // 롤백 — 주문 삭제 (아직 포인트 차감 전이므로 포인트 복구 불필요)
     await (writer as any).from("local_food_orders").delete().eq("id", order.id)
-    await rollbackPoints()
     console.error("[local-food-orders POST] insert items", iErr)
     return NextResponse.json({ error: "주문 생성 실패" }, { status: 500 })
+  }
+
+  // ─── 포인트 차감 (주문/아이템 INSERT 성공 이후) ───────────────────────────
+  //   UNIQUE 제약을 통과한 단일 요청만 여기 도달 → 이중 차감 불가.
+  if (pointsToUse > 0) {
+    const { data: spendRes, error: spendErr } = await supabase.rpc("points_spend_atomic", {
+      p_user_id: user.id,
+      p_plaza_id: null as any,  // 광장 격리 해제 — RPC에서 무시됨
+      p_category: "local_food",
+      p_amount: pointsToUse,
+      p_payment_total: amount,
+      p_source_id: null as any,
+    })
+
+    // 차감 실패 시 주문/아이템 롤백 (보상)
+    const rollbackOrder = async () => {
+      await (writer as any).from("local_food_order_items").delete().eq("order_id", order.id)
+      await (writer as any).from("local_food_orders").delete().eq("id", order.id)
+    }
+
+    if (spendErr) {
+      console.error("[order POST] points_spend_atomic error", spendErr)
+      await rollbackOrder()
+      return NextResponse.json({ error: "포인트 차감 실패" }, { status: 500 })
+    }
+    if (!spendRes || (spendRes as any).ok === false) {
+      const reason = (spendRes as any)?.reason || "unknown"
+      const msg =
+        reason === "insufficient_balance_or_suspended"
+          ? "포인트 잔액이 부족합니다"
+          : reason === "exceeds_redemption_pct"
+          ? "결제액의 30% 까지만 포인트 사용 가능합니다"
+          : reason === "category_disabled"
+          ? "포인트 사용이 비활성화되어 있습니다"
+          : "포인트 사용 실패"
+      await rollbackOrder()
+      return NextResponse.json({ error: msg }, { status: 400 })
+    }
+
+    pointsTxId = (spendRes as any).tx_id || null
+
+    // 차감 tx_id 를 주문에 기록 — 이후 취소/환불 시 환원 근거
+    const { error: updErr } = await (writer as any)
+      .from("local_food_orders")
+      .update({ points_tx_id: pointsTxId })
+      .eq("id", order.id)
+    if (updErr) {
+      // tx_id 기록 실패 → 차감 포인트 환원 + 주문 롤백 (불일치 방지)
+      console.error("[order POST] points_tx_id update failed, rolling back", updErr)
+      await rollbackPoints()
+      await rollbackOrder()
+      return NextResponse.json({ error: "주문 생성 실패" }, { status: 500 })
+    }
+    order.points_tx_id = pointsTxId
   }
 
   return NextResponse.json({ order })

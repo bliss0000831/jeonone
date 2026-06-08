@@ -73,7 +73,7 @@ export async function POST(
 
   let q = supabase
     .from("local_food_orders")
-    .select("buyer_id, seller_id, status, buyer_memo, amount")
+    .select("buyer_id, seller_id, status, buyer_memo, amount, points_used, points_tx_id")
     .eq("id", id)
   if (plaza) q = q.eq("plaza_id", plaza)
   const { data: order } = await q.maybeSingle()
@@ -134,6 +134,24 @@ export async function POST(
       error: "처리 실패",
       ...(pgCancelled ? { warning: "PG 취소는 완료됐으나 DB 반영 실패. 관리자에게 문의하세요." } : {}),
     }, { status: 500 })
+  }
+
+  // 사용 포인트 환원 — 실제 환불 완료(status='refunded') 시에만.
+  //   cancel 라우트와 동일한 패턴: points_used > 0 이고 points_tx_id 가 있으면
+  //   points_refund_spend RPC 로 환원. 이미 reverted 된 tx 면 RPC 가 no-op → 중복 안전.
+  //   service_role(admin) 클라이언트로 호출.
+  if (pgCancelled && order.points_used > 0 && order.points_tx_id) {
+    try {
+      const { createAdminClient } = await import("@/lib/supabase/admin")
+      const admin = createAdminClient()
+      await admin.rpc("points_refund_spend", {
+        p_tx_id: order.points_tx_id,
+        p_reason: "주문 환불",
+      })
+    } catch (refundErr) {
+      // 포인트 환원 실패는 치명적 — 수동 정산 필요. 단 PG/DB 는 이미 처리됨.
+      console.error(`[refund] CRITICAL: points_refund_spend failed for order ${id}, tx ${order.points_tx_id}. Manual reconciliation required.`, refundErr)
+    }
   }
 
   // 판매자에게 환불 요청 알림 (비동기, non-fatal)

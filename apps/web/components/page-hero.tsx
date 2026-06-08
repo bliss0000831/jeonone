@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import { MapPin } from "lucide-react"
+import { getCurrentPlazaClient } from "@/lib/plaza/client"
 
 interface PageHeroProps {
   /** 이 히어로가 속한 페이지 식별자. 있으면 DB(page_heroes)에 저장된 이미지가 우선. */
@@ -38,7 +39,9 @@ let heroMapPromise: Promise<Record<string, string>> | null = null
 function loadHeroMap(): Promise<Record<string, string>> {
   if (heroMapCache) return Promise.resolve(heroMapCache)
   if (heroMapPromise) return heroMapPromise
-  heroMapPromise = fetch("/api/page-heroes", { cache: "no-store" })
+  const plaza = getCurrentPlazaClient()
+  const heroUrl = plaza ? `/api/page-heroes?plaza=${encodeURIComponent(plaza)}` : "/api/page-heroes"
+  heroMapPromise = fetch(heroUrl, { cache: "no-store" })
     .then((r) => r.json())
     .then((data) => {
       heroMapCache = data?.heroes || {}

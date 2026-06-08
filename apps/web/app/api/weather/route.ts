@@ -358,8 +358,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'DATA_GO_KR_KEY 누락' }, { status: 500 })
   }
 
+  const searchParams = new URL(request.url).searchParams
   // ?region=인제 — 광장 내 sub-region 단위 조회
-  const subRegion = (new URL(request.url).searchParams.get('region') || '').slice(0, 30).trim()
+  const subRegion = (searchParams.get('region') || '').slice(0, 30).trim()
+  // ?plaza= 쿼리 우선, 없으면 host/x-plaza 컨텍스트.
+  // 응답(좌표·중기예보 지역코드)이 광장별로 다르므로 캐시 키(URL)에 plaza 포함 필수.
+  // (이 라우트는 middleware matcher 제외 → x-plaza 헤더 없음. Vary 불가, 쿼리로 분리.)
+  const queryPlaza = (searchParams.get('plaza') || '').trim()
 
   // 광장별 좌표 결정 — 광장 컨텍스트면 plazas.center_lat/lng 로 격자 변환
   let nx = DEFAULT_NX, ny = DEFAULT_NY
@@ -368,7 +373,7 @@ export async function GET(request: NextRequest) {
   let parentRegionForGeocode: string | null = null
   let coverage: string[] = []
   try {
-    const plaza = await getCurrentPlaza()
+    const plaza = queryPlaza.length > 0 ? queryPlaza : await getCurrentPlaza()
     if (plaza) {
       const supabase = await createClient()
       const { data } = await supabase

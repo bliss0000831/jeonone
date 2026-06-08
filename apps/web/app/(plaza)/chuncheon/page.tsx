@@ -583,6 +583,8 @@ export default function ChuncheonPage() {
     setLoadingWeather(true)
     const params = new URLSearchParams()
     if (selectedRegion) params.set('region', selectedRegion)
+    const wPlaza = getCurrentPlazaClient()
+    if (wPlaza) params.set('plaza', wPlaza)
     if (weatherKey) params.set('_', String(weatherKey))
     const qs = params.toString()
     fetch(`/api/weather${qs ? `?${qs}` : ''}`)
@@ -617,6 +619,8 @@ export default function ChuncheonPage() {
       const params = new URLSearchParams({ page: String(currentPage), _: String(refreshKey) })
       if (q) params.set('q', q)
       if (region) params.set('region', region)
+      const nPlaza = getCurrentPlazaClient()
+      if (nPlaza) params.set('plaza', nPlaza)
       const res = await fetch(`/api/news?${params}`)
       const data = await res.json()
       if (resetPage) {
@@ -645,6 +649,8 @@ export default function ChuncheonPage() {
     const params = new URLSearchParams({ page: String(nextPage) })
     if (searchQuery) params.set('q', searchQuery)
     if (selectedRegion) params.set('region', selectedRegion)
+    const nPlaza = getCurrentPlazaClient()
+    if (nPlaza) params.set('plaza', nPlaza)
     try {
       const res = await fetch(`/api/news?${params}`)
       const data = await res.json()

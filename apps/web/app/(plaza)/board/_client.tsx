@@ -117,7 +117,8 @@ function BoardPageContent() {
   useEffect(() => {
     let alive = true
     const plaza = getCurrentPlazaClient()
-    const heroP = fetch('/api/page-heroes?key=board').then((r) => r.json()).catch(() => null)
+    const heroUrl = plaza ? `/api/page-heroes?key=board&plaza=${encodeURIComponent(plaza)}` : '/api/page-heroes?key=board'
+    const heroP = fetch(heroUrl).then((r) => r.json()).catch(() => null)
     const userP = supabase.auth.getUser()
     let catQ: any = supabase.from('board_categories').select('*').order('sort_order')
     if (plaza) catQ = catQ.eq('plaza_id', plaza)

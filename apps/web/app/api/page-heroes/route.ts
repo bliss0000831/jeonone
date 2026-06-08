@@ -25,9 +25,15 @@ export const revalidate = 3600
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
-  const plaza = await getCurrentPlaza()
   const url = new URL(request.url)
   const key = url.searchParams.get("key")
+  // ?plaza= 쿼리 우선, 없으면 host/x-plaza 컨텍스트.
+  // 응답이 광장별로 다르므로 캐시 키(URL)에 plaza 가 포함돼야 CDN 이 광장별 분리 캐싱.
+  // (이 라우트는 middleware matcher 제외 → x-plaza 헤더 없음. Vary 불가, 쿼리로 분리.)
+  const queryPlaza = url.searchParams.get("plaza")
+  const plaza = (queryPlaza && queryPlaza.length > 0)
+    ? queryPlaza
+    : await getCurrentPlaza()
 
   // CDN 캐시 헤더 — 1시간 신선, 24시간 stale 허용
   const cacheHeaders = {

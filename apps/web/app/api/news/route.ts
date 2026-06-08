@@ -485,7 +485,11 @@ export async function GET(request: NextRequest) {
   const start = (page - 1) * naverDisplay + 1  // page1→1, page2→101, page3→201
 
   // 광장별 도시명 + coverage 추출 — query 키워드 + 제목 필터에 사용
-  const plaza = await getCurrentPlaza()
+  // ?plaza= 쿼리 우선, 없으면 host/x-plaza 컨텍스트.
+  // 응답이 광장(cityName/parentRegion/coverage)별로 다르므로 캐시 키(URL)에 plaza 포함 필수.
+  // (이 라우트는 middleware matcher 제외 → x-plaza 헤더 없음. Vary 불가, 쿼리로 분리.)
+  const queryPlaza = (searchParams.get('plaza') || '').trim()
+  const plaza = queryPlaza.length > 0 ? queryPlaza : await getCurrentPlaza()
   let cityName = '춘천'
   let parentRegion = '강원'
   let coverage: string[] = []

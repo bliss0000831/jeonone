@@ -23,7 +23,6 @@ import {
   User,
   Eye,
   MessageCircle,
-  Home as HomeIcon,
   Search,
   AlertTriangle,
   Ban,
@@ -80,7 +79,6 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState({
     chat: true,
     marketing: false,
-    property: true,
   })
   const [postsPublic, setPostsPublic] = useState(true)
   const [query, setQuery] = useState("")
@@ -97,7 +95,7 @@ export default function SettingsPage() {
       const { data: row } = await supabase
         .from("profiles")
         .select(
-          "nickname, avatar_url, account_type, role, posts_public, notif_chat, notif_property, notif_marketing",
+          "nickname, avatar_url, account_type, role, posts_public, notif_chat, notif_marketing",
         )
         .eq("id", user.id)
         .single()
@@ -105,7 +103,6 @@ export default function SettingsPage() {
         if (typeof row.posts_public === "boolean") setPostsPublic(row.posts_public)
         setNotifications({
           chat: row.notif_chat ?? true,
-          property: row.notif_property ?? true,
           marketing: row.notif_marketing ?? false,
         })
         setProfile({
@@ -119,12 +116,11 @@ export default function SettingsPage() {
     checkUser()
   }, [])
 
-  const persistNotif = async (key: "chat" | "property" | "marketing", next: boolean) => {
+  const persistNotif = async (key: "chat" | "marketing", next: boolean) => {
     if (!user) return
     const prev = notifications
     setNotifications((s) => ({ ...s, [key]: next }))
-    const column =
-      key === "chat" ? "notif_chat" : key === "property" ? "notif_property" : "notif_marketing"
+    const column = key === "chat" ? "notif_chat" : "notif_marketing"
     const { error } = await supabase
       .from("profiles")
       .update({ [column]: next })
@@ -209,7 +205,6 @@ export default function SettingsPage() {
   const sections = useMemo<Section[]>(() => {
     const notifActive = [
       notifications.chat,
-      notifications.property,
       notifications.marketing,
     ].filter(Boolean).length
 
@@ -277,21 +272,11 @@ export default function SettingsPage() {
           },
           {
             type: "toggle",
-            icon: HomeIcon,
-            iconColor: "text-emerald-600",
-            iconBg: "bg-emerald-500/10",
-            label: "관심 매물 알림",
-            helper: "찜한 매물 가격 변경·새 댓글",
-            value: notifications.property,
-            onChange: () => persistNotif("property", !notifications.property),
-          },
-          {
-            type: "toggle",
             icon: Megaphone,
             iconColor: "text-violet-600",
             iconBg: "bg-violet-500/10",
-            label: "마케팅 알림",
-            helper: "이벤트·프로모션 소식",
+            label: "마케팅 정보 수신",
+            helper: "이벤트·프로모션 소식 수신에 동의합니다",
             value: notifications.marketing,
             onChange: () => persistNotif("marketing", !notifications.marketing),
           },

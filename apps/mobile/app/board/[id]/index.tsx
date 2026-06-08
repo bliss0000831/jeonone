@@ -466,7 +466,7 @@ export default function BoardDetailScreen() {
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
               <Ionicons name="eye-outline" size={14} color={lightColors.ink500} />
-              <Text style={styles.metaText}>{post.view_count.toLocaleString()}</Text>
+              <Text style={styles.metaText}>{(post.view_count ?? 0).toLocaleString()}</Text>
             </View>
             <Pressable
               onPress={handleLike}
@@ -479,12 +479,12 @@ export default function BoardDetailScreen() {
                 color={isLiked ? "#ef4444" : lightColors.ink500}
               />
               <Text style={[styles.metaText, isLiked && { color: "#ef4444" }]}>
-                {post.like_count.toLocaleString()}
+                {(post.like_count ?? 0).toLocaleString()}
               </Text>
             </Pressable>
             <View style={styles.metaItem}>
               <Ionicons name="chatbubble-outline" size={14} color={lightColors.ink500} />
-              <Text style={styles.metaText}>{post.comment_count.toLocaleString()}</Text>
+              <Text style={styles.metaText}>{(post.comment_count ?? 0).toLocaleString()}</Text>
             </View>
           </View>
 
