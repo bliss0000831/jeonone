@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   menuBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#ffffff", borderWidth: 1.5, borderColor: "#bbf7d0", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 7.5 },
   menuBtnText: { fontSize: 13, fontWeight: "800", color: GREEN_DARK },
 
-  hero: { alignItems: "center", paddingTop: 18, paddingBottom: 14 },
+  hero: { alignItems: "center", paddingTop: 19, paddingBottom: 14 },
   heroLogo: { width: 110, height: 110, borderRadius: 55, marginBottom: 7, borderWidth: 4, borderColor: "rgba(22,101,52,0.3)" },
   heroTitle: { fontSize: 30, fontWeight: "900", color: GREEN, includeFontPadding: false },
   heroSub: { fontSize: 14, fontWeight: "700", color: BROWN, marginTop: 4 },
