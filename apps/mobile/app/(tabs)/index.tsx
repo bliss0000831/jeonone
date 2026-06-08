@@ -332,10 +332,10 @@ const styles = StyleSheet.create({
   brand: { fontSize: 16, fontWeight: "900", color: GREEN_DARK, flexShrink: 1 },
   topRight: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 },
   // 속초 칩 = 로그인 버튼: 동일 paddingVertical(9) 로 높이 일치 (고정 height 대신 — RN Web 호환)
-  locChip: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#dcfce7", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 9, maxWidth: 120, flexShrink: 0 },
+  locChip: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#dcfce7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, maxWidth: 120, flexShrink: 0 },
   locText: { fontSize: 13, fontWeight: "700", color: GREEN_DARK, flexShrink: 1 },
   iconBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
+  loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 9 },
   loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
 
   hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
