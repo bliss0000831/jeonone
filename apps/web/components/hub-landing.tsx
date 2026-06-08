@@ -238,7 +238,7 @@ export function HubLanding({
               ) : trimmed ? (
                 <span className="inline-flex items-center gap-1"><Search className="w-4 h-4" /> “{trimmed}” 검색 결과</span>
               ) : (
-                hasVisited ? '최근 동네' : '추천 동네'
+                hasVisited ? '최근 들어간 동네' : '추천 동네'
               )}
             </p>
             <BigRegionCard plaza={featured} onEnter={() => goPlaza(featured.id)} />
@@ -250,14 +250,14 @@ export function HubLanding({
           </div>
         )}
 
-        {/* ─── 열린 마을 둘러보기 (가로 슬라이드) ──────────────── */}
+        {/* ─── 다른 지역 구경하기 (2열 그리드) ──────────────── */}
         {otherOpen.length > 0 && (
           <section className="mt-9">
             <div className="flex items-end justify-between mb-3">
-              <h2 className="text-xl sm:text-2xl font-black text-[#225a39]">열린 마을 둘러보기</h2>
-              <span className="text-sm font-bold text-stone-500">전체 {stats.open}곳 →</span>
+              <h2 className="text-xl sm:text-2xl font-black text-[#225a39]">다른 지역 구경하기</h2>
+              <span className="text-sm font-bold text-stone-500">전체 {stats.open}곳</span>
             </div>
-            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 scrollbar-thin">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {otherOpen.map((p) => (
                 <VillageCard key={p.id} plaza={p} onClick={() => goPlaza(p.id)} />
               ))}
@@ -280,7 +280,7 @@ export function HubLanding({
         <footer className="pt-10 mt-10 border-t border-[#225a39]/15 text-center">
           <div className="flex items-center justify-center gap-2 mb-1">
             <Sprout className="w-4 h-4 text-[#225a39]" />
-            <p className="text-sm font-semibold text-[#225a39]">전원일기 — 전국의 농촌을 잇는 플랫폼</p>
+            <p className="text-sm font-semibold text-[#225a39]">전원일기 — 전국의 농촌을 잇습니다</p>
           </div>
           <p className="text-xs text-stone-400">© {new Date().getFullYear()} 전원일기</p>
         </footer>
@@ -336,8 +336,9 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
         <span className="text-stone-300">·</span>
         <div className="flex items-center gap-1.5 text-base font-bold">
           <MessageCircle className="w-5 h-5 text-[#225a39]" />
+          <span className="text-stone-500 font-semibold">오늘 글</span>
           <span className="text-[#225a39] tabular-nums">{postsToday}</span>
-          <span className="text-stone-500 font-semibold">개 글 오늘</span>
+          <span className="text-stone-500 font-semibold">개</span>
         </div>
         <span className="text-stone-300">·</span>
         <div className="flex items-center gap-1.5 text-base font-bold">
@@ -360,7 +361,7 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
               : 'bg-stone-100 text-stone-400 cursor-not-allowed',
           )}
         >
-          {isOpen ? (<>{province} 들어가기 <ArrowRight className="w-6 h-6" /></>) : '오픈예정'}
+          {isOpen ? (<>{province} 바로가기 <ArrowRight className="w-6 h-6" /></>) : '오픈예정'}
         </button>
       </div>
     </div>
@@ -372,13 +373,13 @@ function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) 
   const province = provinceName(plaza.id, plaza.name)
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
-  const snippet = plaza.recent_post_title ?? '이웃들이 모이고 있어요'
+  const snippet = plaza.recent_post_title ?? '새로 시작하는 동네예요'
   const c = provinceColors(plaza.id)
   return (
     <button
       type="button"
       onClick={onClick}
-      className="snap-start shrink-0 w-[220px] sm:w-[240px] bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
+      className="w-full bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
     >
       <div className="relative h-[110px] overflow-hidden flex items-end px-4 pb-3">
         <Image src={provincePhoto(plaza.id)} alt="" fill className="object-cover" />

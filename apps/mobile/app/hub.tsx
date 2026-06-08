@@ -67,7 +67,7 @@ function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number): num
 function getKickerLabel(byLocation: boolean, trimmed: string, hasVisited: boolean): string {
   if (byLocation) return '📍 가까운 지역이에요'
   if (trimmed) return '🔍 ' + trimmed + ' 검색 결과'
-  return hasVisited ? '최근 동네' : '추천 동네'
+  return hasVisited ? '최근 들어간 동네' : '추천 동네'
 }
 
 export default function HubScreen() {
@@ -311,22 +311,18 @@ export default function HubScreen() {
               </View>
             )}
 
-            {/* ─── 열린 마을 둘러보기 (가로 슬라이드) ───────────── */}
+            {/* ─── 다른 지역 구경하기 (2열 그리드) ───────────── */}
             {otherOpen.length > 0 && (
               <>
                 <View style={styles.browseHeader}>
-                  <Text style={styles.sectionTitle}>열린 마을 둘러보기</Text>
-                  <Text style={styles.browseAll}>전체 {stats.open}곳 →</Text>
+                  <Text style={styles.sectionTitle}>다른 지역 구경하기</Text>
+                  <Text style={styles.browseAll}>전체 {stats.open}곳</Text>
                 </View>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.hScroll}
-                >
+                <View style={styles.villageGrid}>
                   {otherOpen.map((p) => (
                     <VillageCard key={p.id} plaza={p} onPress={() => enterPlaza(p)} />
                   ))}
-                </ScrollView>
+                </View>
               </>
             )}
 
@@ -343,7 +339,7 @@ export default function HubScreen() {
             )}
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>🌱 전원일기 — 전국의 농촌을 잇는 플랫폼</Text>
+              <Text style={styles.footerText}>🌱 전원일기 — 전국의 농촌을 잇습니다</Text>
             </View>
           </View>
         )}
@@ -399,8 +395,9 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
         <Text style={styles.statSep}>·</Text>
         <View style={styles.statCell}>
           <Ionicons name="chatbubble-ellipses" size={18} color={GREEN} />
+          <Text style={styles.statLabel}>오늘 글</Text>
           <Text style={styles.statValue}>{postsToday}</Text>
-          <Text style={styles.statLabel}>개 글 오늘</Text>
+          <Text style={styles.statLabel}>개</Text>
         </View>
         <Text style={styles.statSep}>·</Text>
         <View style={styles.statCell}>
@@ -414,7 +411,7 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
       <Pressable style={[styles.enterBtn, !isOpen && styles.enterBtnDisabled]} onPress={onEnter} disabled={!isOpen}>
         {isOpen ? (
           <>
-            <Text style={styles.enterBtnText}>{province} 들어가기</Text>
+            <Text style={styles.enterBtnText}>{province} 바로가기</Text>
             <Ionicons name="arrow-forward" size={22} color={GREEN} />
           </>
         ) : (
@@ -429,7 +426,7 @@ function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) 
   const province = provinceName(plaza.id, plaza.name)
   const members = plaza.member_count ?? 0
   const postsToday = plaza.posts_today ?? 0
-  const snippet = plaza.recent_post_title ?? "이웃들이 모이고 있어요"
+  const snippet = plaza.recent_post_title ?? "새로 시작하는 동네예요"
   const c = provinceColors(plaza.id)
   return (
     <Pressable style={styles.village} onPress={onPress}>
@@ -558,8 +555,8 @@ const styles = StyleSheet.create({
   // 열린 마을 둘러보기
   browseHeader: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 24, marginBottom: 10 },
   browseAll: { fontSize: 14, fontWeight: "700", color: "#78716c" },
-  hScroll: { paddingRight: 16, paddingVertical: 4, gap: 12 },
-  village: { width: 230, backgroundColor: "#fff", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "#e7e5e4", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  villageGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  village: { width: "47.5%", flexGrow: 1, backgroundColor: "#fff", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "#e7e5e4", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   villagePhoto: { height: 100, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 12, justifyContent: "flex-end" },
   villagePhotoTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: -0.3, textShadowColor: "rgba(0,0,0,0.3)", textShadowRadius: 4 },
   villageBadge: { position: "absolute", top: 10, left: 10, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(16,185,129,0.9)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
