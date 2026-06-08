@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   iconBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   loginBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: GREEN, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 9 },
   loginBtnText: { fontSize: 13, fontWeight: "800", color: "#ffffff" },
-  menuBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#dcfce7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9 },
+  menuBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: "#ffffff", borderWidth: 1.5, borderColor: "#bbf7d0", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 7.5 },
   menuBtnText: { fontSize: 13, fontWeight: "800", color: GREEN_DARK },
 
   hero: { alignItems: "center", paddingTop: 16, paddingBottom: 14 },
