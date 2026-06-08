@@ -230,7 +230,7 @@ export function HubLanding({
 
         {/* ─── 내 지역 큰 카드 ─────────────────────────────────── */}
         {featured ? (
-          <section id="my-region" className="scroll-mt-4 mt-5">
+          <section id="my-region" className="scroll-mt-4 mt-6">
             <p className="mb-2 text-base font-bold text-stone-500 flex items-center gap-1.5">
               <span className="w-1 h-5 rounded-full bg-[#225a39]" />
               {byLocation ? (
