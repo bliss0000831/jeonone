@@ -101,7 +101,7 @@ export function RegisterConsentBlock({ serviceKind, onChange }: Props) {
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-sm font-bold text-foreground">필수 동의 사항</p>
+      <p className="text-base font-bold text-foreground">필수 동의 사항</p>
       {items.map((item) => (
         <label
           key={item.id}
@@ -113,19 +113,19 @@ export function RegisterConsentBlock({ serviceKind, onChange }: Props) {
             onChange={() =>
               setChecked((p) => ({ ...p, [item.id]: !p[item.id] }))
             }
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+            className="mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-primary"
           />
-          <span className="text-xs leading-[18px] text-muted-foreground">
+          <span className="text-sm leading-[20px] text-muted-foreground">
             {renderText(item.text, item.emphasis)}
           </span>
         </label>
       ))}
       <div className="flex justify-end">
         <Link
-          href="/legal/terms"
-          className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+          href="/terms"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
         >
-          <FileText className="w-3 h-3" />
+          <FileText className="w-3.5 h-3.5" />
           약관 전문 보기
         </Link>
       </div>

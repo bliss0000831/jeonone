@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { ArrowLeft, Heart } from "lucide-react"
@@ -21,6 +21,11 @@ export default function SharingRegisterPage() {
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
   const [consented, setConsented] = useState(false)
   const [subRegion, setSubRegion] = useState("")
+  const consentRef = useRef<HTMLDivElement>(null)
+  const focusField = (ref: React.RefObject<HTMLElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+    ref.current?.focus({ preventScroll: true })
+  }
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -47,6 +52,11 @@ export default function SharingRegisterPage() {
 
     if (!formData.title || !formData.description) {
       toast("제목과 설명을 입력해주세요")
+      return
+    }
+    if (!consented) {
+      toast("필수 동의에 체크해주세요")
+      focusField(consentRef)
       return
     }
 
@@ -169,12 +179,14 @@ export default function SharingRegisterPage() {
         <RegionFormField value={subRegion} onChange={setSubRegion} />
 
         {/* 동의 체크 */}
-        <RegisterConsentBlock serviceKind="sharing" onChange={setConsented} />
+        <div ref={consentRef}>
+          <RegisterConsentBlock serviceKind="sharing" onChange={setConsented} />
+        </div>
 
         {/* 제출 버튼 */}
         <button
           type="submit"
-          disabled={isSubmitting || !consented}
+          disabled={isSubmitting}
           className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {isSubmitting ? "등록 중..." : "나눔 등록하기"}

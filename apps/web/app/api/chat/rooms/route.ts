@@ -165,7 +165,10 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit(request, 'mutate', user.id)
   if (limited) return limited
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
   const { propertyId, sellerId, postId, postType } = body
 
   // 부동산 매물 채팅 (기존 로직)

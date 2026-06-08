@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { Header } from "@/components/header"
 import { BottomNav } from "@/components/bottom-nav"
@@ -33,6 +33,11 @@ export default function LocalFoodRegisterPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [subRegion, setSubRegion] = useState("")
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
+  const consentRef = useRef<HTMLDivElement>(null)
+  const focusField = (ref: React.RefObject<HTMLElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+    ref.current?.focus({ preventScroll: true })
+  }
 
   useEffect(() => {
     fetch('/api/categories?type=local_food')
@@ -95,6 +100,11 @@ export default function LocalFoodRegisterPage() {
     }
     if (!form.price) {
       toast("가격을 입력해주세요")
+      return
+    }
+    if (!consented) {
+      toast("필수 동의에 체크해주세요")
+      focusField(consentRef)
       return
     }
 
@@ -359,13 +369,15 @@ export default function LocalFoodRegisterPage() {
           </div>
 
           {/* 동의 체크 */}
-          <RegisterConsentBlock serviceKind="localFood" onChange={setConsented} />
+          <div ref={consentRef}>
+            <RegisterConsentBlock serviceKind="localFood" onChange={setConsented} />
+          </div>
 
           {/* Submit */}
           <Button
             type="submit"
             className="w-full h-12 text-base font-medium"
-            disabled={isSubmitting || !consented}
+            disabled={isSubmitting}
           >
             {isSubmitting ? "등록 중..." : "상품 등록하기"}
           </Button>

@@ -75,7 +75,10 @@ export async function PUT(
     void logAdminMutation(user.id, "update", TABLE, id, resource)
   }
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
 
   const allowedFields = [
     'title', 'description', 'content', 'price', 'original_price',

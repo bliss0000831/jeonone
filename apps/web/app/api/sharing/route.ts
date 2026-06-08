@@ -107,7 +107,10 @@ export async function POST(request: Request) {
   }
 
   // Allow all users to share (공유 기능은 일반 사용자도 가능)
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
   const { title, description, category, images, location, sub_region } = body
 
   if (!title || !description) {

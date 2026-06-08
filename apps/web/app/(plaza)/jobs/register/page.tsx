@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {ArrowLeft, Briefcase} from "lucide-react"
@@ -33,6 +33,11 @@ export default function JobsRegisterPage() {
   useBeforeUnload(formDirty)
   const [images, setImages] = useState<string[]>([])
   const [subRegion, setSubRegion] = useState("")
+  const consentRef = useRef<HTMLDivElement>(null)
+  const focusField = (ref: React.RefObject<HTMLElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+    ref.current?.focus({ preventScroll: true })
+  }
   const [formData, setFormData] = useState({
     kind: "hiring" as "hiring" | "seeking",
     title: "",
@@ -61,6 +66,11 @@ export default function JobsRegisterPage() {
     }
     if (!formData.hourlyWage || Number.isNaN(wageNum) || wageNum <= 0) {
       toast("시급을 정확히 입력해주세요 (원 단위, 0보다 큰 숫자)")
+      return
+    }
+    if (!consented) {
+      toast("필수 동의에 체크해주세요")
+      focusField(consentRef)
       return
     }
 
@@ -322,11 +332,13 @@ export default function JobsRegisterPage() {
           />
         </div>
 
-        <RegisterConsentBlock serviceKind="jobs" onChange={setConsented} />
+        <div ref={consentRef}>
+          <RegisterConsentBlock serviceKind="jobs" onChange={setConsented} />
+        </div>
 
         <button
           type="submit"
-          disabled={isSubmitting || !consented}
+          disabled={isSubmitting}
           className="w-full py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors disabled:opacity-50"
         >
           {isSubmitting ? "등록 중..." : "공고 등록하기"}

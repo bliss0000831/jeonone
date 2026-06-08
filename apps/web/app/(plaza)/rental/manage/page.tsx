@@ -173,7 +173,7 @@ export default function RentalManagePage() {
       <div className="flex-1 grid place-items-center text-center px-6">
         <div>
           <p className="text-lg font-bold mb-2">로그인이 필요합니다</p>
-          <Link href="/login" className="inline-block rounded-xl bg-primary text-primary-foreground font-bold px-5 py-2.5">로그인</Link>
+          <Link href="/auth/login?redirect=/rental/manage" className="inline-block rounded-xl bg-primary text-primary-foreground font-bold px-5 py-2.5">로그인</Link>
         </div>
       </div>
     </div>

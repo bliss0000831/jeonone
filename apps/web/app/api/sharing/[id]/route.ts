@@ -43,7 +43,10 @@ export async function PATCH(
   if (m.error) return m.error
   const { writer, resource, isOwner, isAdmin, plaza } = m
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
 
   // 허용된 필드만 업데이트
   const allowedFields = ["title", "description", "category", "images", "location", "status", "sub_region"]

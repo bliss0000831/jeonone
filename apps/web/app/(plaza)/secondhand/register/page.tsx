@@ -35,6 +35,7 @@ export default function SecondhandRegisterPage() {
   const titleRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
   const descRef = useRef<HTMLTextAreaElement>(null)
+  const consentRef = useRef<HTMLDivElement>(null)
   // 검증 실패 시 해당 필드로 포커스+스크롤 — 토스트만으로는 어느 칸이 문제인지 모름
   const focusField = (ref: React.RefObject<HTMLElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -72,6 +73,11 @@ export default function SecondhandRegisterPage() {
     }
     if (images.length === 0) {
       toast("사진을 1장 이상 올려주세요 — 농기구는 사진이 있어야 거래가 됩니다")
+      return
+    }
+    if (!consented) {
+      toast("필수 동의에 체크해주세요")
+      focusField(consentRef)
       return
     }
 
@@ -477,12 +483,14 @@ export default function SecondhandRegisterPage() {
         <RegionFormField value={subRegion} onChange={setSubRegion} />
 
         {/* 동의 체크 */}
-        <RegisterConsentBlock serviceKind="secondhand" onChange={setConsented} />
+        <div ref={consentRef}>
+          <RegisterConsentBlock serviceKind="secondhand" onChange={setConsented} />
+        </div>
 
         {/* 제출 */}
         <button
           type="submit"
-          disabled={isSubmitting || !consented}
+          disabled={isSubmitting}
           className={`w-full py-3 text-white rounded-lg font-medium transition-colors disabled:opacity-50 ${
             postAsSharing
               ? "bg-rose-500 hover:bg-rose-600"

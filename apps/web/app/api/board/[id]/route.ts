@@ -68,7 +68,10 @@ export async function PUT(
   if (m.error) return m.error
   const { writer, isAdmin, plaza } = m
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
 
   // images[0] → thumbnail_url (web/mobile edit 패턴과 동일)
   const images: string[] = Array.isArray(body.images) ? body.images : []

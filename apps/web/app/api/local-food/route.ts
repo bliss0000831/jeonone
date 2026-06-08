@@ -116,7 +116,10 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit(request, 'post', user.id)
   if (limited) return limited
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
 
   if (!body.title || typeof body.title !== 'string' || body.title.length > 200) {
     return NextResponse.json({ error: "제목이 올바르지 않습니다" }, { status: 400 })

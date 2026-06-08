@@ -84,7 +84,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "이 광장의 권한이 없습니다" }, { status: 403 })
   }
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
   const page_key = typeof body.page_key === "string" ? body.page_key : null
   const image_url = typeof body.image_url === "string" ? body.image_url : null
   if (!page_key) return NextResponse.json({ error: "page_key required" }, { status: 400 })

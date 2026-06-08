@@ -45,7 +45,10 @@ export async function PATCH(
   if (m.error) return m.error
   const { writer, isAdmin, plaza } = m
 
-  const body = await request.json()
+  const body = await request.json().catch(() => null)
+  if (!body) {
+    return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
+  }
   const allowed = [
     "title", "description", "category", "price",
     "is_price_negotiable", "images", "location", "condition", "status", "sub_region",
