@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   heroBgWrap: { position: "absolute", top: 0, left: 0, right: 0, height: 320, overflow: "hidden" },
   heroBgImg: { width: "100%", height: "100%", opacity: 0.14 },
 
-  hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 28, paddingBottom: 14 },
+  hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 22, paddingBottom: 14 },
   brandRow: { alignItems: "center", marginBottom: 6 },
   brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff" },
 
