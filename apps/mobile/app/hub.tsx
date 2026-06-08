@@ -246,7 +246,7 @@ export default function HubScreen() {
           </View>
 
           <Text style={styles.h1}>어디에 사세요?</Text>
-          <Text style={styles.sub}>사는 곳을 고르면 농기구·농산물 직거래부터 일손 구하기, 마을 소식까지 한곳에서 볼 수 있어요.</Text>
+          <Text style={styles.sub}>우리 지역 농기구·농산물·일손·소식을 한곳에서 볼 수 있어요.</Text>
 
           {/* 내 위치로 찾기 */}
           <Pressable style={styles.locateBtn} onPress={handleLocate} disabled={locating}>
