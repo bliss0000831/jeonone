@@ -174,7 +174,7 @@ export function HubLanding({
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f7f6f0]/50 to-[#f7f6f0]" />
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
+        <div className="max-w-3xl mx-auto px-4 pt-10 pb-4 text-center">
           <div className="flex justify-center mb-5">
             <div className="relative w-20 h-20 rounded-full overflow-hidden ring-2 ring-white shadow-lg">
               <Image src="/images/logo-farmer.png" alt="전원일기" fill className="object-cover" priority />
@@ -230,7 +230,7 @@ export function HubLanding({
 
         {/* ─── 내 지역 큰 카드 ─────────────────────────────────── */}
         {featured ? (
-          <section id="my-region" className="scroll-mt-4 mt-6">
+          <section id="my-region" className="scroll-mt-4 mt-4">
             <p className="mb-2 text-base font-bold text-stone-500 flex items-center gap-1.5">
               <span className="w-1 h-5 rounded-full bg-[#225a39]" />
               {byLocation ? (

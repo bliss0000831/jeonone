@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   liveChip: {
     flexDirection: "row", alignItems: "center", gap: 10,
     backgroundColor: "rgba(220,252,231,0.7)", borderColor: "#bbf7d0", borderWidth: 1,
-    borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, marginTop: 16,
+    borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, marginTop: 8,
   },
   liveChipText: { color: "#44403c", fontSize: 15, fontWeight: "600", flex: 1 },
   liveChipBold: { color: GREEN, fontWeight: "900" },
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   liveDotCore: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#10b981" },
 
   // 우리 동네 라벨
-  kickerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 24, marginBottom: 8 },
+  kickerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 16, marginBottom: 8 },
   kickerBar: { width: 4, height: 18, borderRadius: 2, backgroundColor: GREEN },
   kicker: { fontSize: 16, fontWeight: "900", color: "#1c1917" },
 
