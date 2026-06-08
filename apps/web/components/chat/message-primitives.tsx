@@ -124,8 +124,22 @@ export function MessageBubble({
             >
               <img
                 src={image}
-                alt=""
-                className="w-full h-auto object-cover"
+                alt="첨부 사진"
+                className="w-full h-auto object-cover bg-muted min-h-[60px]"
+                onError={(e) => {
+                  // 깨진 이미지 fallback — 회색 placeholder + 안내 텍스트
+                  const el = e.currentTarget
+                  el.style.display = 'none'
+                  const parent = el.parentElement
+                  if (parent && !parent.querySelector('[data-img-fallback]')) {
+                    const span = document.createElement('span')
+                    span.setAttribute('data-img-fallback', '')
+                    span.className =
+                      'flex items-center justify-center w-[160px] h-[120px] bg-muted text-xs text-muted-foreground'
+                    span.textContent = '사진을 불러올 수 없어요'
+                    parent.appendChild(span)
+                  }
+                }}
               />
             </a>
           ) : (

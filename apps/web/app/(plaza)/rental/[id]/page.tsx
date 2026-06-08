@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { Tractor, ArrowLeft, Loader2, CalendarDays } from "lucide-react"
+import { CallButton } from "@/components/detail"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
@@ -123,8 +124,10 @@ export default function RentalDetailPage() {
       </main>
 
       <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border p-3 z-40">
-        <div className="max-w-2xl mx-auto">
-          <button onClick={apply} disabled={submitting} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
+          <CallButton userId={r.owner_id} />
+          <button onClick={apply} disabled={submitting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CalendarDays className="w-5 h-5" />} 대여 신청{total > 0 ? ` · ${won(total)}` : ""}
           </button>
         </div>

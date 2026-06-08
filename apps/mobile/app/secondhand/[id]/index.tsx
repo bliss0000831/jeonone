@@ -54,6 +54,7 @@ import { useTrackRecent } from "@/lib/recent-views"
 import { useTrackView } from "@/lib/view-tracker"
 import { useCurrentPlaza, buildShareUrl } from "@/lib/plaza"
 import { AuthorCard } from "@/components/AuthorCard"
+import { CallButton } from "@/components/CallButton"
 import { DetailLegalNotice } from "@/components/legal/DetailLegalNotice"
 import { useSecondhandSafetyGate } from "@/components/legal/SecondhandSafetyModal"
 import { AddressMapPreview } from "@/components/AddressMapPreview"
@@ -493,14 +494,18 @@ export default function SecondhandDetailScreen() {
             </Text>
           </Pressable>
         ) : (
-          <Pressable
-            style={[styles.actionPrimary, { flex: 1, backgroundColor: AMBER }]}
-            onPress={openChat}
-            disabled={busy}
-          >
-            <Ionicons name="chatbubble-ellipses" size={18} color="#ffffff" />
-            <Text style={styles.actionPrimaryText}>채팅으로 문의</Text>
-          </Pressable>
+          <>
+            <Pressable
+              style={[styles.actionPrimary, { flex: 1, backgroundColor: AMBER }]}
+              onPress={openChat}
+              disabled={busy}
+            >
+              <Ionicons name="chatbubble-ellipses" size={18} color="#ffffff" />
+              <Text style={styles.actionPrimaryText}>채팅으로 문의</Text>
+            </Pressable>
+            {/* 보조: 전화 걸기 — 판매자 phone 있을 때만 노출 */}
+            <CallButton userId={author?.id} color={AMBER} />
+          </>
         )}
       </View>
       {share.element}

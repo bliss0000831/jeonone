@@ -33,6 +33,7 @@ import {
   DetailMeta,
   DetailTitleBlock,
   DetailHeaderActions,
+  CallButton,
 } from "@/components/detail"
 import { AddressMapPreview } from "@/components/address-map-preview"
 import { MapPin } from "lucide-react"
@@ -362,19 +363,23 @@ export default function SecondhandDetailPage() {
             내가 등록한 매물
           </Button>
         ) : (
-          <Button
-            size="lg"
-            onClick={handleChat}
-            disabled={chatLoading}
-            className="flex-1 gap-2 bg-amber-500 hover:bg-amber-600 text-white"
-          >
-            {chatLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <MessageCircle className="w-5 h-5" />
-            )}
-            {chatLoading ? "연결 중..." : "채팅으로 문의"}
-          </Button>
+          <>
+            <Button
+              size="lg"
+              onClick={handleChat}
+              disabled={chatLoading}
+              className="flex-1 gap-2 bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              {chatLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <MessageCircle className="w-5 h-5" />
+              )}
+              {chatLoading ? "연결 중..." : "채팅으로 문의"}
+            </Button>
+            {/* 보조: 전화 걸기 — 판매자 phone 있을 때만 노출 */}
+            <CallButton userId={post.user_id} className="border-amber-500 text-amber-700" />
+          </>
         )
       }
     >

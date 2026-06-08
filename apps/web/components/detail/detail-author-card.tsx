@@ -16,6 +16,7 @@ import { ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { getBusinessInfo, type BusinessInfo } from "@/lib/services/business-info"
+import { NeighborStar } from "@/components/trust-score"
 
 interface DetailAuthorCardProps {
   /** 프로필 링크 */
@@ -58,6 +59,9 @@ interface ProfileStats {
   is_verified_phone: boolean | null
   is_verified_business: boolean | null
   is_verified_license: boolean | null
+  /** 이웃 별 — 평균 별점(0~5) / 후기 수. 후기 없으면 "거래 후기 없음" 표시. */
+  trust_score: number | null
+  review_count: number | null
 }
 
 interface OtherPost {
@@ -106,7 +110,7 @@ export function DetailAuthorCard({
       const { data: profile } = await supabase
         .from("profiles")
         .select(
-          "created_at, response_rate, completed_deals, is_verified_phone, is_verified_business, is_verified_license, account_type",
+          "created_at, response_rate, completed_deals, is_verified_phone, is_verified_business, is_verified_license, account_type, trust_score, review_count",
         )
         .eq("id", userId)
         .maybeSingle()
@@ -189,6 +193,14 @@ export function DetailAuthorCard({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold text-foreground truncate">{name}</span>
                 {badges}
+                {/* 이웃 별 — userId 로 stats 로딩 후 표시 (후기 없으면 "새 이웃") */}
+                {stats && (
+                  <NeighborStar
+                    score={stats.trust_score}
+                    reviewCount={stats.review_count}
+                    variant="compact"
+                  />
+                )}
               </div>
               {mergedSubtitle && (
                 <div className="text-xs text-muted-foreground mt-0.5 truncate">

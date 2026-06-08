@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap, Star } from "lucide-react"
+import { CallButton } from "@/components/detail"
 
 const FALLBACK_IMG = "/images/card-auction.jpg"
 
@@ -189,6 +190,10 @@ export default function AuctionDetailPage() {
                 className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary text-primary font-bold py-3 hover:bg-primary/5 disabled:opacity-50">
                 <Zap className="w-5 h-5" /> 즉시구매 · {won(a.buy_now_price)}
               </button>
+            )}
+            {/* 보조: 판매자에게 전화 걸기 — 본인 경매가 아니고 phone 있을 때만 */}
+            {a.seller_id !== user?.id && (
+              <CallButton userId={a.seller_id} className="w-full" />
             )}
           </div>
         </div>

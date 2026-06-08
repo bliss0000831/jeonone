@@ -49,6 +49,7 @@ import { useTrackRecent } from "@/lib/recent-views"
 import { useTrackView } from "@/lib/view-tracker"
 import { useCurrentPlaza, buildShareUrl } from "@/lib/plaza"
 import { AuthorCard } from "@/components/AuthorCard"
+import { CallButton } from "@/components/CallButton"
 import { DetailLegalNotice } from "@/components/legal/DetailLegalNotice"
 
 
@@ -461,6 +462,8 @@ export default function LocalFoodDetailScreen() {
               <Ionicons name="chatbubble-ellipses-outline" size={18} color={lightColors.ink900} />
               <Text style={styles.actionOutlineText}>문의</Text>
             </Pressable>
+            {/* 보조: 전화 걸기 — 판매자 phone 있을 때만 노출 */}
+            <CallButton userId={author?.id} color={lightColors.primary} />
             <Pressable
               style={[styles.actionPrimary, { flex: 1 }]}
               onPress={openCheckout}

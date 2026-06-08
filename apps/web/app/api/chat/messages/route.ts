@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
   // 메시지 조회
   const { data: messages, error } = await supabase
     .from("messages")
-    .select("id, chat_room_id, sender_id, content, is_read, is_system, plaza_id, created_at")
+    .select("id, chat_room_id, sender_id, content, image_url, is_read, is_system, plaza_id, created_at")
     .eq("chat_room_id", roomId)
     .limit(200)
     .order("created_at", { ascending: true })
@@ -183,12 +183,15 @@ export async function POST(request: NextRequest) {
   // 모바일은 chat_room_id, 웹은 roomId 로 보냄 — 둘 다 허용
   const roomId = (body as any).roomId ?? (body as any).chat_room_id
   const content = (body as any).content as string | undefined
+  const imageUrlRaw = (body as any).image_url as string | undefined
+  const imageUrl = typeof imageUrlRaw === 'string' && imageUrlRaw.trim() ? imageUrlRaw.trim() : null
 
-  if (!roomId || !content?.trim()) {
+  // content 또는 image_url 둘 중 하나는 있어야 함 (사진만 보내는 메시지 허용)
+  if (!roomId || (!content?.trim() && !imageUrl)) {
     return NextResponse.json({ error: "채팅방 ID와 메시지 내용이 필요합니다" }, { status: 400 })
   }
   // 메시지 길이 제한 — 폭탄 방어
-  if (content.length > 5000) {
+  if (content && content.length > 5000) {
     return NextResponse.json({ error: "메시지가 너무 깁니다 (최대 5000자)" }, { status: 400 })
   }
 
@@ -236,12 +239,14 @@ export async function POST(request: NextRequest) {
       console.error('[chat/messages] admin client unavailable, falling back to user client', e)
     }
   }
+  const trimmedContent = content?.trim() || null
   const { data: message, error } = await messageWriter
     .from("messages")
     .insert({
       chat_room_id: roomId,
       sender_id: user.id,
-      content: content.trim()
+      content: trimmedContent,
+      image_url: imageUrl,
     })
     .select()
     .single()
@@ -252,11 +257,13 @@ export async function POST(request: NextRequest) {
   }
 
   // 채팅방 마지막 메시지 업데이트 — RLS 우회 위해 admin client
+  // 사진만 보낸 경우 미리보기는 "[사진]" 으로 표시.
+  const lastMessagePreview = trimmedContent ?? "[사진]"
   if (room) {
     await messageWriter
       .from("chat_rooms")
       .update({
-        last_message: content.trim(),
+        last_message: lastMessagePreview,
         last_message_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
@@ -289,7 +296,7 @@ export async function POST(request: NextRequest) {
       })
       recipients.delete(user.id)
 
-      const messagePreview = `${senderName}님: ${preview(content.trim(), 50)}`
+      const messagePreview = `${senderName}님: ${trimmedContent ? preview(trimmedContent, 50) : "[사진]"}`
       await Promise.all(
         Array.from(recipients).map((uid) =>
           notify(

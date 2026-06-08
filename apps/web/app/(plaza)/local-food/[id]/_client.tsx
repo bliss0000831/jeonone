@@ -16,6 +16,7 @@ import {
   DetailAuthorCard,
   DetailMeta,
   DetailHeaderActions,
+  CallButton,
 } from "@/components/detail"
 import {
   DropdownMenu,
@@ -299,6 +300,8 @@ export default function LocalFoodDetailPage({
               <MessageCircle className="w-5 h-5" />
               {chatLoading ? "연결 중..." : "문의"}
             </Button>
+            {/* 보조: 전화 걸기 — 판매자 phone 있을 때만 노출 */}
+            <CallButton userId={post.user_id} />
             <Button
               size="lg"
               onClick={() => {

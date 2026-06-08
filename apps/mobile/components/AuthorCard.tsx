@@ -85,6 +85,12 @@ interface BizInfo {
   contact_phone: string | null
 }
 
+/** 이웃 별 — 평균 별점(0~5)/후기 수. 후기 없으면 "새 이웃". */
+interface NeighborStarInfo {
+  trust_score: number | null
+  review_count: number | null
+}
+
 export const AuthorCard = memo(function AuthorCard({
   profile,
   title = "판매자 정보",
@@ -125,6 +131,34 @@ export const AuthorCard = memo(function AuthorCard({
     })()
     return () => { alive = false }
   }, [profile.id, profile.account_type])
+
+  // 이웃 별(평균 별점/후기 수) — profile.id 로 조회 (bizInfo 와 동일 안전 수준)
+  const [star, setStar] = useState<NeighborStarInfo | null>(null)
+  useEffect(() => {
+    if (!profile.id) {
+      setStar(null)
+      return
+    }
+    let alive = true
+    ;(async () => {
+      try {
+        const { data } = await (getSupabase() as any)
+          .from("profiles")
+          .select("trust_score, review_count")
+          .eq("id", profile.id)
+          .maybeSingle()
+        if (alive && data) setStar(data as NeighborStarInfo)
+      } catch {}
+    })()
+    return () => { alive = false }
+  }, [profile.id])
+
+  // 별점 표시 판정 — 0~5 범위 + 후기 1개 이상일 때만 점수 표시 (ProfileCounters 와 동일 규칙)
+  const reviewCount = star?.review_count ?? 0
+  const validScore =
+    star?.trust_score != null && star.trust_score >= 0 && star.trust_score <= 5 && reviewCount > 0
+      ? star.trust_score
+      : null
 
   // 뱃지 결정: extraBadge 우선, 없으면 account_type 라벨
   const badge: { label: string; color: string } | null = extraBadge
@@ -190,6 +224,24 @@ export const AuthorCard = memo(function AuthorCard({
               </View>
             )}
           </View>
+          {/* 이웃 별 — 후기 있으면 "⭐ 4.3 (12)", 없으면 "⭐ 새 이웃" */}
+          {star && (
+            <View style={styles.starRow}>
+              <Ionicons
+                name={validScore != null ? "star" : "star-outline"}
+                size={13}
+                color={validScore != null ? "#fbbf24" : lightColors.ink500}
+              />
+              {validScore != null ? (
+                <Text style={styles.starText}>
+                  {validScore.toFixed(1)}
+                  <Text style={styles.starCount}> ({reviewCount})</Text>
+                </Text>
+              ) : (
+                <Text style={styles.starCount}>새 이웃</Text>
+              )}
+            </View>
+          )}
           {joined && <Text style={styles.joined}>{joined}</Text>}
         </View>
 
@@ -325,6 +377,21 @@ const styles = StyleSheet.create({
   },
   joined: {
     fontSize: 12,
+    color: lightColors.ink500,
+  },
+  starRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  starText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#b45309",
+  },
+  starCount: {
+    fontSize: 12,
+    fontWeight: "500",
     color: lightColors.ink500,
   },
   extra: {

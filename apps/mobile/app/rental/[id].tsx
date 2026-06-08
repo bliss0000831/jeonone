@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
+import { CallButton } from "@/components/CallButton"
 
 const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
@@ -102,7 +103,9 @@ export default function RentalDetailScreen() {
         </View>
       </ScrollView>
       <View style={styles.btnBar}>
-        <Pressable style={styles.btn} onPress={apply} disabled={submitting}>
+        {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
+        <CallButton userId={r.owner_id} color={GREEN} />
+        <Pressable style={[styles.btn, { flex: 1 }]} onPress={apply} disabled={submitting}>
           {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
         </Pressable>
       </View>
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
   dateInput: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 15 },
   totalRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12 },
   total: { fontSize: 17, fontWeight: "900", color: GREEN },
-  btnBar: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 12, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
+  btnBar: { position: "absolute", bottom: 0, left: 0, right: 0, flexDirection: "row", gap: 8, padding: 12, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
   btn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: GREEN, borderRadius: 12, paddingVertical: 14 },
   btnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
 })

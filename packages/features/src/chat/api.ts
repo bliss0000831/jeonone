@@ -328,7 +328,7 @@ export async function listMessages(
   const limit = opts.limit ?? 50
   let query = supabase
     .from("messages")
-    .select("id, chat_room_id, sender_id, content, is_read, is_system, plaza_id, created_at")
+    .select("id, chat_room_id, sender_id, content, image_url, is_read, is_system, plaza_id, created_at")
     .eq("chat_room_id", roomId)
     .order("created_at", { ascending: false })
     .limit(limit)
@@ -345,6 +345,9 @@ export async function listMessages(
  *
  * RLS 가 권한 검증 (buyer/seller 또는 accepted expert 만 INSERT).
  * 성공 시 chat_rooms.updated_at + last_message 도 갱신 (함수 내에서 처리).
+ *
+ * @param imageUrl 첨부 사진 URL (옵셔널). content 없이 사진만 보낼 수도 있음.
+ *   기존 text-only 호출 (imageUrl 미지정) 은 그대로 동작.
  */
 export async function sendMessage(
   supabase: SupabaseClient,
@@ -352,8 +355,12 @@ export async function sendMessage(
   senderId: string,
   content: string,
   plazaId: string,
+  imageUrl?: string | null,
 ): Promise<Message> {
-  if (!content.trim()) {
+  const trimmed = content.trim()
+  const image = imageUrl?.trim() || null
+  // content 또는 image 둘 중 하나는 있어야 함 (사진만 보내는 메시지 허용)
+  if (!trimmed && !image) {
     throw new Error("메시지 내용이 비어있습니다")
   }
   if (content.length > 5000) {
@@ -365,7 +372,8 @@ export async function sendMessage(
     .insert({
       chat_room_id: roomId,
       sender_id: senderId,
-      content: content.trim(),
+      content: trimmed || null,
+      image_url: image,
       plaza_id: plazaId,
       is_read: false,
     })
@@ -374,10 +382,12 @@ export async function sendMessage(
   if (error) throw error
 
   // 채팅방 메타 갱신 (최신 메시지 미리보기) — fire-and-forget
+  // 사진만 보낸 경우 미리보기는 "[사진]" 으로 표시.
+  const preview = trimmed ? trimmed.slice(0, 100) : "[사진]"
   void supabase
     .from("chat_rooms")
     .update({
-      last_message: content.trim().slice(0, 100),
+      last_message: preview,
       last_message_at: data.created_at,
       updated_at: data.created_at,
     })

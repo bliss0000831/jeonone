@@ -6,23 +6,28 @@
  *   - 햅틱 (impactLight on send)
  *   - multiline + 자동 높이
  *
- * Phase 2B-1: 텍스트만. 이미지 첨부는 Phase 2B-2.
+ * 사진 전송: 카메라/갤러리 버튼 → expo-image-picker → 호출 측 onPickImage(uri).
+ * 어르신 친화 — 사진 버튼을 큼직하게.
  */
 
 import { useRef, useState } from "react"
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   StyleSheet,
   TextInput,
   View,
 } from "react-native"
+import * as ImagePicker from "expo-image-picker"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
 import { impactLight } from "@gwangjang/platform/haptics"
 
 interface ChatComposerProps {
   onSend: (content: string) => Promise<void> | void
+  /** 사진 선택 시 호출 — 로컬 URI 전달. 호출 측에서 업로드 + 메시지 전송 처리. */
+  onPickImage?: (localUri: string) => Promise<void> | void
   /** 전문가 초대 등 좌측 추가 버튼 (옵션) */
   leftSlot?: React.ReactNode
   /** placeholder */
@@ -35,6 +40,7 @@ interface ChatComposerProps {
 
 export function ChatComposer({
   onSend,
+  onPickImage,
   leftSlot,
   placeholder = "메시지 입력...",
   disabled = false,
@@ -79,9 +85,110 @@ export function ChatComposer({
     }
   }
 
+  // 선택된 사진 URI 를 정규화 후 호출 측에 전달 (업로드는 호출 측 책임)
+  async function deliverImage(uri: string) {
+    if (!onPickImage) return
+    const u =
+      uri.startsWith("file://") ||
+      uri.startsWith("http") ||
+      uri.startsWith("content://") ||
+      uri.startsWith("/")
+        ? uri
+        : `file://${uri}`
+    setSending(true)
+    try {
+      await impactLight()
+    } catch {
+      /* 햅틱 실패 무시 */
+    }
+    try {
+      await onPickImage(u)
+    } catch {
+      /* 실패 시 호출 측에서 Alert 처리 */
+    } finally {
+      setSending(false)
+    }
+  }
+
+  // 갤러리에서 사진 선택
+  async function pickFromLibrary() {
+    if (disabled || sending) return
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (!perm.granted) {
+        Alert.alert("권한 필요", "사진 라이브러리 권한이 필요합니다. 설정에서 허용해 주세요.")
+        return
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        quality: 0.8,
+      })
+      const asset = result.assets?.[0]
+      if (!asset) return
+      await deliverImage(asset.uri)
+    } catch (err) {
+      Alert.alert("오류", err instanceof Error ? err.message : "사진을 불러오지 못했습니다.")
+    }
+  }
+
+  // 카메라로 촬영
+  async function takePhoto() {
+    if (disabled || sending) return
+    try {
+      const perm = await ImagePicker.requestCameraPermissionsAsync()
+      if (!perm.granted) {
+        Alert.alert("권한 필요", "카메라 권한이 필요합니다. 설정에서 허용해 주세요.")
+        return
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.8,
+      })
+      const asset = result.assets?.[0]
+      if (!asset) return
+      await deliverImage(asset.uri)
+    } catch (err) {
+      Alert.alert("오류", err instanceof Error ? err.message : "사진을 촬영하지 못했습니다.")
+    }
+  }
+
   return (
     <View style={styles.container}>
       {leftSlot}
+      {/* 사진 버튼 — 어르신 친화로 큼직하게. 카메라 + 갤러리 */}
+      {onPickImage && (
+        <>
+          <Pressable
+            onPress={takePhoto}
+            disabled={disabled || sending}
+            accessibilityLabel="사진 촬영"
+            accessibilityRole="button"
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.mediaButton,
+              (disabled || sending) && styles.mediaButtonDisabled,
+              pressed && styles.sendButtonPressed,
+            ]}
+          >
+            <Ionicons name="camera" size={26} color={lightColors.primary} />
+          </Pressable>
+          <Pressable
+            onPress={pickFromLibrary}
+            disabled={disabled || sending}
+            accessibilityLabel="사진 첨부"
+            accessibilityRole="button"
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.mediaButton,
+              (disabled || sending) && styles.mediaButtonDisabled,
+              pressed && styles.sendButtonPressed,
+            ]}
+          >
+            <Ionicons name="image" size={26} color={lightColors.primary} />
+          </Pressable>
+        </>
+      )}
       <View style={[styles.inputWrap, disabled && styles.inputWrapDisabled]}>
         <TextInput
           style={styles.input}
@@ -153,6 +260,17 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     padding: 0, // 안드 기본 패딩 완전 제거
     margin: 0,
+  },
+  // 어르신 친화 — 사진 버튼 큼직하게 (44pt 터치 타겟)
+  mediaButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mediaButtonDisabled: {
+    opacity: 0.4,
   },
   sendButton: {
     width: 40,

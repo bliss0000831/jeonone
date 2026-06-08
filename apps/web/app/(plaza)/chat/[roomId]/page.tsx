@@ -29,7 +29,8 @@ interface Message {
   id: string
   chat_room_id: string
   sender_id: string
-  content: string
+  content: string | null
+  image_url?: string | null
   is_read: boolean
   created_at: string
 }
@@ -402,6 +403,64 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
     }
   }
 
+  const handleImagePick = async (file: File) => {
+    if (isSending || !currentUserId) return
+    setIsSending(true)
+
+    // 낙관적 미리보기 — 로컬 objectURL 로 즉시 표시 후 업로드 완료 시 교체/정리
+    const localUrl = URL.createObjectURL(file)
+    const tempId = `temp-${
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    }`
+    const optimisticMessage: Message = {
+      id: tempId,
+      chat_room_id: roomId,
+      sender_id: currentUserId,
+      content: null,
+      image_url: localUrl,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }
+    setMessages((prev) => [...prev, optimisticMessage])
+
+    try {
+      // 1) /api/upload → R2 URL
+      const form = new FormData()
+      form.append("file", file)
+      form.append("folder", "misc")
+      const upRes = await fetch("/api/upload", { method: "POST", body: form })
+      const upData = await upRes.json().catch(() => ({}))
+      if (!upRes.ok || !upData.url) {
+        throw new Error(upData.error || "이미지 업로드에 실패했습니다")
+      }
+
+      // 2) image_url 로 메시지 전송
+      const response = await fetch("/api/chat/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId, image_url: upData.url }),
+      })
+      const data = await response.json()
+      if (response.ok && data.message) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === tempId ? data.message : m)),
+        )
+      } else {
+        setMessages((prev) => prev.filter((m) => m.id !== tempId))
+        toast.error("사진 전송에 실패했습니다")
+      }
+    } catch (error) {
+      console.error("사진 전송 실패:", error)
+      setMessages((prev) => prev.filter((m) => m.id !== tempId))
+      toast.error(error instanceof Error ? error.message : "사진 전송에 실패했습니다")
+    } finally {
+      URL.revokeObjectURL(localUrl)
+      setIsSending(false)
+    }
+  }
+
   const formatPrice = (price: number) => {
     if (price >= 10000) {
       const uk = Math.floor(price / 10000)
@@ -615,6 +674,7 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
       value={newMessage}
       onChange={setNewMessage}
       onSend={handleSend}
+      onImagePick={handleImagePick}
       sending={isSending}
       placeholder="메시지 보내기"
       topSlot={
@@ -899,6 +959,7 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
                   senderAvatarUrl={sender?.avatar_url}
                   senderBadge={showAvatar ? senderBadge : undefined}
                   time={formatChatTime(message.created_at)}
+                  image={message.image_url}
                 >
                   {message.content}
                 </MessageBubble>

@@ -5,8 +5,17 @@
  * isMe(자신) vs 상대방 분리 + 시스템 메시지 별도 처리.
  */
 
-import { Image, Pressable, StyleSheet, Text, View } from "react-native"
+import { useState } from "react"
+import {
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
+import { Ionicons } from "@expo/vector-icons"
 import type { Message } from "@gwangjang/features/chat"
 
 interface MessageBubbleProps {
@@ -31,6 +40,10 @@ export function MessageBubble({
   senderAvatar,
   onSenderPress,
 }: MessageBubbleProps) {
+  // 사진 확대 보기 + 깨진 이미지 fallback
+  const [imageExpanded, setImageExpanded] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
+  const imageUrl = message.image_url ?? null
   // 시스템 메시지는 중앙 정렬 pill
   if (message.is_system) {
     return (
@@ -85,18 +98,93 @@ export function MessageBubble({
           </View>
         )}
 
-        <View
-          style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}
-        >
-          <Text style={[styles.content, isMe && styles.contentMe]}>
-            {message.content}
-          </Text>
-        </View>
+        {imageUrl ? (
+          /* 사진 메시지 — 썸네일. 탭하면 전체화면 확대. */
+          <Pressable
+            onPress={() => !imageFailed && setImageExpanded(true)}
+            disabled={imageFailed}
+            accessibilityLabel="사진 보기"
+            accessibilityRole="imagebutton"
+            style={styles.imageWrap}
+          >
+            {imageFailed ? (
+              <View style={styles.imageFallback}>
+                <Ionicons
+                  name="image-outline"
+                  size={28}
+                  color={lightColors.ink500}
+                />
+                <Text style={styles.imageFallbackText}>
+                  사진을 불러올 수 없어요
+                </Text>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: imageUrl }}
+                style={styles.image}
+                resizeMode="cover"
+                onError={() => setImageFailed(true)}
+              />
+            )}
+            {/* 사진과 함께 보낸 캡션 (있으면) */}
+            {message.content ? (
+              <View
+                style={[
+                  styles.bubble,
+                  isMe ? styles.bubbleMe : styles.bubbleOther,
+                  styles.captionBubble,
+                ]}
+              >
+                <Text style={[styles.content, isMe && styles.contentMe]}>
+                  {message.content}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
+        ) : (
+          <View
+            style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}
+          >
+            <Text style={[styles.content, isMe && styles.contentMe]}>
+              {message.content}
+            </Text>
+          </View>
+        )}
 
         {!isMe && showTime && (
           <Text style={styles.time}>{formatTime(message.created_at)}</Text>
         )}
       </View>
+
+      {/* 사진 전체화면 확대 보기 */}
+      {imageUrl && !imageFailed && (
+        <Modal
+          visible={imageExpanded}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setImageExpanded(false)}
+        >
+          <Pressable
+            style={styles.modalBackdrop}
+            onPress={() => setImageExpanded(false)}
+          >
+            <Pressable
+              onPress={() => setImageExpanded(false)}
+              accessibilityLabel="닫기"
+              accessibilityRole="button"
+              style={styles.modalClose}
+              hitSlop={12}
+            >
+              <Ionicons name="close" size={30} color="#ffffff" />
+            </Pressable>
+            <Image
+              source={{ uri: imageUrl }}
+              style={styles.modalImage}
+              resizeMode="contain"
+            />
+          </Pressable>
+        </Modal>
+      )}
     </View>
   )
 }
@@ -183,6 +271,54 @@ const styles = StyleSheet.create({
   },
   contentMe: {
     color: "#ffffff",
+  },
+  // 사진 메시지 — 썸네일
+  imageWrap: {
+    maxWidth: "70%",
+  },
+  image: {
+    width: 220,
+    height: 220,
+    maxWidth: "100%",
+    borderRadius: BUBBLE_RADIUS,
+    backgroundColor: lightColors.muted,
+  },
+  imageFallback: {
+    width: 180,
+    height: 140,
+    borderRadius: BUBBLE_RADIUS,
+    backgroundColor: lightColors.muted,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  imageFallbackText: {
+    fontSize: fontSize.xs,
+    color: lightColors.ink500,
+  },
+  captionBubble: {
+    marginTop: 4,
+    alignSelf: "flex-start",
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.92)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalImage: {
+    width: "100%",
+    height: "80%",
+  },
+  modalClose: {
+    position: "absolute",
+    top: 48,
+    right: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   time: {
     fontSize: 11,

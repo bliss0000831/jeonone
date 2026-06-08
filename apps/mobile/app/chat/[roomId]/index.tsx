@@ -48,7 +48,7 @@ import {
 } from "@gwangjang/features/chat"
 import { useAuth } from "@/lib/auth-context"
 import { useCurrentPlaza } from "@/lib/plaza"
-import { getSupabase, gwangjangFetch } from "@/lib/supabase"
+import { getSupabase, gwangjangFetch, uploadImage } from "@/lib/supabase"
 import { plazaName } from "@/lib/constants"
 import { MessageBubble } from "@/components/chat/MessageBubble"
 import { ChatComposer } from "@/components/chat/ChatComposer"
@@ -353,15 +353,21 @@ export default function ChatRoomScreen() {
     [messages, participantsMap, user, currentPlaza, router],
   )
 
-  const handleSend = useCallback(
-    async (content: string) => {
+  // 텍스트 / 사진 공통 전송. imageUrl 지정 시 사진 메시지.
+  // optimisticImageUri: 사진 전송 시 업로드 전 로컬 미리보기용 URI.
+  const sendMessageInternal = useCallback(
+    async (
+      content: string,
+      imageUrl?: string | null,
+      optimisticImageUri?: string | null,
+    ) => {
       if (!user || !room) return
-      const supabase = getSupabase()
       const optimistic: Message = {
         id: `temp-${Date.now()}`,
         chat_room_id: roomId,
         sender_id: user.id,
         content,
+        image_url: imageUrl ?? optimisticImageUri ?? null,
         is_read: false,
         plaza_id: room.plaza_id,
         created_at: new Date().toISOString(),
@@ -375,6 +381,7 @@ export default function ChatRoomScreen() {
           body: JSON.stringify({
             chat_room_id: roomId,
             content,
+            ...(imageUrl ? { image_url: imageUrl } : {}),
           }),
         })
         if (!res.ok) {
@@ -395,6 +402,29 @@ export default function ChatRoomScreen() {
       }
     },
     [room, roomId, user],
+  )
+
+  const handleSend = useCallback(
+    (content: string) => sendMessageInternal(content),
+    [sendMessageInternal],
+  )
+
+  // 사진 전송 — 로컬 URI 즉시 미리보기 → R2 업로드 → image_url 로 메시지 전송
+  const handlePickImage = useCallback(
+    async (localUri: string) => {
+      if (!user || !room) return
+      try {
+        const url = await uploadImage(localUri, "misc")
+        if (!url) throw new Error("사진 업로드에 실패했습니다")
+        await sendMessageInternal("", url, localUri)
+      } catch (err) {
+        Alert.alert(
+          "전송 실패",
+          err instanceof Error ? err.message : "사진을 보내지 못했습니다.",
+        )
+      }
+    },
+    [room, user, sendMessageInternal],
   )
 
   const loadMore = async () => {
@@ -717,6 +747,7 @@ export default function ChatRoomScreen() {
         ) : (
           <ChatComposer
             onSend={handleSend}
+            onPickImage={handlePickImage}
             onTyping={sendTyping}
           />
         )}

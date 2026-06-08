@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
+import { CallButton } from "@/components/CallButton"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -143,6 +144,8 @@ export default function AuctionDetailScreen() {
 
       {!ended && (
         <View style={styles.bidBarWrap}>
+          {/* 보조: 판매자에게 전화 걸기 — 본인 경매가 아니고 phone 있을 때만 */}
+          {a.seller_id !== uid ? <CallButton userId={a.seller_id} color={GREEN} /> : null}
           {a.buy_now_price && a.seller_id !== uid ? (
             <Pressable style={styles.buyNowBtn} onPress={buyNow} disabled={submitting}>
               <Ionicons name="flash" size={18} color={GREEN} />
