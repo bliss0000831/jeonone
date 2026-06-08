@@ -31,24 +31,26 @@ const NON_AGENT_ROLES: AccountType[] = [
 
 const ALL_ROLES: AccountType[] = [...NON_AGENT_ROLES, "agent"]
 
-/** basePath → 허용된 account_type 목록. null = 로그인 사용자 모두 가능. */
+/**
+ * basePath → 허용된 account_type 목록. null = 로그인 사용자 모두 가능.
+ *
+ * 전원일기: 권한 구분 없이 모든 로그인 사용자가 모든 도메인에 등록 가능
+ * (관리자는 canRegisterDomain 의 isAdmin 으로 항상 통과). 옛 광장의 역할별
+ * 잠금(producer/business 등)은 제거 — 누구나 로컬푸드·농기구·일손 등록 가능.
+ */
 export const DOMAIN_REGISTER_ROLES: Record<string, AccountType[] | null> = {
-  "/property": ALL_ROLES, // 매물 — agent 분기는 register 화면에서 처리
-  "/requests": NON_AGENT_ROLES,
-  "/service-requests": NON_AGENT_ROLES,
-  "/local-food": ["producer"],
-  "/group-buying": ["business"],
-  "/interior": ["interior"],
-  "/moving": ["moving"],
-  "/cleaning": ["cleaning"],
-  "/repair": ["repair"],
-  "/new-store": ["business"],
-  // 모든 로그인 사용자 공통
-  "/board": null,
-  "/sharing": null,
+  "/local-food": null,
   "/secondhand": null,
   "/jobs": null,
+  "/sharing": null,
+  "/board": null,
+  "/auction": null,
+  "/rental": null,
   "/clubs": null,
+  "/group-buying": null,
+  "/property": null,
+  "/requests": null,
+  "/service-requests": null,
 }
 
 export function normalizeAccountType(raw: string | null | undefined): AccountType {

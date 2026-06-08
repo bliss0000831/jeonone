@@ -79,12 +79,7 @@ export default function LocalFoodRegisterPage() {
         .single()
 
       setUserAccountType(profile?.account_type || null)
-
-      const isAdmin = profile?.role === "admin" || profile?.role === "superadmin"
-      if (!isAdmin && profile?.account_type !== "producer") {
-        toast("생산자 또는 관리자 권한이 필요합니다")
-        router.push("/local-food")
-      }
+      // 전원일기: 로컬푸드 등록 권한 구분 없음 — 로그인 사용자 누구나 가능
     }
     checkAuth()
   }, [router])

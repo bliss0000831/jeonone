@@ -39,14 +39,12 @@ interface RegisterAction {
 const FARM_ROLES = ["user", "producer", "business"]
 
 const REGISTER_ACTIONS: RegisterAction[] = [
-  // ── 모든 계정 공통 (농촌 직거래·커뮤니티) ────
+  // ── 전원일기: 모든 로그인 사용자 공통 (권한 구분 없음) ────
   { icon: "bag-handle",      label: "농기구",            route: "/secondhand/register",   iconColor: "#d97706", bgColor: "#f59e0b1A" },
+  { icon: "leaf",            label: "로컬푸드",          route: "/local-food/register",   iconColor: "#22c55e", bgColor: "#22c55e1A" },
   { icon: "gift",            label: "나눔",              route: "/sharing/register",      iconColor: "#ef4444", bgColor: "#ef44441A" },
   { icon: "briefcase",       label: "일손",              route: "/jobs/register",         iconColor: "#0d9488", bgColor: "#14b8a61A" },
   { icon: "chatbox",         label: "마을 소식",         route: "/board/create",          iconColor: "#3b82f6", bgColor: "#3b82f61A" },
-
-  // ── 역할 전용 ────
-  { icon: "leaf",            label: "로컬 푸드 등록",    route: "/local-food/register",   iconColor: "#22c55e", bgColor: "#22c55e1A", roles: ["producer"] },
 ]
 
 export function RegisterSheet({ visible, onClose }: Props) {
@@ -76,20 +74,8 @@ export function RegisterSheet({ visible, onClose }: Props) {
     })()
   }, [visible, user, plaza])
 
-  // 권한 필터
-  const KNOWN_ROLES = new Set(FARM_ROLES)
-  const role = KNOWN_ROLES.has(accountType) ? accountType : "user"
-  const actions = REGISTER_ACTIONS.filter(
-    (a) => !a.roles || a.roles.includes(role),
-  )
-
-  // 잠긴 카드 — 일반인 (user) 에게만 (로컬푸드 생산자 전환 안내)
-  const lockedActions =
-    role === "user"
-      ? [
-          { icon: "leaf",          label: "로컬 푸드",   color: "#22c55e" },
-        ]
-      : []
+  // 전원일기: 권한 구분 없이 모든 항목 노출
+  const actions = REGISTER_ACTIONS
 
   function go(route: string) {
     onClose()
@@ -141,43 +127,6 @@ export function RegisterSheet({ visible, onClose }: Props) {
                 </Pressable>
               ))}
             </View>
-
-            {/* 잠긴 카테고리 — 일반인 전용 */}
-            {lockedActions.length > 0 && (
-              <Pressable
-                style={styles.lockedCta}
-                onPress={() => go("/mypage/account-upgrade")}
-              >
-                <View style={styles.lockedIcons}>
-                  {lockedActions.slice(0, 4).map((a, i) => (
-                    <View
-                      key={a.label}
-                      style={[
-                        styles.lockedIcon,
-                        {
-                          backgroundColor: a.color + "1A",
-                          marginLeft: i === 0 ? 0 : -6,
-                        },
-                      ]}
-                    >
-                      <Ionicons name={a.icon as any} size={11} color={a.color} />
-                    </View>
-                  ))}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                    <Ionicons name="lock-closed" size={11} color={lightColors.ink900} />
-                    <Text style={styles.lockedTitle}>
-                      로컬푸드 생산자 계정 전환 시 등록 가능
-                    </Text>
-                  </View>
-                  <Text style={styles.lockedSub} numberOfLines={1}>
-                    직접 키운 농산물을 로컬푸드로 판매해보세요
-                  </Text>
-                </View>
-                <Text style={styles.lockedArrow}>신청 →</Text>
-              </Pressable>
-            )}
           </ScrollView>
         </Pressable>
       </Pressable>

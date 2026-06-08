@@ -54,52 +54,9 @@ export default function LocalFoodRegisterScreen() {
   const router = useRouter()
   const { user } = useAuth()
   const DEFAULT_PLAZA = useCurrentPlaza()
-  // 권한 게이트 — web 1:1 (account_type !== 'producer' 차단)
-  // 🅲 account_type 은 현재 광장 plaza_profiles 우선
-  const [permChecking, setPermChecking] = useState(true)
-  const [permAllowed, setPermAllowed] = useState(false)
-  useEffect(() => {
-    if (!user) return
-    let cancelled = false
-    ;(async () => {
-      const supabase = getSupabase()
-      const [profRes, ppRes] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("account_type, role")
-          .eq("id", user.id)
-          .maybeSingle(),
-        DEFAULT_PLAZA
-          ? supabase
-              .from("plaza_profiles")
-              .select("account_type")
-              .eq("user_id", user.id)
-              .eq("plaza_id", DEFAULT_PLAZA)
-              .maybeSingle()
-          : Promise.resolve({ data: null } as any),
-      ])
-      if (cancelled) return
-      const prof: any = profRes?.data || {}
-      const pp: any = (ppRes as any)?.data || {}
-      const t = pp.account_type ?? prof.account_type
-      const r = prof.role
-      const isAdmin = r === "admin" || r === "superadmin"
-      if (!isAdmin && t !== "producer") {
-        setPermChecking(false)
-        Alert.alert(
-          "권한 필요",
-          "로컬푸드 등록은 생산자 계정만 가능합니다. 마이페이지 → 계정 유형 신청에서 전환할 수 있어요.",
-          [{ text: "확인", onPress: () => router.back() }],
-        )
-      } else {
-        setPermAllowed(true)
-        setPermChecking(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [user, router, DEFAULT_PLAZA])
+  // 전원일기: 로컬푸드 등록 권한 구분 없음 — 모든 로그인 사용자 허용
+  const [permChecking] = useState(false)
+  const [permAllowed] = useState(true)
   const [formDirty, setFormDirty] = useState(false)
   useUnsavedChangesGuard(formDirty)
   const [submitting, setSubmitting] = useState(false)
