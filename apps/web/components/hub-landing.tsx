@@ -371,10 +371,7 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
 // ─── 가로 슬라이드용 작은 마을 카드 (목업) ─────────────────────
 function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) {
   const province = provinceName(plaza.id, plaza.name)
-  const members = plaza.member_count ?? 0
-  const postsToday = plaza.posts_today ?? 0
-  const snippet = plaza.recent_post_title ?? '새로 시작하는 동네예요'
-  const c = provinceColors(plaza.id)
+  const coverage = plaza.coverage ?? []
   return (
     <button
       type="button"
@@ -391,15 +388,19 @@ function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) 
         </span>
         <p className="relative text-2xl font-black text-white drop-shadow tracking-tight">{province}</p>
       </div>
-      <div className="px-3 pt-2.5 pb-3">
-        <p className="text-sm text-stone-500 line-clamp-1">{snippet}</p>
-        <div className="flex items-center gap-2 mt-2 text-sm font-bold text-stone-700">
-          <Users className="w-4 h-4 text-[#225a39]" />
-          <span className="tabular-nums">{members.toLocaleString()}</span><span className="text-stone-400 font-semibold">명</span>
-          <span className="text-stone-300">·</span>
-          <MessageCircle className="w-4 h-4 text-[#225a39]" />
-          <span className="tabular-nums">{postsToday}</span><span className="text-stone-400 font-semibold">개 글</span>
-        </div>
+      <div className="px-3 py-3 min-h-[56px] flex items-center">
+        {coverage.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {coverage.slice(0, 3).map((cv) => (
+              <span key={cv} className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-sm font-bold">{cv}</span>
+            ))}
+            {coverage.length > 3 && (
+              <span className="text-xs text-stone-400 font-bold self-center">+{coverage.length - 3}</span>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-stone-500">새로 시작하는 동네예요</p>
+        )}
       </div>
     </button>
   )

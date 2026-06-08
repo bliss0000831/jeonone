@@ -424,10 +424,7 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
 
 function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) {
   const province = provinceName(plaza.id, plaza.name)
-  const members = plaza.member_count ?? 0
-  const postsToday = plaza.posts_today ?? 0
-  const snippet = plaza.recent_post_title ?? "새로 시작하는 동네예요"
-  const c = provinceColors(plaza.id)
+  const coverage = plaza.coverage ?? []
   return (
     <Pressable style={styles.village} onPress={onPress}>
       <ImageBackground source={provincePhoto(plaza.id)} style={styles.villagePhoto} imageStyle={{ resizeMode: "cover" }}>
@@ -442,16 +439,18 @@ function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) 
         <Text style={styles.villagePhotoTitle}>{province}</Text>
       </ImageBackground>
       <View style={styles.villageBody}>
-        <Text style={styles.villageSnippet} numberOfLines={1}>{snippet}</Text>
-        <View style={styles.villageStats}>
-          <Ionicons name="people" size={14} color={GREEN} />
-          <Text style={styles.villageStatValue}>{members.toLocaleString()}</Text>
-          <Text style={styles.villageStatLabel}>명</Text>
-          <Text style={styles.statSep}>·</Text>
-          <Ionicons name="chatbubble-ellipses" size={14} color={GREEN} />
-          <Text style={styles.villageStatValue}>{postsToday}</Text>
-          <Text style={styles.villageStatLabel}>개 글</Text>
-        </View>
+        {coverage.length > 0 ? (
+          <View style={styles.villageChips}>
+            {coverage.slice(0, 3).map((c) => (
+              <View key={c} style={styles.villageChip}><Text style={styles.villageChipText}>{c}</Text></View>
+            ))}
+            {coverage.length > 3 && (
+              <Text style={styles.villageChipMore}>+{coverage.length - 3}</Text>
+            )}
+          </View>
+        ) : (
+          <Text style={styles.villageSnippet} numberOfLines={1}>새로 시작하는 동네예요</Text>
+        )}
       </View>
     </Pressable>
   )
@@ -563,11 +562,12 @@ const styles = StyleSheet.create({
   villageBadgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#ffffff" },
   villageBadgeText: { color: "#173524", fontSize: 11, fontWeight: "900" },
   villageBadgeTextWhite: { color: "#ffffff", fontSize: 11, fontWeight: "900" },
-  villageBody: { paddingHorizontal: 12, paddingVertical: 12, gap: 4 },
+  villageBody: { paddingHorizontal: 12, paddingVertical: 12, minHeight: 52, justifyContent: "center" },
   villageSnippet: { fontSize: 13, color: "#78716c", fontWeight: "500" },
-  villageStats: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4 },
-  villageStatValue: { color: GREEN, fontSize: 13, fontWeight: "900" },
-  villageStatLabel: { color: "#a8a29e", fontSize: 12, fontWeight: "600" },
+  villageChips: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
+  villageChip: { backgroundColor: "#f0f0ea", borderRadius: 7, paddingHorizontal: 8, paddingVertical: 3 },
+  villageChipText: { fontSize: 13, color: "#44403c", fontWeight: "700" },
+  villageChipMore: { fontSize: 12, color: "#a8a29e", fontWeight: "700", alignSelf: "center" },
 
   sectionTitle: { fontSize: 21, fontWeight: "900", color: GREEN },
 
