@@ -196,7 +196,7 @@ export function HubLanding({
             className="mt-7 w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-5 rounded-2xl bg-[#225a39] hover:bg-[#1b4a2f] active:bg-[#163d27] disabled:opacity-70 text-white text-xl sm:text-2xl font-black shadow-xl transition-colors"
           >
             <LocateFixed className={cn('w-7 h-7', locating && 'animate-spin')} />
-            {locating ? '위치 찾는 중…' : '내 위치로 찾기'}
+            {locating ? '위치 찾는 중…' : '자동으로 내 지역 찾기'}
           </button>
 
           {/* 검색 */}

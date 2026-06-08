@@ -255,7 +255,7 @@ export default function HubScreen() {
             ) : (
               <Ionicons name="locate" size={24} color="#fff" />
             )}
-            <Text style={styles.locateText}>{locating ? "위치 찾는 중…" : "내 위치로 찾기"}</Text>
+            <Text style={styles.locateText}>{locating ? "위치 찾는 중…" : "자동으로 내 지역 찾기"}</Text>
           </Pressable>
 
           {/* 검색 */}
