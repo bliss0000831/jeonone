@@ -488,10 +488,10 @@ const styles = StyleSheet.create({
   heroBgImg: { width: "100%", height: "100%", opacity: 0.14 },
 
   hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 16, paddingBottom: 14 },
-  brandRow: { alignItems: "center", marginBottom: 14 },
+  brandRow: { alignItems: "center", marginBottom: 6 },
   brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff" },
 
-  h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center" },
+  h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center", includeFontPadding: false },
   sub: { fontSize: 16, color: "#57534e", textAlign: "center", marginTop: 8, lineHeight: 23, fontWeight: "500" },
 
   locateBtn: {
