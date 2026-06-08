@@ -324,24 +324,17 @@ export function ProfileShell({
           }
           setUnifiedLoading(true)
           try {
-            // 올리기(bump) 기능 있는 테이블 — effective_at(= COALESCE(bumped_at, created_at)) 로 정렬
-            const BUMPABLE_TABLES = new Set([
-              "local_food",
-            ])
             const results = await Promise.all(
               POSTS_SOURCES.map(async (src) => {
                 try {
-                  const isBumpable = BUMPABLE_TABLES.has(src.table)
                   const cols = src.cols
                     ? src.cols
-                    : isBumpable
-                    ? "id, title, content, description, images, created_at, bumped_at, effective_at, status"
                     : "id, title, content, description, images, created_at, status"
                   let q: any = (supabase as any)
                     .from(src.table)
                     .select(cols)
                     .eq("user_id", userId)
-                    .order(isBumpable ? "effective_at" : "created_at", { ascending: false })
+                    .order("created_at", { ascending: false })
                     .limit(20)
                   q = withPlaza(q)
                   const { data } = await q
@@ -355,8 +348,7 @@ export function ProfileShell({
                       kindLabel: src.kindLabel,
                       title: row.title || row.name || "(제목 없음)",
                       excerpt: row.content || row.description || null,
-                      // 카드의 "방금 전" 표시도 bump 반영 — effective_at 우선
-                      created_at: row.effective_at ?? row.bumped_at ?? row.created_at,
+                      created_at: row.created_at,
                       href: `${src.hrefPrefix}${row.id}`,
                       image: imgs && imgs.length > 0 ? imgs[0] : null,
                     } as UnifiedPost

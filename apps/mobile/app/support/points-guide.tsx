@@ -39,7 +39,6 @@ export default function PointsGuideScreen() {
         </Section>
 
         <Section title="사용 방법">
-          <Item icon="arrow-up-outline" color="#2563eb" label="올리기 / 올리기권" desc="내 글을 상단으로 끌어올리기" />
           <Item icon="cart-outline" color="#7c3aed" label="공동구매·로컬푸드 결제" desc="구매 시 포인트로 일부 결제" />
           <Item icon="star-outline" color="#f59e0b" label="이벤트 응모 / 기프티콘" desc="이벤트 참여, 상품 교환" />
         </Section>

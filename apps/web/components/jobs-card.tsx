@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin, Clock, MoreVertical, Pencil, Trash2, Loader2, Briefcase, Eye, Heart, ArrowUp } from "lucide-react"
+import { MapPin, Clock, MoreVertical, Pencil, Trash2, Loader2, Briefcase, Eye, Heart } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,9 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn, stripRegionPrefix } from "@/lib/utils"
-// BumpDialog 는 모달 — 카드 첫 렌더에 불필요. 메뉴 클릭 시 lazy load.
-import dynamic from "next/dynamic"
-const BumpDialog = dynamic(() => import("@/components/bump-dialog").then((m) => m.BumpDialog), { ssr: false })
 import { toast } from "sonner"
 import { memo, useState } from "react"
 import { MediaThumbnail } from "@/components/media-thumbnail"
@@ -66,7 +63,6 @@ export const JobsCard = memo(function JobsCard({ post, currentUserId, isAdmin = 
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
   const [currentStatus, setCurrentStatus] = useState(post.status)
-  const [bumpOpen, setBumpOpen] = useState(false)
 
   const kind = kindStyles[post.kind] || kindStyles.hiring
   const isClosed = currentStatus === "closed"
@@ -223,15 +219,6 @@ export const JobsCard = memo(function JobsCard({ post, currentUserId, isAdmin = 
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {isOwner && (
-                      <DropdownMenuItem
-                        onClick={(e) => e.stopPropagation()}
-                        onSelect={() => setBumpOpen(true)}
-                      >
-                        <ArrowUp className="w-4 h-4 mr-2" />
-                        올리기
-                      </DropdownMenuItem>
-                    )}
                     {isOwner && currentStatus === "active" && (
                       <DropdownMenuItem onClick={handleClose}>모집마감</DropdownMenuItem>
                     )}
@@ -264,14 +251,6 @@ export const JobsCard = memo(function JobsCard({ post, currentUserId, isAdmin = 
           </div>
         </div>
       </div>
-      {isOwner && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="jobs"
-          targetId={post.id}
-        />
-      )}
     </Link>
   )
 })

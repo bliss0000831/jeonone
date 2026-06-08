@@ -2,12 +2,9 @@
 
 import { memo, useState } from "react"
 import Link from "next/link"
-import { Heart, MapPin, MoreVertical, Trash2, Edit, Eye, ArrowUp } from "lucide-react"
+import { Heart, MapPin, MoreVertical, Trash2, Edit, Eye } from "lucide-react"
 import { FavoriteButton } from "@/components/favorite-button"
 import { cn, stripRegionPrefix, formatTimeAgo } from "@/lib/utils"
-// BumpDialog 는 모달 — 카드 첫 렌더에 불필요. 메뉴 클릭 시 lazy load.
-import dynamic from "next/dynamic"
-const BumpDialog = dynamic(() => import("@/components/bump-dialog").then((m) => m.BumpDialog), { ssr: false })
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import {
@@ -63,7 +60,6 @@ export const LocalFoodCard = memo(function LocalFoodCard({
   const [isLiked, setIsLiked] = useState(post.user_liked || false)
   const [likeCount, setLikeCount] = useState(post.like_count || 0)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [bumpOpen, setBumpOpen] = useState(false)
 
   const isAuthor = currentUserId === post.user_id
   const canManage = isAuthor || isAdmin
@@ -239,15 +235,6 @@ export const LocalFoodCard = memo(function LocalFoodCard({
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {isAuthor && (
-                      <DropdownMenuItem
-                        onClick={(e) => e.stopPropagation()}
-                        onSelect={() => setBumpOpen(true)}
-                      >
-                        <ArrowUp className="w-4 h-4 mr-2" />
-                        올리기
-                      </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem asChild>
                       <Link href={`/local-food/${post.id}/edit`} className="flex items-center gap-2">
                         <Edit className="w-4 h-4" />
@@ -269,14 +256,6 @@ export const LocalFoodCard = memo(function LocalFoodCard({
           </div>
         </div>
       </div>
-      {isAuthor && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="local_food"
-          targetId={post.id}
-        />
-      )}
     </Link>
   )
 })

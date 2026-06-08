@@ -306,11 +306,7 @@ export default function JobsDetailScreen() {
             postId={post.id}
             authorId={post.user_id}
             editHref={`/jobs/${post.id}/edit`}
-            bumpable
             onDeleted={() => router.back()}
-            onAction={() => {
-              setPost((prev) => prev ? { ...prev, bumped_at: new Date().toISOString(), effective_at: new Date().toISOString() } as any : prev)
-            }}
           />
         </View>
       </View>

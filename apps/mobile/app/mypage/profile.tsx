@@ -145,7 +145,7 @@ export default function MyPageTab() {
   const [reviewsOpen, setReviewsOpen] = useState(false)
   const [followModal, setFollowModal] = useState<"followers" | "following" | null>(null)
   const [shareOpen, setShareOpen] = useState(false)
-  // 글 메뉴 (올리기/수정/삭제 등) 동작 후 리스트 강제 재로드 — version bump.
+  // 글 메뉴 (수정/삭제 등) 동작 후 리스트 강제 재로드 — version bump.
   const [reloadVersion, setReloadVersion] = useState(0)
   const reloadList = () => setReloadVersion((v) => v + 1)
 

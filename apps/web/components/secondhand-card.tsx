@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin, Eye, Heart, MoreVertical, Pencil, Trash2, Loader2, ShoppingBag, CheckCircle, ArrowUp } from "lucide-react"
+import { MapPin, Eye, Heart, MoreVertical, Pencil, Trash2, Loader2, ShoppingBag, CheckCircle } from "lucide-react"
 import { FavoriteButton } from "@/components/favorite-button"
 import {
   DropdownMenu,
@@ -15,9 +15,6 @@ import { toast } from "sonner"
 import { memo, useState } from "react"
 import { MediaThumbnail } from "@/components/media-thumbnail"
 import { timeAgoKo as getTimeAgo } from "@/components/listing/time-ago"
-// BumpDialog 는 모달 — 카드 첫 렌더에 불필요. 메뉴 클릭 시 lazy load.
-import dynamic from "next/dynamic"
-const BumpDialog = dynamic(() => import("@/components/bump-dialog").then((m) => m.BumpDialog), { ssr: false })
 
 export interface SecondhandPost {
   id: string
@@ -66,7 +63,6 @@ export const SecondhandCard = memo(function SecondhandCard({ post, currentUserId
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
   const [currentStatus, setCurrentStatus] = useState(post.status)
-  const [bumpOpen, setBumpOpen] = useState(false)
 
   const status = statusLabels[currentStatus] || statusLabels.active
   const timeAgo = getTimeAgo(post.effective_at ?? post.bumped_at ?? post.created_at)
@@ -197,15 +193,6 @@ export const SecondhandCard = memo(function SecondhandCard({ post, currentUserId
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {isOwner && (
-                      <DropdownMenuItem
-                        onClick={(e) => e.stopPropagation()}
-                        onSelect={() => setBumpOpen(true)}
-                      >
-                        <ArrowUp className="w-4 h-4 mr-2" />
-                        올리기
-                      </DropdownMenuItem>
-                    )}
                     {isOwner && currentStatus === "active" && (
                       <DropdownMenuItem onClick={(e) => handleStatusChange(e, "reserved")}>
                         <CheckCircle className="w-4 h-4 mr-2 text-yellow-500" />
@@ -250,14 +237,6 @@ export const SecondhandCard = memo(function SecondhandCard({ post, currentUserId
           </div>
         </div>
       </div>
-      {isOwner && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="secondhand"
-          targetId={post.id}
-        />
-      )}
     </Link>
   )
 })

@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
-import { MessageCircle, Leaf, ShoppingBag } from "lucide-react"
+import { MessageCircle, Leaf, ShoppingBag, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
@@ -17,7 +17,12 @@ import {
   DetailMeta,
   DetailHeaderActions,
 } from "@/components/detail"
-import { BumpQuickMenu } from "@/components/bump-quick-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { ReportButton } from "@/components/report-button"
 import { usePostChat } from "@/hooks/use-post-chat"
 import { useConfirm } from "@/components/confirm-provider"
@@ -237,14 +242,33 @@ export default function LocalFoodDetailPage({
               {!(user && user.id === post.user_id) && !isAdmin && (
                 <ReportButton targetType="local_food" targetId={post.id} variant="icon" />
               )}
-              <BumpQuickMenu
-                isOwner={!!user && user.id === post.user_id}
-                isAdmin={isAdmin}
-                targetType="local_food"
-                targetId={post.id}
-                editHref={`/local-food/${post.id}/edit`}
-                onDelete={handleDelete}
-              />
+              {((!!user && user.id === post.user_id) || isAdmin) && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="p-2 hover:bg-secondary rounded-full transition-colors"
+                      aria-label="더보기"
+                    >
+                      <MoreVertical className="w-5 h-5 text-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/local-food/${post.id}/edit`} className="flex items-center gap-2">
+                        <Pencil className="w-4 h-4 mr-2" />
+                        수정하기
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleDelete}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      삭제하기
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </>
           }
         />

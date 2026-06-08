@@ -2,7 +2,7 @@
  * ListCardMenu — 리스트/카드 아이템 우측에 들어가는 작은 ⋮ 메뉴
  *
  * 역할별 메뉴:
- *   - 작성자: 올리기(bumpable 만) / 수정 / 삭제
+ *   - 작성자: 수정 / 삭제
  *   - 관리자/슈퍼관리자: 수정 / 삭제 (모든 글)
  *   - 그 외: 공유 / 숨기기 / 신고
  *
@@ -41,7 +41,6 @@ import { useAuth } from "@/lib/auth-context"
 import { getSupabase, gwangjangFetch } from "@/lib/supabase"
 import { getCachedPlaza, buildShareUrl } from "@/lib/plaza"
 import { useHiddenPosts } from "@/lib/hidden-posts"
-import { BumpDialog } from "@/components/BumpDialog"
 
 export type ListCardKind =
   | "properties"
@@ -105,33 +104,6 @@ const KIND_TABLE: Record<ListCardKind, string> = {
   board: "board_posts",
 }
 
-// 올리기 지원 카테고리
-const BUMPABLE: Set<ListCardKind> = new Set([
-  "properties",
-  "secondhand",
-  "interior",
-  "moving",
-  "cleaning",
-  "repair",
-  "group-buying",
-  "local-food",
-  "jobs",
-  "new-store",
-])
-
-const KIND_TO_BUMP_TARGET: Partial<Record<ListCardKind, string>> = {
-  properties: "property",
-  secondhand: "secondhand",
-  interior: "interior",
-  moving: "moving",
-  cleaning: "cleaning",
-  repair: "repair",
-  "group-buying": "group_buying",
-  "local-food": "local_food",
-  jobs: "jobs",
-  "new-store": "new_store",
-}
-
 const REPORT_REASONS = [
   { value: "commercial", label: "업자 의심" },
   { value: "spam", label: "스팸/광고" },
@@ -165,7 +137,6 @@ export function ListCardMenu({
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [bumpOpen, setBumpOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   const [reportReason, setReportReason] = useState("commercial")
   const [reportDetail, setReportDetail] = useState("")
@@ -204,7 +175,6 @@ export function ListCardMenu({
 
   const isOwner = !!user && !!authorId && user.id === authorId
   const showOwnerActions = isOwner || isAdmin
-  const showBump = isOwner && BUMPABLE.has(kind)
 
   function handleEdit() {
     setMenuOpen(false)
@@ -254,15 +224,6 @@ export function ListCardMenu({
         },
       },
     ])
-  }
-
-  // 올리기 — 메뉴 닫고 BumpDialog 열기 (즉시 처리 X, 사용자가 결제 방식 선택)
-  function handleBump() {
-    setMenuOpen(false)
-    const targetType = KIND_TO_BUMP_TARGET[kind]
-    if (!targetType || !user) return
-    // setMenuOpen 이 unmount 하기 전 짧은 delay 후 BumpDialog 열기 (애니메이션 겹침 방지)
-    setTimeout(() => setBumpOpen(true), 120)
   }
 
   async function handleShare() {
@@ -363,16 +324,6 @@ export function ListCardMenu({
           >
             {showOwnerActions ? (
               <>
-                {showBump && (
-                  <>
-                    <MenuRow
-                      icon="arrow-up-outline"
-                      label="올리기"
-                      onPress={handleBump}
-                    />
-                    <View style={styles.sep} />
-                  </>
-                )}
                 <MenuRow
                   icon="create-outline"
                   label="수정하기"
@@ -498,17 +449,6 @@ export function ListCardMenu({
           {share.element}
         </View>
       </Modal>
-
-      {/* 올리기 모달 — PostActionsMenu 와 동일 UI */}
-      {KIND_TO_BUMP_TARGET[kind] && (
-        <BumpDialog
-          visible={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType={KIND_TO_BUMP_TARGET[kind]!}
-          targetId={postId}
-          onBumped={() => onChanged?.()}
-        />
-      )}
     </>
   )
 }

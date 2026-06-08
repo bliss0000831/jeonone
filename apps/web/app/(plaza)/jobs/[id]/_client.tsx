@@ -17,9 +17,7 @@ import {
   Clock,
   CalendarDays,
   Phone,
-  ArrowUp,
 } from "lucide-react"
-import { BumpDialog } from "@/components/bump-dialog"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -79,7 +77,6 @@ export default function JobsDetailPage() {
   const [isLiked, setIsLiked] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [isAdmin, setIsAdmin] = useState(false)
-  const [bumpOpen, setBumpOpen] = useState(false)
   const [postStatus, setPostStatus] = useState<string>("active")
   const { handleChat, chatLoading } = usePostChat({
     postId: typeof id === "string" ? id : undefined,
@@ -274,15 +271,6 @@ export default function JobsDetailPage() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {isOwner && (
-                      <>
-                        <DropdownMenuItem onClick={() => setBumpOpen(true)}>
-                          <ArrowUp className="w-4 h-4 mr-2" />
-                          올리기
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
                     {isOwner && !isClosed && (
                       <>
                         <DropdownMenuItem onClick={handleClose}>
@@ -437,14 +425,6 @@ export default function JobsDetailPage() {
           />
         </DetailSection>
       </DetailBody>
-      {isOwner && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="jobs"
-          targetId={post.id}
-        />
-      )}
     </DetailShell>
   )
 }

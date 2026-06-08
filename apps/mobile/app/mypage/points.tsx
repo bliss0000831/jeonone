@@ -59,7 +59,6 @@ const SOURCE_LABEL: Record<string, string> = {
   "like.received": "좋아요 받음",
   "signup.bonus": "가입 보너스",
   "daily.login": "일일 출석",
-  "bump.purchase": "올리기 / 올리기권 구매",
   "group_buying.purchase": "공동구매 결제",
   "local_food.purchase": "로컬푸드 결제",
   "boost.purchase": "부스트 결제",

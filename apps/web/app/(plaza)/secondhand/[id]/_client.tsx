@@ -11,12 +11,10 @@ import {
   Trash2,
   CheckCircle,
   Info,
-  ArrowUp,
   MessageCircle,
   Loader2,
 } from "lucide-react"
 import { usePostChat } from "@/hooks/use-post-chat"
-import { BumpDialog } from "@/components/bump-dialog"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -88,7 +86,6 @@ export default function SecondhandDetailPage() {
   const [actionBusy, setActionBusy] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [postStatus, setPostStatus] = useState<string>("active")
-  const [bumpOpen, setBumpOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
   // 채팅하기 — 훅은 조건부 return 위에서 호출해야 Rules of Hooks 위반이 안 남
@@ -301,11 +298,6 @@ export default function SecondhandDetailPage() {
                   <DropdownMenuContent align="end">
                     {isOwner && (
                       <>
-                        <DropdownMenuItem onClick={() => setBumpOpen(true)}>
-                          <ArrowUp className="w-4 h-4 mr-2" />
-                          올리기
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                         {postStatus === "active" && (
                           <DropdownMenuItem onClick={() => handleStatusChange("reserved")}>
                             <CheckCircle className="w-4 h-4 mr-2 text-yellow-500" />
@@ -489,14 +481,6 @@ export default function SecondhandDetailPage() {
           </div>
         )}
       </DetailBody>
-      {isOwner && post && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="secondhand"
-          targetId={post.id}
-        />
-      )}
     </DetailShell>
   )
 }

@@ -4,7 +4,6 @@
  * 권한별 노출 (web ListingActionsMenu / report-button 정독):
  *   - 비작성자 + 비관리자: 사이렌 🚨 아이콘 → 신고 모달
  *   - 작성자 OR 관리자/슈퍼관리자: ⋮ 아이콘 → 메뉴
- *     · (bumpable) 올리기
  *     · 수정하기
  *     · 삭제하기
  *
@@ -14,7 +13,6 @@
  *     postId={id}
  *     authorId={post.user_id}
  *     editHref={`/property/${id}/edit`}
- *     bumpable
  *     onDeleted={() => router.back()}
  *   />
  */
@@ -54,39 +52,6 @@ export type PostKind =
   | "board"
   | "service-requests"
   | "property-requests"
-
-/**
- * 올리기(bump) 가 가능한 종류 — web bump-quick-menu.tsx BumpTarget 1:1
- * 지원: property, secondhand, interior, moving, cleaning, repair,
- *       group_buying, local_food, jobs, new_store
- * 미지원: sharing, clubs, board
- */
-const BUMPABLE_KINDS = new Set<PostKind>([
-  "properties",
-  "secondhand",
-  "interior",
-  "moving",
-  "cleaning",
-  "repair",
-  "group-buying",
-  "local-food",
-  "jobs",
-  "new-store",
-])
-
-/** kind URL slug → /api/bump/use 의 targetType 매핑 (web BumpTargetType) */
-const KIND_TO_BUMP_TARGET: Partial<Record<PostKind, string>> = {
-  properties: "property",
-  secondhand: "secondhand",
-  interior: "interior",
-  moving: "moving",
-  cleaning: "cleaning",
-  repair: "repair",
-  "group-buying": "group_buying",
-  "local-food": "local_food",
-  jobs: "jobs",
-  "new-store": "new_store",
-}
 
 /** kind URL slug → 기본 detail 경로 prefix (편집 href fallback 용) */
 const KIND_PATH: Record<PostKind, string> = {
@@ -150,16 +115,8 @@ interface Props {
   authorId?: string | null
   /** 수정 페이지 경로 (없으면 자동 추론: `/{KIND_PATH[kind]}/{postId}/edit`) */
   editHref?: string
-  /**
-   * 올리기 지원 — web bump-quick-menu 정독 기준 자동 결정.
-   * 강제 비활성: bumpable={false}.
-   * 강제 활성: bumpable={true} (커스텀 — 보통 불필요)
-   */
-  bumpable?: boolean
   /** 삭제 후 호출 — 보통 router.back() */
   onDeleted?: () => void
-  /** 올리기 후 호출 (새로고침 등) */
-  onAction?: () => void
 }
 
 const REPORT_REASONS = [
@@ -175,9 +132,7 @@ export function PostActionsMenu({
   postId,
   authorId,
   editHref,
-  bumpable,
   onDeleted,
-  onAction,
 }: Props) {
   const router = useRouter()
   const { user } = useAuth()
@@ -188,17 +143,6 @@ export function PostActionsMenu({
   const [reportDetail, setReportDetail] = useState("")
   const [reportSubmitting, setReportSubmitting] = useState(false)
   const [busy, setBusy] = useState(false)
-  // 올리기 모달 상태 (web bump-quick-menu.tsx 1:1)
-  const [bumpOpen, setBumpOpen] = useState(false)
-  const [bumpLoading, setBumpLoading] = useState(false)
-  const [bumpStatus, setBumpStatus] = useState<{
-    freeRemaining: number
-    freeTotal: number
-    pointsCost: number
-    ticketBalance: number
-    pointBalance: number
-  } | null>(null)
-  const [bumpError, setBumpError] = useState<string | null>(null)
 
   // admin / superadmin 체크 — 현재 광장 scope 적용 (web canAccessPlaza 미러)
   useEffect(() => {
@@ -239,14 +183,6 @@ export function PostActionsMenu({
 
   const isOwner = !!user && !!authorId && user.id === authorId
   const showOwnerActions = isOwner || isAdmin
-
-  // 올리기 노출 규칙 (web 1:1):
-  //  - 작성자만 노출 (관리자는 "남의 글 끌올" 방지 차원에서 미노출)
-  //  - 종류 자체가 bumpable 해야 함 (sharing/clubs/board 미지원)
-  //  - props.bumpable === false 면 강제 숨김
-  const kindBumpable = BUMPABLE_KINDS.has(kind)
-  const showBump =
-    isOwner && kindBumpable && (bumpable === undefined ? true : bumpable)
 
   function go(route: string) {
     setMenuOpen(false)
@@ -340,165 +276,6 @@ export function PostActionsMenu({
         },
       },
     ])
-  }
-
-  // 메뉴에서 "올리기" 탭 → 메뉴 닫고 약간 후 BumpModal 오픈 (RN modal 충돌 회피)
-  function handleBump() {
-    const targetType = KIND_TO_BUMP_TARGET[kind]
-    if (!targetType) {
-      Alert.alert("알림", "올리기를 지원하지 않는 글입니다")
-      return
-    }
-    setMenuOpen(false)
-    // 메뉴 fade 애니메이션이 끝난 후 BumpModal 열기 (300ms — 안드/iOS 모두 안정적)
-    setTimeout(() => openBumpModal(), 300)
-  }
-
-  // plaza subdomain 직접 호출 — host 기반 plaza 인식 (CORS / x-plaza 헤더 우회)
-  async function bumpFetch(path: string, init?: RequestInit) {
-    const plaza = getCachedPlaza().id || "www"
-    const supabase = getSupabase()
-    const { data: { session } } = await supabase.auth.getSession()
-    const headers = new Headers(init?.headers ?? {})
-    if (!headers.has("Content-Type") && init?.body) {
-      headers.set("Content-Type", "application/json")
-    }
-    if (session?.access_token) {
-      headers.set("Authorization", `Bearer ${session.access_token}`)
-    }
-    return fetch(`https://${plaza}.gwangjang.app${path}`, { ...init, headers, cache: "no-store" } as any)
-  }
-
-  async function openBumpModal() {
-    const targetType = KIND_TO_BUMP_TARGET[kind]
-    if (!targetType) return
-    setBumpOpen(true)
-    setBumpLoading(true)
-    setBumpStatus(null)
-    setBumpError(null)
-    try {
-      // supabase 직접 쿼리 — web /api/bump/status 1:1 미러 (CORS 우회)
-      const supabase = getSupabase()
-      if (!user?.id) {
-        setBumpError("로그인이 필요합니다")
-        return
-      }
-      const plaza = getCachedPlaza().id
-      if (!plaza) {
-        setBumpError("광장 정보가 없습니다")
-        return
-      }
-
-      // bump_settings
-      const { data: setting } = await supabase
-        .from("bump_settings")
-        .select("*")
-        .eq("target_type", targetType)
-        .eq("enabled", true)
-        .maybeSingle()
-      if (!setting) {
-        setBumpError("올리기 기능이 비활성화되어 있습니다")
-        return
-      }
-
-      // 오늘 무료 사용량
-      const todayStr = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Asia/Seoul",
-      }).format(new Date())
-      const { data: daily } = await supabase
-        .from("bump_daily")
-        .select("free_used")
-        .eq("user_id", user.id)
-        .eq("plaza_id", plaza)
-        .eq("target_type", targetType)
-        .eq("date", todayStr)
-        .maybeSingle()
-      const freeUsed = (daily as any)?.free_used ?? 0
-      const freePerDay = (setting as any).free_per_day ?? 2
-      const freeRemaining = Math.max(0, freePerDay - freeUsed)
-
-      // 올리기권 잔액
-      const { data: ticket } = await supabase
-        .from("bump_tickets")
-        .select("balance")
-        .eq("user_id", user.id)
-        .eq("plaza_id", plaza)
-        .maybeSingle()
-      const ticketBalance = (ticket as any)?.balance ?? 0
-
-      // 포인트 잔액 — 광장 격리 해제됨 (전 광장 공유)
-      const { data: pts } = await supabase
-        .from("user_points")
-        .select("available")
-        .eq("user_id", user.id)
-        .maybeSingle()
-      const pointBalance = (pts as any)?.available ?? 0
-
-      setBumpStatus({
-        freeRemaining,
-        freeTotal: freePerDay,
-        pointsCost: (setting as any).points_cost ?? 0,
-        ticketBalance,
-        pointBalance,
-      })
-    } catch (e: any) {
-      setBumpError(e?.message || "잔여 조회 중 오류가 발생했습니다")
-    } finally {
-      setBumpLoading(false)
-    }
-  }
-
-  async function submitBump(payment: "free" | "points" | "ticket") {
-    const targetType = KIND_TO_BUMP_TARGET[kind]
-    if (!targetType) return
-    setBusy(true)
-    try {
-      // supabase RPC 직접 호출 — web /api/bump/use 1:1 (CORS 우회)
-      const supabase = getSupabase()
-      if (!user?.id) {
-        Alert.alert("로그인 필요", "로그인 후 이용해주세요")
-        return
-      }
-      const plaza = getCachedPlaza().id
-      if (!plaza) {
-        Alert.alert("오류", "광장 정보가 없습니다")
-        return
-      }
-      const pointsCost = bumpStatus?.pointsCost ?? 0
-      const { data: rpcResult, error: rpcErr } = await supabase.rpc("bump_atomic", {
-        p_user_id: user.id,
-        p_plaza_id: plaza,
-        p_target_type: targetType,
-        p_target_id: postId,
-        p_payment: payment,
-        p_points_cost: pointsCost,
-      })
-      if (rpcErr) {
-        Alert.alert("실패", rpcErr.message || "올리기에 실패했습니다")
-        return
-      }
-      const r = rpcResult as { ok: boolean; reason?: string; bumped_at?: string }
-      if (r?.ok) {
-        setBumpOpen(false)
-        Alert.alert("완료", "글을 다시 올렸어요")
-        onAction?.()
-      } else {
-        const reason = r?.reason ?? "unknown"
-        const reasonMap: Record<string, string> = {
-          no_free_quota: "오늘 무료 잔여를 모두 사용했습니다",
-          no_tickets: "올리기권이 부족합니다",
-          insufficient_points: "포인트가 부족합니다",
-          cooldown: "쿨다운 중입니다",
-          account_too_young: "계정 가입 후 일정 기간이 지나야 가능합니다",
-          not_found_or_not_owner: "본인의 글이 아닙니다",
-        }
-        Alert.alert("실패", reasonMap[reason] || reason)
-      }
-    } catch (e: any) {
-      Alert.alert("오류", e?.message || "요청 중 오류가 발생했습니다")
-    } finally {
-      setBusy(false)
-    }
   }
 
   async function handleReportSubmit() {
@@ -600,17 +377,6 @@ export function PostActionsMenu({
       >
         <Pressable style={styles.menuBackdrop} onPress={() => setMenuOpen(false)}>
           <Pressable style={styles.menu} onPress={(e) => e.stopPropagation()}>
-            {showBump && (
-              <>
-                <MenuItem
-                  icon="arrow-up-outline"
-                  label="올리기"
-                  onPress={handleBump}
-                  disabled={busy}
-                />
-                <View style={styles.menuSep} />
-              </>
-            )}
             <MenuItem icon="create-outline" label="수정하기" onPress={handleEdit} />
             <MenuItem
               icon="trash-outline"
@@ -619,175 +385,6 @@ export function PostActionsMenu({
               danger
               disabled={busy}
             />
-          </Pressable>
-        </Pressable>
-      </Modal>
-
-      {/* Bump Modal — web bump-quick-menu.tsx 1:1 */}
-      <Modal
-        visible={bumpOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => !busy && setBumpOpen(false)}
-      >
-        <Pressable
-          style={styles.bumpBackdrop}
-          onPress={() => !busy && setBumpOpen(false)}
-        >
-          <Pressable style={styles.bumpCard} onPress={(e) => e.stopPropagation()}>
-            {/* 헤더 */}
-            <View style={styles.bumpHeader}>
-              <Ionicons name="arrow-up" size={18} color={lightColors.primary} />
-              <Text style={styles.bumpTitle}>글 올리기</Text>
-              <Pressable
-                onPress={() => !busy && setBumpOpen(false)}
-                hitSlop={8}
-                accessibilityLabel="닫기"
-                accessibilityRole="button"
-                style={{ marginLeft: "auto" }}
-              >
-                <Ionicons name="close" size={20} color={lightColors.ink500} />
-              </Pressable>
-            </View>
-
-            <Text style={styles.bumpSub}>
-              내 글을 다시 최신순 맨 위로 올립니다. (다른 분이 글을 올리면 자연스럽게 밀려요)
-            </Text>
-
-            {bumpLoading ? (
-              <View style={{ paddingVertical: 24, alignItems: "center" }}>
-                <ActivityIndicator color={lightColors.primary} />
-              </View>
-            ) : bumpError ? (
-              <View style={{ paddingVertical: 16, alignItems: "center", gap: 10 }}>
-                <Ionicons name="alert-circle-outline" size={32} color="#ef4444" />
-                <Text style={{ fontSize: 13, color: lightColors.ink700, textAlign: "center" }}>
-                  {bumpError}
-                </Text>
-                <Pressable
-                  onPress={() => setBumpOpen(false)}
-                  style={styles.bumpCloseBtn}
-                >
-                  <Text style={styles.bumpCloseBtnText}>닫기</Text>
-                </Pressable>
-              </View>
-            ) : !bumpStatus ? null : (
-              <>
-                {/* 잔여 칩 */}
-                <View style={styles.bumpStatRow}>
-                  <View style={styles.bumpStatChip}>
-                    <Ionicons name="arrow-up" size={12} color={lightColors.ink500} />
-                    <Text style={styles.bumpStatLabel}>무료 잔여</Text>
-                    <Text style={styles.bumpStatValue}>
-                      {bumpStatus.freeRemaining}/{bumpStatus.freeTotal}
-                    </Text>
-                  </View>
-                  <View style={styles.bumpStatChip}>
-                    <Ionicons name="ticket-outline" size={12} color={lightColors.ink500} />
-                    <Text style={styles.bumpStatLabel}>올리기권</Text>
-                    <Text style={styles.bumpStatValue}>{bumpStatus.ticketBalance}장</Text>
-                  </View>
-                </View>
-
-                {/* 무료로 올리기 */}
-                <Pressable
-                  onPress={() => bumpStatus.freeRemaining > 0 && submitBump("free")}
-                  disabled={busy || bumpStatus.freeRemaining <= 0}
-                  style={[
-                    styles.bumpBtn,
-                    bumpStatus.freeRemaining > 0
-                      ? styles.bumpBtnPrimary
-                      : styles.bumpBtnDisabled,
-                  ]}
-                >
-                  <Ionicons
-                    name="arrow-up"
-                    size={16}
-                    color={bumpStatus.freeRemaining > 0 ? "#ffffff" : "#94a3b8"}
-                  />
-                  <Text
-                    style={[
-                      styles.bumpBtnText,
-                      bumpStatus.freeRemaining > 0
-                        ? { color: "#ffffff" }
-                        : { color: "#94a3b8" },
-                    ]}
-                  >
-                    무료로 올리기
-                  </Text>
-                  <Text
-                    style={[
-                      styles.bumpBtnSub,
-                      bumpStatus.freeRemaining > 0
-                        ? { color: "rgba(255,255,255,0.85)" }
-                        : { color: "#94a3b8" },
-                    ]}
-                  >
-                    {bumpStatus.freeRemaining > 0
-                      ? `잔여 ${bumpStatus.freeRemaining}회`
-                      : "모두 사용함"}
-                  </Text>
-                </Pressable>
-
-                {/* 포인트로 올리기 */}
-                <Pressable
-                  onPress={() =>
-                    bumpStatus.pointsCost > 0 &&
-                    bumpStatus.pointBalance >= bumpStatus.pointsCost &&
-                    submitBump("points")
-                  }
-                  disabled={
-                    busy ||
-                    bumpStatus.pointsCost <= 0 ||
-                    bumpStatus.pointBalance < bumpStatus.pointsCost
-                  }
-                  style={[styles.bumpBtn, styles.bumpBtnPoints]}
-                >
-                  <Ionicons name="sparkles-outline" size={16} color="#b45309" />
-                  <Text style={[styles.bumpBtnText, { color: "#b45309" }]}>
-                    포인트로 올리기
-                  </Text>
-                  <View style={{ alignItems: "flex-end" }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#b45309" }}>
-                      {bumpStatus.pointsCost}P
-                    </Text>
-                    <Text style={{ fontSize: 10, color: "#92400e" }}>
-                      보유 {bumpStatus.pointBalance}P
-                    </Text>
-                  </View>
-                </Pressable>
-
-                {/* 올리기권으로 올리기 */}
-                <Pressable
-                  onPress={() =>
-                    bumpStatus.ticketBalance > 0 && submitBump("ticket")
-                  }
-                  disabled={busy || bumpStatus.ticketBalance <= 0}
-                  style={[styles.bumpBtn, styles.bumpBtnTicket]}
-                >
-                  <Ionicons name="ticket-outline" size={16} color={lightColors.ink900} />
-                  <Text style={[styles.bumpBtnText, { color: lightColors.ink900 }]}>
-                    올리기권으로 올리기
-                  </Text>
-                  <Text style={{ fontSize: 11, color: lightColors.ink500 }}>
-                    보유 {bumpStatus.ticketBalance}장
-                  </Text>
-                </Pressable>
-
-                {/* 올리기권 충전하기 */}
-                <Pressable
-                  onPress={() => {
-                    setBumpOpen(false)
-                    setTimeout(() => router.push("/bump-tickets" as any), 100)
-                  }}
-                  style={{ alignItems: "center", paddingTop: 12 }}
-                >
-                  <Text style={{ fontSize: 12, color: lightColors.ink500 }}>
-                    🎫 올리기권 충전하기 →
-                  </Text>
-                </Pressable>
-              </>
-            )}
           </Pressable>
         </Pressable>
       </Modal>
@@ -949,90 +546,6 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: 999,
     alignItems: "center", justifyContent: "center",
   },
-
-  // Bump Modal (web bump-quick-menu.tsx 1:1)
-  bumpBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  bumpCard: {
-    width: "100%",
-    maxWidth: 380,
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 18,
-    gap: 10,
-  },
-  bumpHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  bumpTitle: { fontSize: 16, fontWeight: "800", color: lightColors.ink900 },
-  bumpSub: { fontSize: 12, color: lightColors.ink500, lineHeight: 17 },
-  bumpStatRow: { flexDirection: "row", gap: 8, marginTop: 4 },
-  bumpStatChip: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "#f1f5f9",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  bumpStatLabel: { fontSize: 11, color: lightColors.ink500, flex: 1 },
-  bumpStatValue: { fontSize: 12, fontWeight: "700", color: lightColors.ink900 },
-  bumpBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-  bumpBtnPrimary: {
-    backgroundColor: lightColors.primary,
-  },
-  bumpBtnDisabled: {
-    backgroundColor: "#f1f5f9",
-  },
-  bumpBtnPoints: {
-    backgroundColor: "#fef3c7",
-    borderColor: "#fde68a",
-  },
-  bumpBtnTicket: {
-    backgroundColor: "#ffffff",
-    borderColor: lightColors.border,
-  },
-  bumpBtnText: {
-    fontSize: 14,
-    fontWeight: "700",
-    flex: 1,
-  },
-  bumpBtnSub: { fontSize: 12 },
-  bumpCloseBtn: {
-    minWidth: 100,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bumpCloseBtnText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: lightColors.ink900,
-  },
-
   // Action menu (작성자/관리자)
   menuBackdrop: {
     flex: 1,

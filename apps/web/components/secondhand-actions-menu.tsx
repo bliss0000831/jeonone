@@ -6,14 +6,11 @@
  * `ListingActionsMenu` 를 감싸고 owner extras 로 [올리기 / 상태변경] 추가.
  */
 
-import { useState } from "react"
-import { ArrowUp, CheckCircle } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ListingActionsMenu } from "@/components/listing-actions-menu"
 import { toast } from "sonner"
-import dynamic from "next/dynamic"
 import type { KakaoShareMeta } from "@/lib/integrations/kakao"
-const BumpDialog = dynamic(() => import("@/components/bump-dialog").then((m) => m.BumpDialog), { ssr: false })
 
 type Status = "active" | "reserved" | "completed" | "hidden"
 
@@ -41,8 +38,6 @@ export function SecondhandActionsMenu({
   currentUserId,
   shareMeta,
 }: Props) {
-  const [bumpOpen, setBumpOpen] = useState(false)
-
   const stop = (e: React.MouseEvent | Event) => {
     e.preventDefault()
     e.stopPropagation()
@@ -65,10 +60,6 @@ export function SecondhandActionsMenu({
 
   const ownerExtras = isOwner ? (
     <>
-      <DropdownMenuItem onSelect={() => setBumpOpen(true)}>
-        <ArrowUp className="w-4 h-4 mr-2" />
-        올리기
-      </DropdownMenuItem>
       {status === "active" && (
         <DropdownMenuItem onClick={(e) => handleStatusChange(e, "reserved")}>
           <CheckCircle className="w-4 h-4 mr-2 text-yellow-500" />
@@ -104,14 +95,6 @@ export function SecondhandActionsMenu({
         currentUserId={currentUserId}
         shareMeta={shareMeta}
       />
-      {isOwner && (
-        <BumpDialog
-          open={bumpOpen}
-          onClose={() => setBumpOpen(false)}
-          targetType="secondhand"
-          targetId={postId}
-        />
-      )}
     </>
   )
 }

@@ -272,11 +272,7 @@ export default function LocalFoodDetailScreen() {
             postId={post.id}
             authorId={post.user_id}
             editHref={`/local-food/${post.id}/edit`}
-            bumpable
             onDeleted={() => router.back()}
-            onAction={() => {
-              setPost((prev) => prev ? { ...prev, bumped_at: new Date().toISOString(), effective_at: new Date().toISOString() } as any : prev)
-            }}
           />
         </View>
       </View>
