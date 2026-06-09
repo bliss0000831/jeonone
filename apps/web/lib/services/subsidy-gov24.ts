@@ -31,19 +31,32 @@ const GANGWON_SIGUNGU = [
 ]
 
 /**
- * 소관기관명에서 강원 시군명을 추출. 시군 단위가 아니면(농림축산식품부·강원도청 등)
- * null 반환 → region NULL = "전국/도 전체" 글로 모든 시군에 노출.
+ * 서비스에서 강원 시군명을 추출. 시군 단위가 아니면 null 반환
+ * → region NULL = "전국/도 전체" 글로 모든 시군에 노출.
  *
- *   '강원특별자치도 춘천시'  → '춘천시'
- *   '강원특별자치도 홍천군청' → '홍천군'
- *   '농림축산식품부'         → null
- *   '강원특별자치도'         → null (도청 직속 = 전역)
+ * gov24 강원 농업 사업은 소관기관명이 보통 '강원특별자치도'(도청) 라서 시군이
+ * 없고, 실제 대상 시군은 본문(서비스명·지원대상·지원내용)에 "춘천시 관내…" 식으로
+ * 들어있다. 따라서 소관기관명 → 본문 순으로 시군을 찾는다.
+ *
+ *   소관기관명 '농림축산식품부'              → null (전국, 모든 시군 노출)
+ *   소관기관명 '강원특별자치도', 본문 "춘천시 관내…" → '춘천시'
+ *   소관기관명 '강원특별자치도' (시군 언급 없음) → null (도청 직속 = 전역)
  */
-export function extractGangwonRegion(소관기관명?: string): string | null {
-  if (!소관기관명) return null
-  for (const s of GANGWON_SIGUNGU) {
-    if (소관기관명.includes(s)) return s
-  }
+export function regionFromService(s: {
+  소관기관명?: string
+  서비스명?: string
+  지원대상?: string
+  지원내용?: string
+  서비스목적요약?: string
+}): string | null {
+  const org = (s.소관기관명 ?? '').trim()
+  // 중앙부처(전국) 사업은 본문에 특정 시군이 예시로 나와도 전국으로 유지
+  if (org.includes('농림축산식품부')) return null
+  // 1) 소관기관명에 시군이 명시된 경우 (가장 정확)
+  for (const sg of GANGWON_SIGUNGU) if (org.includes(sg)) return sg
+  // 2) 본문에서 시군 탐색 (강원 지역 사업 — 대상 시군이 본문에 들어있음)
+  const text = `${s.서비스명 ?? ''} ${s.지원대상 ?? ''} ${s.지원내용 ?? ''} ${s.서비스목적요약 ?? ''}`
+  for (const sg of GANGWON_SIGUNGU) if (text.includes(sg)) return sg
   return null
 }
 

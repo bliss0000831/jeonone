@@ -27,7 +27,7 @@ import { verifyCronAuth } from '@/lib/security/cron-auth'
 import {
   collectAgricultureSubsidies,
   buildContent,
-  extractGangwonRegion,
+  regionFromService,
 } from '@/lib/services/subsidy-gov24'
 
 export const dynamic = 'force-dynamic'
@@ -131,12 +131,12 @@ export async function GET(req: Request) {
     const toBackfill = services.filter((s) => {
       const row = seenById.get(s.서비스ID)
       if (!row) return false
-      const want = extractGangwonRegion(s.소관기관명)
+      const want = regionFromService(s)
       return (row.region ?? null) !== (want ?? null)
     })
     for (const s of toBackfill) {
       const row = seenById.get(s.서비스ID)!
-      const want = extractGangwonRegion(s.소관기관명)
+      const want = regionFromService(s)
       const { error: upErr } = await (admin as any)
         .from('board_posts')
         .update({ region: want })
@@ -169,7 +169,7 @@ export async function GET(req: Request) {
       source_id: s.서비스ID,
       source_url: s.상세조회URL ?? null,
       // 시군 단위면 시군명, 도청/전국이면 null(= 모든 시군 노출)
-      region: extractGangwonRegion(s.소관기관명),
+      region: regionFromService(s),
     }))
 
     const { error: insErr, count } = await (admin as any)
