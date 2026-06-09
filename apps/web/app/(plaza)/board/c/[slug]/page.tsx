@@ -42,6 +42,18 @@ function fmtDate(s: string) {
   return `${d.getMonth() + 1}월 ${d.getDate()}일 (${w})`
 }
 
+/** 본문에서 사람이 읽을 발췌 텍스트만 추출 (【라벨】·URL·자동수집 안내 제거) */
+function excerpt(content?: string) {
+  if (!content) return ""
+  return content
+    .replace(/【[^】]*】/g, " ")
+    .replace(/원문 보기:\s*\S+/g, "")
+    .replace(/—\s*보조금24[^\n]*/g, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
 export default function BoardCategoryPage() {
   const params = useParams()
   const slug = (typeof params.slug === "string" ? params.slug : params.slug?.[0]) || "free"
@@ -135,7 +147,12 @@ export default function BoardCategoryPage() {
                         <Link href={`/board/${post.id}`} className="block">
                           <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
                             {thumb ? <Image src={thumb} alt={post.title} fill className="object-cover" /> : (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5"><Icon className="w-12 h-12 text-primary/30" /></div>
+                              <div className="w-full h-full flex flex-col gap-2 p-4 bg-gradient-to-br from-primary/10 to-primary/[0.03]">
+                                <Icon className="w-6 h-6 text-primary/40 shrink-0" />
+                                <p className="text-sm leading-relaxed text-foreground/70 line-clamp-4 whitespace-pre-line">
+                                  {excerpt(post.content) || meta.desc}
+                                </p>
+                              </div>
                             )}
                           </div>
                         </Link>

@@ -18,6 +18,18 @@ const CATS = [
   { slug: "qna", label: "궁금해요", icon: "help-circle" as const },
 ]
 
+/** 본문에서 사람이 읽을 발췌 텍스트만 추출 (【라벨】·URL·자동수집 안내 제거) */
+function excerpt(content?: string) {
+  if (!content) return ""
+  return content
+    .replace(/【[^】]*】/g, " ")
+    .replace(/원문 보기:\s*\S+/g, "")
+    .replace(/—\s*보조금24[^\n]*/g, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
 export default function BoardCategoryScreen() {
   const router = useRouter()
   const plaza = useCurrentPlazaState()
@@ -85,13 +97,19 @@ export default function BoardCategoryScreen() {
           <View style={{ gap: 10 }}>
             {filtered.map((p) => {
               const thumb = p.thumbnail_url || p.images?.[0]
+              const ex = !thumb ? excerpt(p.content) : ""
               return (
                 <Pressable key={p.id} style={styles.card} onPress={() => router.push(`/board/${p.id}` as any)}>
-                  {thumb ? <Image source={{ uri: thumb }} style={styles.cardImg} contentFit="cover" /> : (
-                    <View style={[styles.cardImg, styles.cardImgPlaceholder]}><Ionicons name={cur.icon} size={28} color="#cbd5e1" /></View>
-                  )}
+                  {thumb ? <Image source={{ uri: thumb }} style={styles.cardImg} contentFit="cover" /> : null}
                   <View style={{ flex: 1, padding: 12 }}>
+                    {!thumb ? (
+                      <View style={styles.chip}>
+                        <Ionicons name={cur.icon} size={12} color={GREEN} />
+                        <Text style={styles.chipText}>{cur.label}</Text>
+                      </View>
+                    ) : null}
                     <Text style={styles.cardTitle} numberOfLines={2}>{p.title}</Text>
+                    {ex ? <Text style={styles.cardExcerpt} numberOfLines={2}>{ex}</Text> : null}
                     <Text style={styles.cardMeta}>{p.author_name || "이웃"} · 조회 {p.view_count ?? 0}</Text>
                     <View style={styles.cardStats}>
                       <Text style={styles.stat}>♥ {p.like_count ?? 0}</Text>
@@ -124,6 +142,9 @@ const styles = StyleSheet.create({
   cardImg: { width: 96, height: 96 },
   cardImgPlaceholder: { backgroundColor: "#f1f5f9", alignItems: "center", justifyContent: "center" },
   cardTitle: { fontSize: 15, fontWeight: "700", color: "#1e293b" },
+  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, marginBottom: 6 },
+  chipText: { fontSize: 11, fontWeight: "700", color: GREEN },
+  cardExcerpt: { fontSize: 13, color: "#64748b", marginTop: 5, lineHeight: 18 },
   cardMeta: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
   cardStats: { flexDirection: "row", gap: 10, marginTop: 6 },
   stat: { fontSize: 12, color: "#64748b" },
