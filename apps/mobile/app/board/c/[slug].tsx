@@ -122,9 +122,18 @@ export default function BoardCategoryScreen() {
               return (
                 <Pressable key={p.id} style={styles.row} onPress={() => router.push(`/board/${p.id}` as any)}>
                   <View style={{ flex: 1 }}>
-                    <View style={styles.chip}>
-                      <Ionicons name={cur.icon} size={11} color={GREEN} />
-                      <Text style={styles.chipText}>{cur.label}</Text>
+                    <View style={styles.chipRow}>
+                      <View style={styles.chip}>
+                        <Ionicons name={cur.icon} size={11} color={GREEN} />
+                        <Text style={styles.chipText}>{cur.label}</Text>
+                      </View>
+                      {isSubsidy ? (
+                        <View style={[styles.regionChip, p.region ? styles.regionChipLocal : styles.regionChipAll]}>
+                          <Text style={[styles.regionChipText, p.region ? styles.regionChipTextLocal : styles.regionChipTextAll]}>
+                            {p.region ? `📍 ${p.region} 농가 대상` : "🌐 전국 어디나"}
+                          </Text>
+                        </View>
+                      ) : null}
                     </View>
                     <Text style={styles.rowTitle} numberOfLines={1}>{p.title}</Text>
                     {ex ? <Text style={styles.rowExcerpt} numberOfLines={1}>{ex}</Text> : null}
@@ -160,8 +169,15 @@ const styles = StyleSheet.create({
   empty: { textAlign: "center", color: "#94a3b8", fontSize: 15, paddingVertical: 48 },
   listBox: { backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: "#eee", overflow: "hidden" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 14, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: "#f1f5f9" },
-  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, marginBottom: 6 },
+  chipRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 6 },
+  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
   chipText: { fontSize: 11, fontWeight: "700", color: GREEN },
+  regionChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
+  regionChipLocal: { backgroundColor: "#fef3c7" },
+  regionChipAll: { backgroundColor: "#e0f2fe" },
+  regionChipText: { fontSize: 11, fontWeight: "700" },
+  regionChipTextLocal: { color: "#b45309" },
+  regionChipTextAll: { color: "#0369a1" },
   rowTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b" },
   rowExcerpt: { fontSize: 13, color: "#64748b", marginTop: 3, lineHeight: 18 },
   rowMeta: { fontSize: 12, color: "#94a3b8", marginTop: 6 },

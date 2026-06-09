@@ -190,9 +190,18 @@ export default function BoardCategoryPage() {
                         className="flex gap-3 p-4 hover:bg-secondary/40 transition-colors"
                       >
                         <div className="flex-1 min-w-0">
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-1.5">
-                            <Icon className="w-3 h-3" />{meta.label}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              <Icon className="w-3 h-3" />{meta.label}
+                            </span>
+                            {isSubsidy && (
+                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+                                post.region ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"
+                              }`}>
+                                {post.region ? `📍 ${post.region} 농가 대상` : "🌐 전국 어디나"}
+                              </span>
+                            )}
+                          </div>
                           <h3 className="text-lg font-bold leading-snug line-clamp-1">{post.title}</h3>
                           {ex && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{ex}</p>}
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2 flex-wrap">
