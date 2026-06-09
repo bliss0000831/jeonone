@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Header } from "@/components/header"
 import { createClient } from "@/lib/supabase/client"
 import { getCurrentPlazaClient } from "@/lib/plaza/client"
+import { useUserLocation } from "@/components/location-selector"
 import type { User } from "@supabase/supabase-js"
 import {
   MessageSquare, Camera, Gift, Lightbulb, Coins, HelpCircle,
@@ -60,10 +61,15 @@ export default function BoardCategoryPage() {
   const meta = CATEGORIES.find((c) => c.slug === slug) ?? CATEGORIES[0]
   const Icon = meta.icon
 
+  const isSubsidy = slug === "subsidy"
+  const { location } = useUserLocation()
+  const mySigungu = location?.sigungu || null
+
   const [user, setUser] = useState<User | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [regionMode, setRegionMode] = useState<"mine" | "all">("mine")
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -87,7 +93,14 @@ export default function BoardCategoryPage() {
 
   useEffect(() => { load() }, [load])
 
-  const filtered = posts.filter((p) => p.title?.toLowerCase().includes(search.toLowerCase()))
+  const filtered = posts.filter((p) => {
+    if (!p.title?.toLowerCase().includes(search.toLowerCase())) return false
+    // 정부지원금: 내 시군 글 + 전국(region NULL) 글만 (전체 보기 토글 시 해제)
+    if (isSubsidy && regionMode === "mine" && mySigungu) {
+      return !p.region || p.region === mySigungu
+    }
+    return true
+  })
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -130,6 +143,33 @@ export default function BoardCategoryPage() {
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="게시글 검색..."
               className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-border bg-card text-base focus:outline-none focus:border-primary" />
           </div>
+
+          {/* 정부지원금 — 내 지역 필터 안내 + 전체 보기 토글 */}
+          {isSubsidy && (
+            <div className="flex items-center justify-between gap-2 mb-5 px-1">
+              {mySigungu ? (
+                <>
+                  <span className="text-sm md:text-base text-muted-foreground">
+                    {regionMode === "mine" ? (
+                      <>📍 <b className="text-foreground">{mySigungu}</b> + 전국 지원금만 모아봤어요</>
+                    ) : (
+                      <>🗺️ 강원 전체 지원금을 보고 있어요</>
+                    )}
+                  </span>
+                  <button
+                    onClick={() => setRegionMode((m) => (m === "mine" ? "all" : "mine"))}
+                    className="flex-shrink-0 text-sm md:text-base font-bold text-primary hover:underline"
+                  >
+                    {regionMode === "mine" ? "전체 보기" : "내 지역만"}
+                  </button>
+                </>
+              ) : (
+                <span className="text-sm md:text-base text-muted-foreground">
+                  💡 상단에서 <b className="text-foreground">동네 설정</b>을 하면 내 지역 지원금만 모아볼 수 있어요
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col lg:flex-row gap-6">
             {/* 목록 */}

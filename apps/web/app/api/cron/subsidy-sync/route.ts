@@ -27,6 +27,7 @@ import { verifyCronAuth } from '@/lib/security/cron-auth'
 import {
   collectAgricultureSubsidies,
   buildContent,
+  extractGangwonRegion,
 } from '@/lib/services/subsidy-gov24'
 
 export const dynamic = 'force-dynamic'
@@ -101,12 +102,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: true, fetched: 0, inserted: 0, skipped: 0 })
     }
 
-    // ── 이미 등록된 source_id 조회 (중복 방지) ──────────────────────
+    // ── 이미 등록된 source_id 조회 (중복 방지 + region backfill) ──────
     const ids = services.map((s) => s.서비스ID)
-    // source/source_id 컬럼은 마이그레이션으로 추가됨(타입 미반영) → any 캐스트
+    // source/source_id/region 컬럼은 마이그레이션으로 추가됨(타입 미반영) → any 캐스트
     const { data: existing, error: existErr } = await (admin as any)
       .from('board_posts')
-      .select('source_id')
+      .select('id, source_id, region')
       .eq('source', SOURCE)
       .in('source_id', ids)
 
@@ -117,18 +118,40 @@ export async function GET(req: Request) {
       )
     }
 
-    const seen = new Set<string>(
-      ((existing as Array<{ source_id: string | null }> | null) ?? [])
-        .map((r) => r.source_id)
-        .filter((v): v is string => !!v),
+    type ExistRow = { id: string; source_id: string | null; region: string | null }
+    const existingRows = ((existing as ExistRow[] | null) ?? []).filter(
+      (r): r is ExistRow => !!r.source_id,
+    )
+    const seenById = new Map<string, ExistRow>(
+      existingRows.map((r) => [r.source_id as string, r]),
     )
 
+    // 기존 글 region backfill — 계산한 시군과 다르면 UPDATE (best-effort, 실패 무시)
+    let backfilled = 0
+    const toBackfill = services.filter((s) => {
+      const row = seenById.get(s.서비스ID)
+      if (!row) return false
+      const want = extractGangwonRegion(s.소관기관명)
+      return (row.region ?? null) !== (want ?? null)
+    })
+    for (const s of toBackfill) {
+      const row = seenById.get(s.서비스ID)!
+      const want = extractGangwonRegion(s.소관기관명)
+      const { error: upErr } = await (admin as any)
+        .from('board_posts')
+        .update({ region: want })
+        .eq('id', row.id)
+      if (!upErr) backfilled++
+    }
+
+    const seen = new Set<string>(seenById.keys())
     const newServices = services.filter((s) => !seen.has(s.서비스ID))
     if (newServices.length === 0) {
       return NextResponse.json({
         ok: true,
         fetched: services.length,
         inserted: 0,
+        backfilled,
         skipped: services.length,
       })
     }
@@ -145,6 +168,8 @@ export async function GET(req: Request) {
       source: SOURCE,
       source_id: s.서비스ID,
       source_url: s.상세조회URL ?? null,
+      // 시군 단위면 시군명, 도청/전국이면 null(= 모든 시군 노출)
+      region: extractGangwonRegion(s.소관기관명),
     }))
 
     const { error: insErr, count } = await (admin as any)
@@ -162,6 +187,7 @@ export async function GET(req: Request) {
       ok: true,
       fetched: services.length,
       inserted: count ?? rows.length,
+      backfilled,
       skipped: services.length - rows.length,
     })
   } catch (e: any) {

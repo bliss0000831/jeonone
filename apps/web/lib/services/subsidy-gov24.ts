@@ -23,6 +23,30 @@ const GOV24_BASE = 'https://api.odcloud.kr/api/gov24/v3/serviceList'
 /** 농업 서비스분야 값 (실제 API 분포로 확인된 단일 카테고리) */
 export const AGRI_SERVICE_FIELD = '농림축산어업'
 
+/** 강원도 시군 (소관기관명 매칭용). 긴 이름 먼저 매칭되도록 길이 정렬은 호출부에서. */
+const GANGWON_SIGUNGU = [
+  '춘천시', '원주시', '강릉시', '동해시', '태백시', '속초시', '삼척시',
+  '홍천군', '횡성군', '영월군', '평창군', '정선군', '철원군', '화천군',
+  '양구군', '인제군', '고성군', '양양군',
+]
+
+/**
+ * 소관기관명에서 강원 시군명을 추출. 시군 단위가 아니면(농림축산식품부·강원도청 등)
+ * null 반환 → region NULL = "전국/도 전체" 글로 모든 시군에 노출.
+ *
+ *   '강원특별자치도 춘천시'  → '춘천시'
+ *   '강원특별자치도 홍천군청' → '홍천군'
+ *   '농림축산식품부'         → null
+ *   '강원특별자치도'         → null (도청 직속 = 전역)
+ */
+export function extractGangwonRegion(소관기관명?: string): string | null {
+  if (!소관기관명) return null
+  for (const s of GANGWON_SIGUNGU) {
+    if (소관기관명.includes(s)) return s
+  }
+  return null
+}
+
 /** gov24 serviceList data[] 항목 (사용하는 필드만 선언) */
 export interface Gov24Service {
   서비스ID: string

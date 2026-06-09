@@ -6,7 +6,7 @@ import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
-import { useCurrentPlazaState } from "@/lib/plaza"
+import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
 
 const GREEN = "#225a39"
 const CATS = [
@@ -35,10 +35,13 @@ export default function BoardCategoryScreen() {
   const plaza = useCurrentPlazaState()
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const cur = CATS.find((c) => c.slug === slug) ?? CATS[0]
+  const isSubsidy = cur.slug === "subsidy"
+  const myRegion = useCurrentRegion(plaza.id)
 
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [regionMode, setRegionMode] = useState<"mine" | "all">("mine")
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -58,7 +61,14 @@ export default function BoardCategoryScreen() {
 
   useFocusEffect(useCallback(() => { load() }, [load]))
 
-  const filtered = posts.filter((p) => (p.title || "").toLowerCase().includes(search.toLowerCase()))
+  const filtered = posts.filter((p) => {
+    if (!(p.title || "").toLowerCase().includes(search.toLowerCase())) return false
+    // 정부지원금: 내 시군 글 + 전국(region NULL) 글만 (전체 보기 토글 시 해제)
+    if (isSubsidy && regionMode === "mine" && myRegion) {
+      return !p.region || p.region === myRegion
+    }
+    return true
+  })
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -90,6 +100,17 @@ export default function BoardCategoryScreen() {
           <Ionicons name="search" size={18} color="#94a3b8" />
           <TextInput value={search} onChangeText={setSearch} placeholder="게시글 검색..." placeholderTextColor="#94a3b8" style={styles.searchInput} />
         </View>
+
+        {isSubsidy ? (
+          <View style={styles.regionBar}>
+            <Text style={styles.regionText}>
+              {regionMode === "mine" ? `📍 ${myRegion} + 전국 지원금` : "🗺️ 강원 전체 지원금"}
+            </Text>
+            <Pressable onPress={() => setRegionMode((m) => (m === "mine" ? "all" : "mine"))} hitSlop={8}>
+              <Text style={styles.regionToggle}>{regionMode === "mine" ? "전체 보기" : "내 지역만"}</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : filtered.length === 0 ? (
           <Text style={styles.empty}>아직 게시글이 없습니다</Text>
@@ -133,6 +154,9 @@ const styles = StyleSheet.create({
   h1: { fontSize: 22, fontWeight: "900", color: "#1e293b", marginBottom: 12 },
   search: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#fff", borderRadius: 12, borderWidth: 2, borderColor: "#e2e8f0", paddingHorizontal: 14, marginBottom: 16 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 15 },
+  regionBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14, paddingHorizontal: 2 },
+  regionText: { fontSize: 14, color: "#64748b", flex: 1 },
+  regionToggle: { fontSize: 14, fontWeight: "800", color: GREEN },
   empty: { textAlign: "center", color: "#94a3b8", fontSize: 15, paddingVertical: 48 },
   listBox: { backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: "#eee", overflow: "hidden" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 14, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: "#f1f5f9" },
