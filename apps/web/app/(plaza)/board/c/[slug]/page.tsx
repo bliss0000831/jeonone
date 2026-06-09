@@ -139,36 +139,36 @@ export default function BoardCategoryPage() {
               ) : filtered.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">아직 게시글이 없습니다</div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="divide-y divide-border rounded-xl border bg-card overflow-hidden">
                   {filtered.map((post) => {
                     const thumb = post.thumbnail_url || post.images?.[0]
+                    const ex = excerpt(post.content)
                     return (
-                      <div key={post.id} className="bg-card border rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-                        <Link href={`/board/${post.id}`} className="block">
-                          <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
-                            {thumb ? <Image src={thumb} alt={post.title} fill className="object-cover" /> : (
-                              <div className="w-full h-full flex flex-col gap-2 p-4 bg-gradient-to-br from-primary/10 to-primary/[0.03]">
-                                <Icon className="w-6 h-6 text-primary/40 shrink-0" />
-                                <p className="text-sm leading-relaxed text-foreground/70 line-clamp-4 whitespace-pre-line">
-                                  {excerpt(post.content) || meta.desc}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </Link>
-                        <div className="p-3">
-                          <Link href={`/board/${post.id}`}><h3 className="text-base font-bold hover:text-primary line-clamp-2 leading-tight h-[2.5rem]">{post.title}</h3></Link>
-                          <div className="border-t my-2" />
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                            <span className="font-medium text-foreground/80">{post.author_name || "이웃"}</span><span>·</span><span>{fmtDate(post.created_at)}</span>
-                          </div>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-0.5"><Eye className="w-3.5 h-3.5" />{post.view_count ?? 0}</span>
+                      <Link
+                        key={post.id}
+                        href={`/board/${post.id}`}
+                        className="flex gap-3 p-4 hover:bg-secondary/40 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-1.5">
+                            <Icon className="w-3 h-3" />{meta.label}
+                          </span>
+                          <h3 className="text-lg font-bold leading-snug line-clamp-1">{post.title}</h3>
+                          {ex && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{ex}</p>}
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2 flex-wrap">
+                            <span className="font-medium text-foreground/70">{post.author_name || "이웃"}</span>
+                            <span>·</span><span>{fmtDate(post.created_at)}</span>
+                            <span className="flex items-center gap-0.5 ml-1"><Eye className="w-3.5 h-3.5" />{post.view_count ?? 0}</span>
                             <span className="flex items-center gap-0.5 text-rose-500"><Heart className="w-3.5 h-3.5" />{post.like_count ?? 0}</span>
                             <span className="flex items-center gap-0.5"><MessageCircle className="w-3.5 h-3.5" />{post.comment_count ?? 0}</span>
                           </div>
                         </div>
-                      </div>
+                        {thumb && (
+                          <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted self-center">
+                            <Image src={thumb} alt={post.title} fill className="object-cover" />
+                          </div>
+                        )}
+                      </Link>
                     )
                   })}
                 </div>

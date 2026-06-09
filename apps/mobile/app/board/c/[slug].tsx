@@ -94,28 +94,24 @@ export default function BoardCategoryScreen() {
         {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : filtered.length === 0 ? (
           <Text style={styles.empty}>아직 게시글이 없습니다</Text>
         ) : (
-          <View style={{ gap: 10 }}>
+          <View style={styles.listBox}>
             {filtered.map((p) => {
               const thumb = p.thumbnail_url || p.images?.[0]
-              const ex = !thumb ? excerpt(p.content) : ""
+              const ex = excerpt(p.content)
               return (
-                <Pressable key={p.id} style={styles.card} onPress={() => router.push(`/board/${p.id}` as any)}>
-                  {thumb ? <Image source={{ uri: thumb }} style={styles.cardImg} contentFit="cover" /> : null}
-                  <View style={{ flex: 1, padding: 12 }}>
-                    {!thumb ? (
-                      <View style={styles.chip}>
-                        <Ionicons name={cur.icon} size={12} color={GREEN} />
-                        <Text style={styles.chipText}>{cur.label}</Text>
-                      </View>
-                    ) : null}
-                    <Text style={styles.cardTitle} numberOfLines={2}>{p.title}</Text>
-                    {ex ? <Text style={styles.cardExcerpt} numberOfLines={2}>{ex}</Text> : null}
-                    <Text style={styles.cardMeta}>{p.author_name || "이웃"} · 조회 {p.view_count ?? 0}</Text>
-                    <View style={styles.cardStats}>
-                      <Text style={styles.stat}>♥ {p.like_count ?? 0}</Text>
-                      <Text style={styles.stat}>💬 {p.comment_count ?? 0}</Text>
+                <Pressable key={p.id} style={styles.row} onPress={() => router.push(`/board/${p.id}` as any)}>
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.chip}>
+                      <Ionicons name={cur.icon} size={11} color={GREEN} />
+                      <Text style={styles.chipText}>{cur.label}</Text>
                     </View>
+                    <Text style={styles.rowTitle} numberOfLines={1}>{p.title}</Text>
+                    {ex ? <Text style={styles.rowExcerpt} numberOfLines={1}>{ex}</Text> : null}
+                    <Text style={styles.rowMeta}>
+                      {p.author_name || "이웃"} · 조회 {p.view_count ?? 0} · ♥ {p.like_count ?? 0} · 💬 {p.comment_count ?? 0}
+                    </Text>
                   </View>
+                  {thumb ? <Image source={{ uri: thumb }} style={styles.rowThumb} contentFit="cover" /> : null}
                 </Pressable>
               )
             })}
@@ -138,14 +134,12 @@ const styles = StyleSheet.create({
   search: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#fff", borderRadius: 12, borderWidth: 2, borderColor: "#e2e8f0", paddingHorizontal: 14, marginBottom: 16 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 15 },
   empty: { textAlign: "center", color: "#94a3b8", fontSize: 15, paddingVertical: 48 },
-  card: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 14, overflow: "hidden", borderWidth: 1, borderColor: "#eee" },
-  cardImg: { width: 96, height: 96 },
-  cardImgPlaceholder: { backgroundColor: "#f1f5f9", alignItems: "center", justifyContent: "center" },
-  cardTitle: { fontSize: 15, fontWeight: "700", color: "#1e293b" },
+  listBox: { backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: "#eee", overflow: "hidden" },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 14, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: "#f1f5f9" },
   chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, marginBottom: 6 },
   chipText: { fontSize: 11, fontWeight: "700", color: GREEN },
-  cardExcerpt: { fontSize: 13, color: "#64748b", marginTop: 5, lineHeight: 18 },
-  cardMeta: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
-  cardStats: { flexDirection: "row", gap: 10, marginTop: 6 },
-  stat: { fontSize: 12, color: "#64748b" },
+  rowTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b" },
+  rowExcerpt: { fontSize: 13, color: "#64748b", marginTop: 3, lineHeight: 18 },
+  rowMeta: { fontSize: 12, color: "#94a3b8", marginTop: 6 },
+  rowThumb: { width: 64, height: 64, borderRadius: 8, backgroundColor: "#f1f5f9" },
 })
