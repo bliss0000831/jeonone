@@ -102,41 +102,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: true, fetched: 0, inserted: 0, skipped: 0 })
     }
 
-    // ── 진단용 ?debug=1 — 실제 필드/시군 추출 결과 샘플 (DB 변경 없음) ──
-    if (req.url.includes('debug=1')) {
-      // DB 에 실제 저장된 region 분포 (backfill 적용 여부 확인)
-      const { data: stored } = await admin
-        .from('board_posts')
-        .select('region')
-        .eq('plaza_id', PLAZA_ID)
-        .eq('category_id', category.id)
-      const storedCounts = ((stored as Array<{ region: string | null }> | null) ?? [])
-        .reduce((acc: Record<string, number>, r) => {
-          const k = r.region ?? '(전국/NULL)'
-          acc[k] = (acc[k] ?? 0) + 1
-          return acc
-        }, {})
-      return NextResponse.json({
-        ok: true,
-        v: 3,
-        fetched: services.length,
-        storedInDB: storedCounts,
-        regionCounts: services.reduce((acc: Record<string, number>, s) => {
-          const r = regionFromService(s) ?? '(전국/NULL)'
-          acc[r] = (acc[r] ?? 0) + 1
-          return acc
-        }, {}),
-        samples: services.slice(0, 4).map((s) => ({
-          서비스명: s.서비스명,
-          소관기관명: s.소관기관명,
-          지원대상: (s.지원대상 ?? '').slice(0, 60),
-          지원내용: (s.지원내용 ?? '').slice(0, 60),
-          서비스목적요약: (s.서비스목적요약 ?? '').slice(0, 60),
-          계산된_region: regionFromService(s),
-        })),
-      })
-    }
-
     // ── 이미 등록된 source_id 조회 (중복 방지 + region backfill) ──────
     const ids = services.map((s) => s.서비스ID)
     // source/source_id/region 컬럼은 마이그레이션으로 추가됨(타입 미반영) → any 캐스트
@@ -169,8 +134,6 @@ export async function GET(req: Request) {
       const want = regionFromService(s)
       return (row.region ?? null) !== (want ?? null)
     })
-    let backfillError: string | null = null
-    const backfillAttempts = toBackfill.length
     for (const s of toBackfill) {
       const row = seenById.get(s.서비스ID)!
       const want = regionFromService(s)
@@ -179,7 +142,6 @@ export async function GET(req: Request) {
         .update({ region: want })
         .eq('id', row.id)
       if (!upErr) backfilled++
-      else if (!backfillError) backfillError = upErr.message ?? String(upErr)
     }
 
     const seen = new Set<string>(seenById.keys())
@@ -190,8 +152,6 @@ export async function GET(req: Request) {
         fetched: services.length,
         inserted: 0,
         backfilled,
-        backfillAttempts,
-        backfillError,
         skipped: services.length,
       })
     }
