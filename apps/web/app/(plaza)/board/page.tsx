@@ -1,40 +1,11 @@
-import type { Metadata } from "next"
-import { createClient } from "@/lib/supabase/server"
-import { getCurrentPlaza } from "@/lib/plaza/server"
-import { plazaCityName } from "@/lib/plaza/city-name"
-import BoardPageClient from "./_client"
+import { redirect } from "next/navigation"
 
-export const revalidate = 60
-
-export async function generateMetadata(): Promise<Metadata> {
-  const supabase = await createClient()
-  const plaza = await getCurrentPlaza()
-
-  let cityName = "광장"
-  if (plaza) {
-    const { data } = await supabase
-      .from("plazas")
-      .select("name")
-      .eq("id", plaza)
-      .single()
-    if (data?.name) cityName = plazaCityName(data.name)
-  }
-
-  const title = `${cityName} 게시판 — 자유·맛집·생활정보·일상`
-  const description = `${cityName} 주민들의 마을 사랑방. 맛집 추천, 생활정보, 일상 이야기를 나눠보세요.`
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: "ko_KR",
-    },
-  }
-}
-
+/**
+ * 소식통(게시판) 진입 — 초록 카테고리 화면(/board/c/[slug])으로 통일.
+ *
+ * 기존 '밝은 허브'(_client.tsx: 핫글/수다왕/지역칩) 디자인은 제거하고,
+ * 앱과 동일하게 카테고리 탭바 화면 하나로 일원화. 기본은 '마을 사랑방'(free).
+ */
 export default function BoardPage() {
-  return <BoardPageClient />
+  redirect("/board/c/free")
 }
