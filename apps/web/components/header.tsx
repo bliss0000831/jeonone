@@ -164,8 +164,15 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
     <header className="safe-top sticky top-0 z-50 bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
-          {/* Location (로고·앱이름 제거 — 위치칩만 좌측) */}
-          <div className="flex items-center min-w-0">
+          {/* 홈 링크(광장명) + 위치칩 좌측 */}
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <Link
+              href="/"
+              aria-label="홈으로"
+              className="flex-shrink-0 font-extrabold text-primary text-sm sm:text-base whitespace-nowrap hover:opacity-80 transition-opacity"
+            >
+              {siteBranding.name}
+            </Link>
             <div className="flex-shrink-0">
               <LocationSelector
                 location={location ?? null}
