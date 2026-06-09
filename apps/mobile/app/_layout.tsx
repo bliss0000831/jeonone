@@ -185,6 +185,7 @@ const DOMAIN_ROUTES = new Set([
   "property", "requests", "interior", "moving", "cleaning", "repair",
   "service-requests", "secondhand", "sharing", "group-buying",
   "local-food", "new-store", "jobs", "clubs",
+  "auction", "rental", "board",
 ])
 
 function RootLayoutNav() {

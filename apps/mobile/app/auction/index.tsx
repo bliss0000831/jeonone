@@ -9,6 +9,7 @@ import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState } from "@/lib/plaza"
+import { DomainTabBar } from "@/components/DomainTabBar"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -70,6 +71,8 @@ export default function AuctionListScreen() {
         <Text style={styles.barTitle}>만물 경매장</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      <DomainTabBar current="auction" />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: 32 }}

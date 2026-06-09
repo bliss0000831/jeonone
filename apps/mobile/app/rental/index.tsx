@@ -8,6 +8,7 @@ import { Image, ImageBackground } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState } from "@/lib/plaza"
+import { DomainTabBar } from "@/components/DomainTabBar"
 
 const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
@@ -59,6 +60,9 @@ export default function RentalListScreen() {
           <Text style={styles.manageText}>예약 관리</Text>
         </Pressable>
       </View>
+
+      <DomainTabBar current="rental" />
+
       <ScrollView
         contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GREEN} colors={[GREEN]} />}
