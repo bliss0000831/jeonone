@@ -53,12 +53,14 @@ const HOMES_CHILDREN: DomainTab[] = [
 ]
 const HOMES_KEYS = new Set(HOMES_CHILDREN.map((t) => t.key))
 
-/** 표시 순서 — 홈즈는 placeholder key 로 자리잡음 */
-const DOMAIN_TABS: (DomainTab | { key: "__homes__"; label: string })[] = [
+/** 표시 순서 — 웹 상단 내비와 동일 (마켓 → 커뮤니티). 경매장·대여 포함. */
+const DOMAIN_TABS: DomainTab[] = [
   { key: "secondhand", label: "농기구/자재", path: "/secondhand" },
   { key: "local-food", label: "로컬푸드",    path: "/local-food" },
-  { key: "jobs",       label: "일손찾기",    path: "/jobs" },
-  { key: "board",      label: "마을소식",    path: "/board" },
+  { key: "auction",    label: "경매장",      path: "/auction" },
+  { key: "rental",     label: "대여",        path: "/rental" },
+  { key: "jobs",       label: "일손",        path: "/jobs" },
+  { key: "board",      label: "소식통",      path: "/board" },
   { key: "sharing",    label: "무료나눔",    path: "/sharing" },
 ]
 
