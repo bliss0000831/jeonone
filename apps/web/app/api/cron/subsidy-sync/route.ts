@@ -102,6 +102,28 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: true, fetched: 0, inserted: 0, skipped: 0 })
     }
 
+    // ── 진단용 ?debug=1 — 실제 필드/시군 추출 결과 샘플 (DB 변경 없음) ──
+    if (req.url.includes('debug=1')) {
+      return NextResponse.json({
+        ok: true,
+        v: 2,
+        fetched: services.length,
+        regionCounts: services.reduce((acc: Record<string, number>, s) => {
+          const r = regionFromService(s) ?? '(전국/NULL)'
+          acc[r] = (acc[r] ?? 0) + 1
+          return acc
+        }, {}),
+        samples: services.slice(0, 4).map((s) => ({
+          서비스명: s.서비스명,
+          소관기관명: s.소관기관명,
+          지원대상: (s.지원대상 ?? '').slice(0, 60),
+          지원내용: (s.지원내용 ?? '').slice(0, 60),
+          서비스목적요약: (s.서비스목적요약 ?? '').slice(0, 60),
+          계산된_region: regionFromService(s),
+        })),
+      })
+    }
+
     // ── 이미 등록된 source_id 조회 (중복 방지 + region backfill) ──────
     const ids = services.map((s) => s.서비스ID)
     // source/source_id/region 컬럼은 마이그레이션으로 추가됨(타입 미반영) → any 캐스트
