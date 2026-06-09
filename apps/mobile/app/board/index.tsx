@@ -2,7 +2,7 @@
  * 게시판 — 광장 web /board 1:1 미러.
  *
  * 동기화 (web):
- *   - board_categories 테이블 동적 로드 (마을 사랑방/맛집추천/생활정보/일상공유/질문답변)
+ *   - board_categories 테이블 동적 로드 (마을 사랑방/농업 일기/무료 나눔/살림 정보/정부 지원금/궁금해요)
  *   - board_posts 테이블에서 plaza_id + category_id + region 필터 (status 필터 X)
  *   - 지역 chips: 사용자 sub_region 우선 (전체광장/춘천/홍천/...)
  *   - is_pinned 우선, created_at desc 정렬
@@ -76,12 +76,13 @@ interface Ranker {
   score: number
 }
 
-/** 카테고리 slug → 아이콘 매핑 */
+/** 카테고리 slug → 아이콘 매핑 (전원일기 6개 — 홈 타일/웹과 동일) */
 const CAT_ICON: Record<string, { name: string; color: string }> = {
   free: { name: "chatbubbles-outline", color: "#6366f1" },
-  food: { name: "restaurant-outline", color: "#f97316" },
-  life: { name: "bulb-outline", color: "#eab308" },
   daily: { name: "camera-outline", color: "#ec4899" },
+  share: { name: "gift-outline", color: "#10b981" },
+  life: { name: "bulb-outline", color: "#eab308" },
+  subsidy: { name: "cash-outline", color: "#16a34a" },
   qna: { name: "help-circle-outline", color: "#0ea5e9" },
 }
 
@@ -152,19 +153,20 @@ export default function BoardListScreen() {
       let q = getSupabase()
         .from("board_categories")
         .select("*")
-        .order("order_index", { ascending: true })
+        .order("sort_order", { ascending: true })
       if (plazaId) q = q.eq("plaza_id", plazaId)
       const { data, error } = await q
       if (!error && data && data.length > 0) {
         setCategories(data as BoardCategory[])
       } else {
-        // 테이블 없거나 비어있을 때 fallback — web 기본값
+        // 테이블 없거나 비어있을 때 fallback — 전원일기 6개 (홈 타일/웹과 동일)
         setCategories([
           { id: "free", slug: "free", name: "마을 사랑방" },
-          { id: "food", slug: "food", name: "맛집추천" },
-          { id: "life", slug: "life", name: "생활정보" },
-          { id: "daily", slug: "daily", name: "일상공유" },
-          { id: "qna", slug: "qna", name: "질문답변" },
+          { id: "daily", slug: "daily", name: "농업 일기" },
+          { id: "share", slug: "share", name: "무료 나눔" },
+          { id: "life", slug: "life", name: "살림 정보" },
+          { id: "subsidy", slug: "subsidy", name: "정부 지원금" },
+          { id: "qna", slug: "qna", name: "궁금해요" },
         ])
       }
     })()
