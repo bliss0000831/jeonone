@@ -10,7 +10,7 @@
  * 주의: SW 변경 시 SW_VERSION 올리면 옛 캐시 자동 정리.
  */
 
-const SW_VERSION = 'v1.1.0'
+const SW_VERSION = 'v1.2.0'
 const CACHE_PREFIX = 'gwangjang-'
 const STATIC_CACHE = `${CACHE_PREFIX}static-${SW_VERSION}`
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${SW_VERSION}`
@@ -72,6 +72,22 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return
 
   const url = new URL(request.url)
+
+  // 0) ⚠️ RSC / Next 라우터 데이터 요청은 절대 캐시하지 않음 (network only).
+  //    App Router 의 soft navigation 은 `?_rsc=` 쿼리 + `RSC: 1` 헤더로 RSC payload 를
+  //    가져온다. 이걸 cache-first 로 서빙하면 옛 배포의 payload(옛 buildId)가 나가고,
+  //    HTML(network-first, 최신 buildId)과 불일치 → Next.js 가 deployment-skew 로 판단해
+  //    하드 리로드 → 무한 새로고침 루프가 된다. 따라서 항상 네트워크에서 받는다.
+  const accept = request.headers.get('accept') || ''
+  if (
+    url.searchParams.has('_rsc') ||
+    request.headers.get('rsc') === '1' ||
+    request.headers.get('next-router-prefetch') === '1' ||
+    accept.includes('text/x-component')
+  ) {
+    event.respondWith(fetch(request))
+    return
+  }
 
   // 1) Supabase / API 호출은 항상 network (인증 / 광장 의존)
   //    실패 시에만 캐시 fallback
