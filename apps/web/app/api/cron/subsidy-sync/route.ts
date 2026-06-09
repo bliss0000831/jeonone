@@ -169,6 +169,8 @@ export async function GET(req: Request) {
       const want = regionFromService(s)
       return (row.region ?? null) !== (want ?? null)
     })
+    let backfillError: string | null = null
+    const backfillAttempts = toBackfill.length
     for (const s of toBackfill) {
       const row = seenById.get(s.서비스ID)!
       const want = regionFromService(s)
@@ -177,6 +179,7 @@ export async function GET(req: Request) {
         .update({ region: want })
         .eq('id', row.id)
       if (!upErr) backfilled++
+      else if (!backfillError) backfillError = upErr.message ?? String(upErr)
     }
 
     const seen = new Set<string>(seenById.keys())
@@ -187,6 +190,8 @@ export async function GET(req: Request) {
         fetched: services.length,
         inserted: 0,
         backfilled,
+        backfillAttempts,
+        backfillError,
         skipped: services.length,
       })
     }
