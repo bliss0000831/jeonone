@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState } from "@/lib/plaza"
 import { DomainTabBar } from "@/components/DomainTabBar"
+import { HeaderActions } from "@/components/HeaderActions"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -69,7 +70,7 @@ export default function AuctionListScreen() {
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
         <Text style={styles.barTitle}>만물 경매장</Text>
-        <View style={{ width: 24 }} />
+        <HeaderActions />
       </View>
 
       <DomainTabBar current="auction" />
@@ -127,8 +128,8 @@ export default function AuctionListScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
-  bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#eee" },
-  barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
+  bar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, height: 52, backgroundColor: "#fff" },
+  barTitle: { fontSize: 17, fontWeight: "700", color: "#1e293b", flex: 1, marginLeft: 4 },
   hero: { width: "100%", height: 170 },
   heroOverlay: { flex: 1, alignItems: "center", justifyContent: "center" },
   heroTitle: { color: "#fff", fontSize: 24, fontWeight: "900", marginTop: 8 },

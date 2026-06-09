@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState } from "@/lib/plaza"
 import { DomainTabBar } from "@/components/DomainTabBar"
+import { HeaderActions } from "@/components/HeaderActions"
 
 const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
@@ -55,10 +56,7 @@ export default function RentalListScreen() {
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
         <Text style={styles.barTitle}>농기구 대여</Text>
-        <Pressable onPress={() => router.push("/rental/manage" as any)} hitSlop={10} style={styles.manageBtn}>
-          <Ionicons name="calendar-outline" size={15} color={GREEN} />
-          <Text style={styles.manageText}>예약 관리</Text>
-        </Pressable>
+        <HeaderActions />
       </View>
 
       <DomainTabBar current="rental" />
@@ -75,7 +73,13 @@ export default function RentalListScreen() {
           </LinearGradient>
         </ImageBackground>
         <View style={{ padding: 16 }}>
-          <Text style={styles.section}>대여 가능한 농기구</Text>
+          <View style={styles.sectionRow}>
+            <Text style={styles.section}>대여 가능한 농기구</Text>
+            <Pressable onPress={() => router.push("/rental/manage" as any)} hitSlop={8} style={styles.manageBtn}>
+              <Ionicons name="calendar-outline" size={15} color={GREEN} />
+              <Text style={styles.manageText}>예약 관리</Text>
+            </Pressable>
+          </View>
           {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : loadError ? (
             <View style={styles.empty}>
               <Ionicons name="cloud-offline-outline" size={48} color="#cbd5e1" />
@@ -107,15 +111,16 @@ export default function RentalListScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
-  bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#eee" },
-  barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
+  bar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, height: 52, backgroundColor: "#fff" },
+  barTitle: { fontSize: 17, fontWeight: "700", color: "#1e293b", flex: 1, marginLeft: 4 },
+  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },
   manageBtn: { flexDirection: "row", alignItems: "center", gap: 3 },
   manageText: { fontSize: 13, fontWeight: "800", color: GREEN },
   hero: { width: "100%", height: 160 },
   heroOverlay: { flex: 1, alignItems: "center", justifyContent: "center" },
   heroTitle: { color: "#fff", fontSize: 22, fontWeight: "900", marginTop: 6 },
   heroSub: { color: "#fff", fontSize: 13, marginTop: 2 },
-  section: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 12 },
+  section: { fontSize: 16, fontWeight: "800", color: "#1e293b" },
   empty: { alignItems: "center", paddingVertical: 48, gap: 8 },
   emptyText: { color: "#94a3b8", fontSize: 15, fontWeight: "600" },
   retryBtn: { marginTop: 12, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: GREEN },
