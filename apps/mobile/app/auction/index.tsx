@@ -1,16 +1,13 @@
-/** 만물 경매장 — 목록 (RN). 웹 /auction 과 동일 구성. */
-import { useState, useEffect, useCallback } from "react"
-import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, RefreshControl } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useRouter } from "expo-router"
-import { useFocusEffect } from "expo-router"
+/** 만물 경매장 — 목록 (RN). 농기구/자재(DomainListScreen) 와 동일한 셸·행 카드. */
+import { useState, useCallback } from "react"
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native"
+import { useRouter, useFocusEffect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
-import { Image, ImageBackground } from "expo-image"
-import { LinearGradient } from "expo-linear-gradient"
+import { Image } from "expo-image"
+import { lightColors, fontSize, spacing } from "@gwangjang/tokens"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState } from "@/lib/plaza"
-import { DomainTabBar } from "@/components/DomainTabBar"
-import { HeaderActions } from "@/components/HeaderActions"
+import { DomainScreenShell } from "@/components/DomainScreenShell"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -66,85 +63,93 @@ export default function AuctionListScreen() {
   useFocusEffect(useCallback(() => { load() }, [load]))
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.bar}>
-        <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
-        <Text style={styles.barTitle}>만물 경매장</Text>
-        <HeaderActions />
+    <DomainScreenShell
+      title="만물 경매장"
+      tab="auction"
+      heroImage={AUCTION_IMG}
+      heroIcon="hammer"
+      heroSub="농산물·농기구 경매 / 즉시 거래"
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    >
+      {/* 개수 툴바 — 농기구/자재 toolbar 1:1 */}
+      <View style={styles.toolbar}>
+        <Text style={styles.count}>진행 중인 경매 {loading ? "" : `${items.length}개`}</Text>
       </View>
 
-      <DomainTabBar current="auction" />
-
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 32 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GREEN} colors={[GREEN]} />}
-      >
-        <ImageBackground source={AUCTION_IMG} style={styles.hero}>
-          <LinearGradient colors={["rgba(0,0,0,0.5)", "rgba(0,0,0,0.6)"]} style={styles.heroOverlay}>
-            <Ionicons name="hammer" size={44} color="#fff" />
-            <Text style={styles.heroTitle}>만물 경매장</Text>
-            <Text style={styles.heroSub}>농산물·농기구 경매 / 즉시 거래</Text>
-          </LinearGradient>
-        </ImageBackground>
-
-        <View style={{ padding: 16 }}>
-          <Text style={styles.section}>진행 중인 경매</Text>
-          {loading ? (
-            <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} />
-          ) : loadError ? (
-            <View style={styles.empty}>
-              <Ionicons name="cloud-offline-outline" size={48} color="#cbd5e1" />
-              <Text style={styles.emptyText}>경매 정보를 불러오지 못했어요</Text>
-              <Pressable onPress={() => load()} style={styles.retryBtn}>
-                <Text style={styles.retryText}>다시 시도</Text>
-              </Pressable>
-            </View>
-          ) : items.length === 0 ? (
-            <View style={styles.empty}>
-              <Ionicons name="hammer-outline" size={48} color="#cbd5e1" />
-              <Text style={styles.emptyText}>진행 중인 경매가 없어요</Text>
-            </View>
-          ) : (
-            <View style={{ gap: 12 }}>
-              {items.map((a) => (
-                <Pressable key={a.id} style={styles.card} onPress={() => router.push(`/auction/${a.id}` as any)}>
-                  <Image source={a.post?.images?.[0] ? { uri: a.post.images[0] } : AUCTION_IMG} style={styles.cardImg} contentFit="cover" />
-                  <View style={{ flex: 1, padding: 12 }}>
-                    <View style={styles.timeBadge}><Ionicons name="time-outline" size={12} color="#fff" /><Text style={styles.timeText}>{timeLeft(a.end_at)}</Text></View>
-                    <Text style={styles.cardTitle} numberOfLines={1}>{a.post?.title || "경매 물품"}</Text>
-                    <Text style={styles.cardLabel}>현재가</Text>
-                    <Text style={styles.cardPrice}>{won(a.current_price || a.start_price)}</Text>
-                    <Text style={styles.cardBids}>입찰 {a.bid_count}회</Text>
-                  </View>
-                </Pressable>
-              ))}
-            </View>
-          )}
+      {loading ? (
+        <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} />
+      ) : loadError ? (
+        <View style={styles.empty}>
+          <Ionicons name="cloud-offline-outline" size={48} color="#cbd5e1" />
+          <Text style={styles.emptyText}>경매 정보를 불러오지 못했어요</Text>
+          <Pressable onPress={() => load()} style={styles.retryBtn}>
+            <Text style={styles.retryText}>다시 시도</Text>
+          </Pressable>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      ) : items.length === 0 ? (
+        <View style={styles.empty}>
+          <Ionicons name="hammer-outline" size={48} color="#cbd5e1" />
+          <Text style={styles.emptyText}>진행 중인 경매가 없어요</Text>
+        </View>
+      ) : (
+        <View>
+          {items.map((a) => (
+            <Pressable key={a.id} style={styles.row} onPress={() => router.push(`/auction/${a.id}` as any)}>
+              <View style={styles.thumbWrap}>
+                <Image source={a.post?.images?.[0] ? { uri: a.post.images[0] } : AUCTION_IMG} style={styles.thumb} contentFit="cover" />
+                <View style={styles.timeBadge}>
+                  <Ionicons name="time-outline" size={12} color="#fff" />
+                  <Text style={styles.timeText}>{timeLeft(a.end_at)}</Text>
+                </View>
+              </View>
+              <View style={styles.body}>
+                <Text style={styles.title} numberOfLines={2}>{a.post?.title || "경매 물품"}</Text>
+                <Text style={styles.metaLabel}>현재가</Text>
+                <Text style={styles.price}>{won(a.current_price || a.start_price)}</Text>
+                <View style={styles.bidsRow}>
+                  <Ionicons name="trending-up" size={13} color={lightColors.ink500} />
+                  <Text style={styles.bids}>입찰 {a.bid_count}회</Text>
+                </View>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </DomainScreenShell>
   )
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#f7f6f0" },
-  bar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, height: 52, backgroundColor: "#fff" },
-  barTitle: { fontSize: 17, fontWeight: "700", color: "#1e293b", flex: 1, marginLeft: 4 },
-  hero: { width: "100%", height: 170 },
-  heroOverlay: { flex: 1, alignItems: "center", justifyContent: "center" },
-  heroTitle: { color: "#fff", fontSize: 24, fontWeight: "900", marginTop: 8 },
-  heroSub: { color: "#fff", fontSize: 14, marginTop: 4 },
-  section: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 12 },
+  toolbar: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: spacing[4], paddingVertical: spacing[2],
+  },
+  count: { fontSize: fontSize.sm, color: lightColors.ink500 },
   empty: { alignItems: "center", paddingVertical: 48, gap: 8 },
   emptyText: { color: "#94a3b8", fontSize: 15, fontWeight: "600" },
   retryBtn: { marginTop: 12, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: GREEN },
   retryText: { color: "#fff", fontSize: 14, fontWeight: "800" },
-  card: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#eee" },
-  cardImg: { width: 120, height: 120 },
-  timeBadge: { flexDirection: "row", alignItems: "center", gap: 3, alignSelf: "flex-start", backgroundColor: "#e11d48", borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, marginBottom: 4 },
+
+  // 행 카드 — DomainListScreen listItem 1:1 (130 썸네일 + borderBottom)
+  row: {
+    flexDirection: "row", gap: 12,
+    paddingHorizontal: 12, paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: lightColors.border,
+    backgroundColor: lightColors.background,
+  },
+  thumbWrap: { width: 130, height: 130, borderRadius: 8, overflow: "hidden", backgroundColor: "#f1f5f9", position: "relative" },
+  thumb: { width: "100%", height: "100%" },
+  timeBadge: {
+    position: "absolute", top: 6, left: 6,
+    flexDirection: "row", alignItems: "center", gap: 3,
+    backgroundColor: "#e11d48", borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2,
+  },
   timeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
-  cardTitle: { fontSize: 15, fontWeight: "700", color: "#1e293b" },
-  cardLabel: { fontSize: 11, color: "#94a3b8", marginTop: 4 },
-  cardPrice: { fontSize: 18, fontWeight: "900", color: GREEN },
-  cardBids: { fontSize: 12, color: "#64748b", marginTop: 2 },
+  body: { flex: 1, minWidth: 0 },
+  title: { fontSize: 17, color: lightColors.ink900, fontWeight: "500", lineHeight: 22 },
+  metaLabel: { fontSize: 12, color: lightColors.ink500, marginTop: 6 },
+  price: { fontSize: 19, fontWeight: "800", color: GREEN, marginTop: 2 },
+  bidsRow: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 6 },
+  bids: { fontSize: 12, color: lightColors.ink500 },
 })
