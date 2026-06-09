@@ -104,10 +104,23 @@ export async function GET(req: Request) {
 
     // ── 진단용 ?debug=1 — 실제 필드/시군 추출 결과 샘플 (DB 변경 없음) ──
     if (req.url.includes('debug=1')) {
+      // DB 에 실제 저장된 region 분포 (backfill 적용 여부 확인)
+      const { data: stored } = await admin
+        .from('board_posts')
+        .select('region')
+        .eq('plaza_id', PLAZA_ID)
+        .eq('category_id', category.id)
+      const storedCounts = ((stored as Array<{ region: string | null }> | null) ?? [])
+        .reduce((acc: Record<string, number>, r) => {
+          const k = r.region ?? '(전국/NULL)'
+          acc[k] = (acc[k] ?? 0) + 1
+          return acc
+        }, {})
       return NextResponse.json({
         ok: true,
-        v: 2,
+        v: 3,
         fetched: services.length,
+        storedInDB: storedCounts,
         regionCounts: services.reduce((acc: Record<string, number>, s) => {
           const r = regionFromService(s) ?? '(전국/NULL)'
           acc[r] = (acc[r] ?? 0) + 1
