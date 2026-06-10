@@ -109,6 +109,8 @@ export default function BoardEditScreen() {
       const u = a.uri
       if (u.startsWith("file://") || u.startsWith("http")) return u
       if (u.startsWith("content://") || u.startsWith("/")) return u
+      // 웹: blob:/data: 등 스킴 있는 URI 는 그대로 — file:// 붙이면 깨져 미리보기 안 됨
+      if (u.includes(":")) return u
       return `file://${u}`
     })
 
