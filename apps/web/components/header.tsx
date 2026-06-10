@@ -186,17 +186,17 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
             <Link href="/secondhand" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
               <Tractor className="w-4 h-4 text-primary" />농기구/자재
             </Link>
+            <Link href="/rental" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-primary" />대여
+            </Link>
             <Link href="/local-food" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
               <Leaf className="w-4 h-4 text-primary" />로컬푸드
             </Link>
             <Link href="/auction" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
               <Gavel className="w-4 h-4 text-primary" />경매장
             </Link>
-            <Link href="/rental" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
-              <Truck className="w-4 h-4 text-primary" />대여
-            </Link>
             <Link href="/jobs" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-primary" />일손
+              <Users className="w-4 h-4 text-primary" />일손 찾기
             </Link>
             <Link href="/board" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
               <Newspaper className="w-4 h-4 text-primary" />전원 소식통

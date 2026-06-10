@@ -19,9 +19,9 @@ import {
 const MAIN = [
   { icon: Home, label: "홈으로", href: "/" },
   { icon: Tractor, label: "농기구/자재 사고팔기", href: "/secondhand" },
+  { icon: Truck, label: "농기구 대여", href: "/rental" },
   { icon: Leaf, label: "강원 로컬푸드", href: "/local-food" },
   { icon: Gavel, label: "만물 경매장", href: "/auction" },
-  { icon: Truck, label: "농기구 대여", href: "/rental" },
   { icon: Users, label: "일손 찾기", href: "/jobs" },
   { icon: Newspaper, label: "전원 소식통", href: "/board" },
 ]

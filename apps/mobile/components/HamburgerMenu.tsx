@@ -3,7 +3,7 @@
  *
  * 구성:
  *   - 녹색 헤더: 농부 로고 + "강원 전원일기" + 시/군
- *   - 메인 메뉴(원형 녹색 아이콘 + 큰 라벨): 홈 / 농기구·자재 / 로컬푸드 / 경매장 / 일손 / 소식통
+ *   - 메인 메뉴(원형 녹색 아이콘 + 큰 라벨): 홈 / 농기구·자재 / 대여 / 로컬푸드 / 경매장 / 일손 찾기 / 소식통
  *   - 커뮤니티: 마을 사랑방 / 무료 나눔 / 농업 일기 / 정부지원금 / 살림 정보 / 궁금해요
  *   - 하단: 로그인·회원가입 (비로그인) 또는 마이페이지 + 로그아웃 (로그인)
  *
@@ -38,9 +38,9 @@ interface Props {
 const MAIN: { icon: any; label: string; route: string }[] = [
   { icon: "home", label: "홈으로", route: "/(tabs)" },
   { icon: "construct", label: "농기구/자재 사고팔기", route: "/secondhand" },
+  { icon: "build", label: "농기구 대여", route: "/rental" },
   { icon: "leaf", label: "강원 로컬푸드", route: "/local-food" },
   { icon: "hammer", label: "만물 경매장", route: "/auction" },
-  { icon: "build", label: "농기구 대여", route: "/rental" },
   { icon: "people", label: "일손 찾기", route: "/jobs" },
   { icon: "newspaper", label: "전원 소식통", route: "/board" },
 ]
