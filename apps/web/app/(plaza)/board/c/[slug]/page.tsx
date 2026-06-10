@@ -11,7 +11,7 @@ import { useUserLocation } from "@/components/location-selector"
 import type { User } from "@supabase/supabase-js"
 import {
   MessageSquare, Camera, Gift, Lightbulb, Coins, HelpCircle,
-  Plus, Search, Eye, Heart, MessageCircle, TrendingUp, User as UserIcon, ImageIcon, Phone, ChevronRight,
+  Plus, Search, Eye, Heart, TrendingUp, User as UserIcon, ImageIcon, Phone, ChevronRight,
 } from "lucide-react"
 
 const CATEGORIES = [
@@ -187,36 +187,34 @@ export default function BoardCategoryPage() {
                       <Link
                         key={post.id}
                         href={`/board/${post.id}`}
-                        className="flex gap-4 p-5 rounded-3xl bg-card shadow-sm ring-1 ring-emerald-900/5 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                        className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border/60 shadow-sm hover:shadow-md hover:border-border transition-all"
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                              <Icon className="w-3 h-3" />{meta.label}
+                          {isSubsidy && (
+                            <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full mb-1 ${
+                              post.region ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"
+                            }`}>
+                              {post.region ? `📍 ${post.region} 농가 대상` : "🌐 전국 어디나"}
                             </span>
-                            {isSubsidy && (
-                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
-                                post.region ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"
-                              }`}>
-                                {post.region ? `📍 ${post.region} 농가 대상` : "🌐 전국 어디나"}
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="text-xl font-bold leading-snug line-clamp-2">{post.title}</h3>
-                          {ex && <p className="text-[15px] text-muted-foreground mt-1.5 line-clamp-1">{ex}</p>}
+                          )}
+                          <h3 className="text-base sm:text-lg font-bold leading-snug line-clamp-1">{post.title}</h3>
+                          {ex && <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{ex}</p>}
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2 flex-wrap">
                             <span className="font-medium text-foreground/70">{post.author_name || "이웃"}</span>
                             <span>·</span><span>{fmtDate(post.created_at)}</span>
                             <span className="flex items-center gap-0.5 ml-1"><Eye className="w-3.5 h-3.5" />{post.view_count ?? 0}</span>
                             <span className="flex items-center gap-0.5 text-rose-500"><Heart className="w-3.5 h-3.5" />{post.like_count ?? 0}</span>
-                            <span className="flex items-center gap-0.5"><MessageCircle className="w-3.5 h-3.5" />{post.comment_count ?? 0}</span>
                           </div>
                         </div>
                         {thumb && (
-                          <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-muted self-center">
+                          <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
                             <Image src={thumb} alt={post.title} fill className="object-cover" />
                           </div>
                         )}
+                        <div className="flex flex-col items-center justify-center min-w-[44px] px-1">
+                          <span className="text-xl font-extrabold text-foreground leading-none">{post.comment_count ?? 0}</span>
+                          <span className="text-xs text-muted-foreground mt-1">댓글</span>
+                        </div>
                       </Link>
                     )
                   })}

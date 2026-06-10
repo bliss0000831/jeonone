@@ -30,6 +30,14 @@ function excerpt(content?: string) {
     .trim()
 }
 
+/** MM. DD. 형식 날짜 */
+function fmtDate(s?: string) {
+  if (!s) return ""
+  const d = new Date(s)
+  if (isNaN(d.getTime())) return ""
+  return `${String(d.getMonth() + 1).padStart(2, "0")}. ${String(d.getDate()).padStart(2, "0")}.`
+}
+
 export default function BoardCategoryScreen() {
   const router = useRouter()
   const plaza = useCurrentPlazaState()
@@ -121,27 +129,25 @@ export default function BoardCategoryScreen() {
               const ex = excerpt(p.content)
               return (
                 <Pressable key={p.id} style={styles.card} onPress={() => router.push(`/board/${p.id}` as any)}>
-                  <View style={{ flex: 1 }}>
-                    <View style={styles.chipRow}>
-                      <View style={styles.chip}>
-                        <Ionicons name={cur.icon} size={12} color={GREEN} />
-                        <Text style={styles.chipText}>{cur.label}</Text>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    {isSubsidy ? (
+                      <View style={[styles.regionChip, p.region ? styles.regionChipLocal : styles.regionChipAll]}>
+                        <Text style={[styles.regionChipText, p.region ? styles.regionChipTextLocal : styles.regionChipTextAll]}>
+                          {p.region ? `📍 ${p.region} 농가 대상` : "🌐 전국 어디나"}
+                        </Text>
                       </View>
-                      {isSubsidy ? (
-                        <View style={[styles.regionChip, p.region ? styles.regionChipLocal : styles.regionChipAll]}>
-                          <Text style={[styles.regionChipText, p.region ? styles.regionChipTextLocal : styles.regionChipTextAll]}>
-                            {p.region ? `📍 ${p.region} 농가 대상` : "🌐 전국 어디나"}
-                          </Text>
-                        </View>
-                      ) : null}
-                    </View>
-                    <Text style={styles.rowTitle} numberOfLines={2}>{p.title}</Text>
+                    ) : null}
+                    <Text style={styles.rowTitle} numberOfLines={1}>{p.title}</Text>
                     {ex ? <Text style={styles.rowExcerpt} numberOfLines={1}>{ex}</Text> : null}
                     <Text style={styles.rowMeta}>
-                      {p.author_name || "이웃"} · 조회 {p.view_count ?? 0} · ♥ {p.like_count ?? 0} · 💬 {p.comment_count ?? 0}
+                      {p.author_name || "이웃"} · {fmtDate(p.created_at)} · 👁 {p.view_count ?? 0} · ♥ {p.like_count ?? 0}
                     </Text>
                   </View>
                   {thumb ? <Image source={{ uri: thumb }} style={styles.rowThumb} contentFit="cover" /> : null}
+                  <View style={styles.commentBox}>
+                    <Text style={styles.commentNum}>{p.comment_count ?? 0}</Text>
+                    <Text style={styles.commentLabel}>댓글</Text>
+                  </View>
                 </Pressable>
               )
             })}
@@ -167,26 +173,28 @@ const styles = StyleSheet.create({
   regionText: { fontSize: 14, color: "#64748b", flex: 1 },
   regionToggle: { fontSize: 14, fontWeight: "800", color: GREEN },
   empty: { textAlign: "center", color: "#94a3b8", fontSize: 15, paddingVertical: 48 },
-  // 메모지·말풍선형 카드 — 둥근 모서리(20) + 부드러운 그림자 + 여백 (테두리 없음)
-  cardList: { gap: 12 },
+  // 글 카드 — 흰 카드 + 연한 테두리/그림자 + 우측 댓글 수 강조
+  cardList: { gap: 10 },
   card: {
-    flexDirection: "row", alignItems: "center", gap: 14,
-    backgroundColor: "#fff", borderRadius: 20,
-    paddingHorizontal: 16, paddingVertical: 15,
-    shadowColor: "#1e3a2a", shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "#fff", borderRadius: 16,
+    paddingHorizontal: 14, paddingVertical: 14,
+    borderWidth: 1, borderColor: "#efefef",
+    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  chipRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 7 },
-  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999 },
-  chipText: { fontSize: 12, fontWeight: "700", color: GREEN },
-  regionChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
+  regionChip: { alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, marginBottom: 6 },
   regionChipLocal: { backgroundColor: "#fef3c7" },
   regionChipAll: { backgroundColor: "#e0f2fe" },
   regionChipText: { fontSize: 11, fontWeight: "700" },
   regionChipTextLocal: { color: "#b45309" },
   regionChipTextAll: { color: "#0369a1" },
-  rowTitle: { fontSize: 18, fontWeight: "800", color: "#1e293b", lineHeight: 24 },
-  rowExcerpt: { fontSize: 14, color: "#64748b", marginTop: 4, lineHeight: 19 },
-  rowMeta: { fontSize: 12.5, color: "#94a3b8", marginTop: 8 },
-  rowThumb: { width: 72, height: 72, borderRadius: 16, backgroundColor: "#f1f5f9" },
+  rowTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b", lineHeight: 21 },
+  rowExcerpt: { fontSize: 13, color: "#94a3b8", marginTop: 3 },
+  rowMeta: { fontSize: 12, color: "#94a3b8", marginTop: 7 },
+  rowThumb: { width: 60, height: 60, borderRadius: 12, backgroundColor: "#f1f5f9" },
+  // 우측 댓글 수 (큰 숫자 + '댓글')
+  commentBox: { alignItems: "center", justifyContent: "center", minWidth: 40, marginLeft: 2 },
+  commentNum: { fontSize: 20, fontWeight: "900", color: "#1e293b" },
+  commentLabel: { fontSize: 12, color: "#94a3b8", marginTop: 2 },
 })
