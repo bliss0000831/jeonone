@@ -222,17 +222,26 @@ export async function uploadImage(
     if (folder) form.append("folder", folder)
     const headers: Record<string, string> = {}
     if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
+    if (!session?.access_token) {
+      console.warn("[uploadImage] 로그인 세션 없음 — 업로드는 로그인 필요(401)")
+    }
     const r = await fetch(`${API_BASE}/api/upload`, {
       method: "POST",
       headers,
       body: form,
     })
-    if (!r.ok) return null
+    if (!r.ok) {
+      const body = await r.text().catch(() => "")
+      console.warn(`[uploadImage] 실패 HTTP ${r.status} @ ${API_BASE}/api/upload — ${body.slice(0, 200)}`)
+      return null
+    }
     const data = await r.json().catch(() => ({}))
     return (data?.url as string) ?? null
   } catch (err) {
     // size 검증 실패 등 — null 대신 에러를 호출부로 전파해서 alert
     if ((err as Error)?.message?.includes("MB")) throw err
+    // 네트워크/CORS 오류는 여기로 (fetch reject) — 콘솔에 사유 표시
+    console.warn(`[uploadImage] 네트워크/CORS 오류 @ ${API_BASE}/api/upload — ${(err as Error)?.message ?? err}`)
     return null
   }
 }
