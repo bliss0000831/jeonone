@@ -188,7 +188,7 @@ export default function SecondhandEditPage() {
           </Link>
           <h1 className="text-base font-semibold flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-amber-600" />
-            중고거래 수정
+            농기구/자재 수정
           </h1>
           <div className="w-9" />
         </div>

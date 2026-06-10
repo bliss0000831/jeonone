@@ -94,7 +94,7 @@ export default function SecondhandDetailScreen() {
   useTrackRecent({
     id: id as string,
     kind: "secondhand",
-    kindLabel: "중고거래",
+    kindLabel: "농기구/자재",
     title: post?.title,
     image: post?.images?.[0] ?? null,
     href: `/secondhand/${id}`,
@@ -320,7 +320,7 @@ export default function SecondhandDetailScreen() {
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
         <View style={styles.headerTitleWrap} pointerEvents="none">
-          <Text style={styles.headerTitle} numberOfLines={1}>중고거래</Text>
+          <Text style={styles.headerTitle} numberOfLines={1}>농기구/자재</Text>
         </View>
         <View style={styles.headerRight}>
           <Pressable accessibilityRole="button" accessibilityLabel="좋아요" onPress={handleLike} hitSlop={8} style={styles.headerBtn}>
@@ -369,7 +369,7 @@ export default function SecondhandDetailScreen() {
           ) : (
             <View style={[styles.galleryFallback, { width, aspectRatio: 1 }]}>
               <Ionicons name="bag-handle-outline" size={64} color="#ffffff" />
-              <Text style={styles.galleryFallbackLabel}>중고거래</Text>
+              <Text style={styles.galleryFallbackLabel}>농기구/자재</Text>
             </View>
           )}
 

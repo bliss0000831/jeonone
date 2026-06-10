@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "중고거래",
-  description: "우리 동네 중고 물품을 사고팔아보세요. 가전, 가구, 의류, 유아용품 등 다양한 카테고리.",
+  title: "농기구/자재",
+  description: "우리 동네 농기구·자재를 사고팔아보세요. 트랙터, 경운기, 이양기, 관리기, 하우스 자재 등 다양한 카테고리.",
   openGraph: {
-    title: "중고거래",
-    description: "우리 동네 중고 물품을 사고팔아보세요. 가전, 가구, 의류, 유아용품 등 다양한 카테고리.",
+    title: "농기구/자재",
+    description: "우리 동네 농기구·자재를 사고팔아보세요. 트랙터, 경운기, 이양기, 관리기, 하우스 자재 등 다양한 카테고리.",
   },
 }
 

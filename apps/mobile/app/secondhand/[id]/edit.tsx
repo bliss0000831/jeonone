@@ -187,7 +187,7 @@ export default function SecondhandEditScreen() {
         return
       }
       await setPostRegion("secondhand_posts", id, regionId)
-      Alert.alert("수정 완료", "중고거래 글이 수정되었습니다")
+      Alert.alert("수정 완료", "농기구/자재 글이 수정되었습니다")
       setFormDirty(false)
       router.replace(`/secondhand/${id}` as any)
     } finally {
@@ -209,7 +209,7 @@ export default function SecondhandEditScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
-        <Text style={styles.headerTitle}>중고거래 수정</Text>
+        <Text style={styles.headerTitle}>농기구/자재 수정</Text>
         <Pressable onPress={handleSubmit} disabled={submitting || uploading} style={[styles.saveBtn, submitting && { opacity: 0.5 }]}>
           {submitting ? (
             <ActivityIndicator size="small" color="#ffffff" />

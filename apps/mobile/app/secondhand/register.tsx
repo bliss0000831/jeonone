@@ -272,7 +272,7 @@ export default function SecondhandRegisterScreen() {
       if (r.flagged) {
         Alert.alert("등록 완료", "등록되었으나 관리자 검토 중입니다.")
       } else {
-        Alert.alert("등록 완료", "중고거래 글이 성공적으로 등록되었습니다")
+        Alert.alert("등록 완료", "농기구/자재 글이 성공적으로 등록되었습니다")
       }
       if (r.postId && !r.flagged) router.replace(`/secondhand/${r.postId}` as any)
       else router.replace("/(tabs)/mypage" as any)
@@ -550,7 +550,7 @@ export default function SecondhandRegisterScreen() {
               </View>
             ) : (
               <Text style={styles.submitBtnText}>
-                {listingType === "auction" ? "경매 등록하기" : listingType === "rental" ? "대여 등록하기" : priceNum === 0 && postAsSharing ? "나눔 등록하기" : "중고거래 등록하기"}
+                {listingType === "auction" ? "경매 등록하기" : listingType === "rental" ? "대여 등록하기" : priceNum === 0 && postAsSharing ? "나눔 등록하기" : "등록하기"}
               </Text>
             )}
           </Pressable>

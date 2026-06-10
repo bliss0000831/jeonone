@@ -38,7 +38,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   new_store: "신장개업",
   local_food: "로컬푸드",
   group_buying: "공동구매",
-  secondhand: "중고거래",
+  secondhand: "농기구/자재",
   jobs: "구인구직",
   interior: "인테리어",
   moving: "이사",

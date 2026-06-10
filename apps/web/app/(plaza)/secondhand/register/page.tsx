@@ -165,7 +165,7 @@ export default function SecondhandRegisterPage() {
         } else if (shouldPostToSharing) {
           toast.success("나눔 글이 성공적으로 등록되었습니다 💝")
         } else {
-          toast.success("중고거래 글이 성공적으로 등록되었습니다")
+          toast.success("농기구/자재 글이 성공적으로 등록되었습니다")
         }
         setFormDirty(false)
         const postId = data.post?.id
@@ -203,7 +203,7 @@ export default function SecondhandRegisterPage() {
           </Link>
           <h1 className="text-base font-semibold flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-amber-600" />
-            중고거래 등록
+            농기구/자재 등록
           </h1>
           <div className="w-9" />
         </div>
@@ -501,7 +501,7 @@ export default function SecondhandRegisterPage() {
             ? "등록 중..."
             : postAsSharing
             ? "나눔 등록하기 💝"
-            : "판매 등록하기"}
+            : "등록하기"}
         </button>
       </form>
     </div>

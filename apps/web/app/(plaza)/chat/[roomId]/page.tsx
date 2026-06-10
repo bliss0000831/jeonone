@@ -302,7 +302,7 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
             image: (data.images as string[] | null)?.[0],
             title: data.title,
             meta: priceStr,
-            badgeLabel: data.category || "중고거래",
+            badgeLabel: data.category || "농기구/자재",
             badgeTone: "primary",
           })
         }

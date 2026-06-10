@@ -387,7 +387,7 @@ export default function SecondhandDetailPage() {
         images={post.images}
         alt={post.title}
         fallbackIcon={ShoppingBag}
-        fallbackLabel="중고거래"
+        fallbackLabel="농기구/자재"
         topLeftBadges={
           <span
             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium shadow-sm ${status.className}`}

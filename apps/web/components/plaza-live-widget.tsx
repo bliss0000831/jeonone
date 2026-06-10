@@ -51,7 +51,7 @@ interface PlazaLiveWidgetProps {
 const KIND_META: Record<FeedKind, { label: string; ring: string; text: string; bg: string }> = {
   sharing:      { label: "나눔",     ring: "ring-rose-500/30",    text: "text-rose-700 dark:text-rose-300",      bg: "bg-rose-500"    },
   local_food:   { label: "로컬푸드", ring: "ring-emerald-500/30", text: "text-emerald-700 dark:text-emerald-300", bg: "bg-emerald-500" },
-  secondhand:   { label: "중고거래", ring: "ring-amber-500/30",   text: "text-amber-700 dark:text-amber-300",    bg: "bg-amber-500"   },
+  secondhand:   { label: "농기구/자재", ring: "ring-amber-500/30",   text: "text-amber-700 dark:text-amber-300",    bg: "bg-amber-500"   },
   jobs:         { label: "구인구직", ring: "ring-teal-500/30",    text: "text-teal-700 dark:text-teal-300",      bg: "bg-teal-500"    },
 }
 

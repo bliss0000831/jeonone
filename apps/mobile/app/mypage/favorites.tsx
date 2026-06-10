@@ -32,7 +32,7 @@ import { CategoryPills, type CategoryPillItem } from "@/components/mypage/Catego
 const SAVED_CATEGORIES: ReadonlyArray<{ kind: string; label: string }> = [
   { kind: "property", label: "부동산" },
   { kind: "interior", label: "홈즈" },
-  { kind: "secondhand", label: "중고거래" },
+  { kind: "secondhand", label: "농기구/자재" },
   { kind: "sharing", label: "나눔" },
   { kind: "group_buying", label: "공동구매" },
   { kind: "local_food", label: "로컬푸드" },

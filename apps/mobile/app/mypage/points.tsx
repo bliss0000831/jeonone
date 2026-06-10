@@ -49,7 +49,7 @@ const SOURCE_LABEL: Record<string, string> = {
   "post.create": "게시글 작성",
   "comment.create": "댓글 작성",
   "property.create": "매물 등록",
-  "secondhand.create": "중고거래 등록",
+  "secondhand.create": "농기구/자재 등록",
   "sharing.create": "나눔 등록",
   "group_buying.create": "공동구매 등록",
   "local_food.create": "로컬푸드 등록",

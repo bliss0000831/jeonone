@@ -116,7 +116,7 @@ export function HeaderActions({
     newStore: useLabel("nav.new_store.label", "신장개업"),
     clubs: useLabel("nav.clubs.label", "모임"),
     sectionMarket: useLabel("nav.section.market", "동네장터"),
-    secondhand: useLabel("nav.secondhand.label", "중고거래"),
+    secondhand: useLabel("nav.secondhand.label", "농기구/자재"),
     sharing: useLabel("nav.sharing.label", "나눔"),
     jobs: useLabel("nav.jobs.label", "구인구직"),
     groupBuying: useLabel("nav.group_buying.label", "공동구매"),

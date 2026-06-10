@@ -40,7 +40,7 @@ const MY_POST_CATEGORIES: ReadonlyArray<{ kind: string; label: string }> = [
   { kind: "new_store", label: "신장개업" },
   { kind: "local_food", label: "로컬푸드" },
   { kind: "group_buying", label: "공동구매" },
-  { kind: "secondhand", label: "중고거래" },
+  { kind: "secondhand", label: "농기구/자재" },
   { kind: "jobs", label: "구인구직" },
   { kind: "interior", label: "인테리어" },
   { kind: "moving", label: "이사" },
