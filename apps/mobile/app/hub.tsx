@@ -388,26 +388,11 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
         <Text style={styles.bigCardProvince}>{province}</Text>
       </ImageBackground>
 
-      {/* 통계 행 */}
+      {/* 통계 — 아이콘 칩 3개 */}
       <View style={styles.statsRow}>
-        <View style={styles.statCell}>
-          <Ionicons name="people" size={18} color={GREEN} />
-          <Text style={styles.statValue}>{members.toLocaleString()}</Text>
-          <Text style={styles.statLabel}>명</Text>
-        </View>
-        <Text style={styles.statSep}>·</Text>
-        <View style={styles.statCell}>
-          <Ionicons name="chatbubble-ellipses" size={18} color={GREEN} />
-          <Text style={styles.statLabel}>오늘 글</Text>
-          <Text style={styles.statValue}>{postsToday}</Text>
-          <Text style={styles.statLabel}>개</Text>
-        </View>
-        <Text style={styles.statSep}>·</Text>
-        <View style={styles.statCell}>
-          <Ionicons name="location" size={18} color={GREEN} />
-          <Text style={styles.statValue}>{coverage.length}</Text>
-          <Text style={styles.statLabel}>개 동네</Text>
-        </View>
+        <StatChip icon="people" value={members.toLocaleString()} unit="명" />
+        <StatChip icon="chatbubble-ellipses" value={String(postsToday)} unit="오늘 글" />
+        <StatChip icon="location" value={String(coverage.length)} unit="개 동네" />
       </View>
 
       {/* CTA */}
@@ -425,36 +410,57 @@ function BigCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }) {
   )
 }
 
+function StatChip({ icon, value, unit }: { icon: any; value: string; unit: string }) {
+  return (
+    <View style={styles.statChip}>
+      <View style={styles.statChipTop}>
+        <Ionicons name={icon} size={15} color={GREEN} />
+        <Text style={styles.statChipValue}>{value}</Text>
+      </View>
+      <Text style={styles.statChipUnit}>{unit}</Text>
+    </View>
+  )
+}
+
 function VillageCard({ plaza, onPress }: { plaza: Plaza; onPress: () => void }) {
   const province = provinceName(plaza.id, plaza.name)
   const coverage = plaza.coverage ?? []
+  const members = plaza.member_count ?? 0
   return (
     <Pressable style={styles.village} onPress={onPress}>
-      <ImageBackground source={provincePhoto(plaza.id)} style={styles.villagePhoto} imageStyle={{ resizeMode: "cover" }}>
+      <ImageBackground source={provincePhoto(plaza.id)} style={styles.villagePhotoFull} imageStyle={{ resizeMode: "cover" }}>
         <LinearGradient
-          colors={["rgba(23,53,36,0)", "rgba(23,53,36,0.7)"]}
+          colors={["rgba(0,0,0,0.05)", "rgba(0,0,0,0.4)", "rgba(0,0,0,0.85)"]}
           style={StyleSheet.absoluteFill as any}
         />
-        <View style={styles.villageBadge}>
-          <View style={styles.villageBadgeDot} />
-          <Text style={styles.villageBadgeTextWhite}>열림</Text>
-        </View>
-        <Text style={styles.villagePhotoTitle}>{province}</Text>
-      </ImageBackground>
-      <View style={styles.villageBody}>
-        {coverage.length > 0 ? (
-          <View style={styles.villageChips}>
-            {coverage.slice(0, 3).map((c) => (
-              <View key={c} style={styles.villageChip}><Text style={styles.villageChipText}>{c}</Text></View>
-            ))}
-            {coverage.length > 3 && (
-              <Text style={styles.villageChipMore}>+{coverage.length - 3}</Text>
-            )}
+        <View style={styles.villageTopRow}>
+          <View style={styles.villageBadgeStatic}>
+            <View style={styles.villageBadgeDot} />
+            <Text style={styles.villageBadgeTextWhite}>열림</Text>
           </View>
-        ) : (
-          <Text style={styles.villageSnippet} numberOfLines={1}>새로 시작하는 동네예요</Text>
-        )}
-      </View>
+          {members > 0 && (
+            <View style={styles.villageMembers}>
+              <Ionicons name="people" size={11} color="#fff" />
+              <Text style={styles.villageMembersText}>{members.toLocaleString()}</Text>
+            </View>
+          )}
+        </View>
+        <View>
+          <Text style={styles.villagePhotoTitle}>{province}</Text>
+          {coverage.length > 0 ? (
+            <View style={styles.villageChips}>
+              {coverage.slice(0, 3).map((c) => (
+                <View key={c} style={styles.villageChipFrost}><Text style={styles.villageChipTextWhite}>{c}</Text></View>
+              ))}
+              {coverage.length > 3 && (
+                <Text style={styles.villageChipMoreWhite}>+{coverage.length - 3}</Text>
+              )}
+            </View>
+          ) : (
+            <Text style={styles.villageSnippetWhite} numberOfLines={1}>새로 시작하는 동네예요</Text>
+          )}
+        </View>
+      </ImageBackground>
     </Pressable>
   )
 }
@@ -486,7 +492,7 @@ const styles = StyleSheet.create({
 
   hero: { alignItems: "center", paddingHorizontal: 20, paddingTop: 22, paddingBottom: 14 },
   brandRow: { alignItems: "center", marginBottom: 6 },
-  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 2, borderColor: "#fff" },
+  brandLogo: { width: 68, height: 68, borderRadius: 34, borderWidth: 3, borderColor: "#fff", shadowColor: "#225a39", shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 10 },
 
   h1: { fontSize: 30, fontWeight: "900", color: GREEN, textAlign: "center", includeFontPadding: false },
   sub: { fontSize: 16, color: "#57534e", textAlign: "center", marginTop: 8, lineHeight: 23, fontWeight: "500" },
@@ -543,11 +549,11 @@ const styles = StyleSheet.create({
   bigCardProvince: { color: "#fff", fontSize: 36, fontWeight: "900", letterSpacing: -0.5, textShadowColor: "rgba(0,0,0,0.35)", textShadowRadius: 8 },
 
   // 통계 행
-  statsRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10 },
-  statCell: { flexDirection: "row", alignItems: "center", gap: 5 },
-  statValue: { color: GREEN, fontSize: 16, fontWeight: "900" },
-  statLabel: { color: "#78716c", fontSize: 14, fontWeight: "600" },
-  statSep: { color: "#d6d3d1", fontSize: 16 },
+  statsRow: { flexDirection: "row", gap: 8, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 8 },
+  statChip: { flex: 1, alignItems: "center", gap: 2, backgroundColor: "rgba(34,90,57,0.06)", borderRadius: 16, paddingVertical: 10 },
+  statChipTop: { flexDirection: "row", alignItems: "center", gap: 5 },
+  statChipValue: { color: GREEN, fontSize: 17, fontWeight: "900" },
+  statChipUnit: { color: "#78716c", fontSize: 12, fontWeight: "600" },
 
   // CTA
   enterBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginHorizontal: 12, marginBottom: 14, marginTop: 2, backgroundColor: "#fff", borderRadius: 16, paddingVertical: 16, borderWidth: 2, borderColor: "rgba(34,90,57,0.15)" },
@@ -558,19 +564,20 @@ const styles = StyleSheet.create({
   browseHeader: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 24, marginBottom: 10 },
   browseAll: { fontSize: 14, fontWeight: "700", color: "#78716c" },
   villageGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  village: { width: "47.5%", flexGrow: 1, backgroundColor: "#fff", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "#e7e5e4", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
-  villagePhoto: { height: 100, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 12, justifyContent: "flex-end" },
-  villagePhotoTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: -0.3, textShadowColor: "rgba(0,0,0,0.3)", textShadowRadius: 4 },
-  villageBadge: { position: "absolute", top: 10, left: 10, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(16,185,129,0.9)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
+  village: { width: "47.5%", flexGrow: 1, borderRadius: 22, overflow: "hidden", backgroundColor: "#1a1a1a", shadowColor: "#000", shadowOpacity: 0.18, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
+  villagePhotoFull: { height: 188, paddingHorizontal: 12, paddingVertical: 12, justifyContent: "space-between" },
+  villageTopRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
+  villagePhotoTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: -0.3, textShadowColor: "rgba(0,0,0,0.4)", textShadowRadius: 6 },
+  villageBadgeStatic: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(16,185,129,0.92)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
   villageBadgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#ffffff" },
-  villageBadgeText: { color: "#173524", fontSize: 11, fontWeight: "900" },
   villageBadgeTextWhite: { color: "#ffffff", fontSize: 11, fontWeight: "900" },
-  villageBody: { paddingHorizontal: 12, paddingVertical: 12, minHeight: 52, justifyContent: "center" },
-  villageSnippet: { fontSize: 13, color: "#78716c", fontWeight: "500" },
-  villageChips: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5 },
-  villageChip: { backgroundColor: "#f0f0ea", borderRadius: 7, paddingHorizontal: 8, paddingVertical: 3 },
-  villageChipText: { fontSize: 13, color: "#44403c", fontWeight: "700" },
-  villageChipMore: { fontSize: 12, color: "#a8a29e", fontWeight: "700", alignSelf: "center" },
+  villageMembers: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: "rgba(255,255,255,0.18)", borderColor: "rgba(255,255,255,0.3)", borderWidth: 1, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  villageMembersText: { color: "#fff", fontSize: 11, fontWeight: "800" },
+  villageChips: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: 7 },
+  villageChipFrost: { backgroundColor: "rgba(255,255,255,0.18)", borderColor: "rgba(255,255,255,0.25)", borderWidth: 1, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 3 },
+  villageChipTextWhite: { fontSize: 12, color: "#fff", fontWeight: "700" },
+  villageChipMoreWhite: { fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: "700", alignSelf: "center" },
+  villageSnippetWhite: { fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: "600", marginTop: 4 },
 
   sectionTitle: { fontSize: 21, fontWeight: "900", color: GREEN },
 

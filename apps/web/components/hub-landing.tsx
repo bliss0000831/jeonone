@@ -176,8 +176,11 @@ export function HubLanding({
 
         <div className="max-w-3xl mx-auto px-4 pt-10 pb-4 text-center">
           <div className="flex justify-center mb-5">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden ring-2 ring-white shadow-lg">
-              <Image src="/images/logo-farmer.png" alt="전원일기" fill className="object-cover" priority />
+            <div className="relative">
+              <div aria-hidden className="absolute -inset-3 rounded-full bg-[#225a39]/15 blur-xl" />
+              <div className="relative w-20 h-20 rounded-full overflow-hidden ring-4 ring-white shadow-[0_10px_30px_rgba(34,90,57,0.28)]">
+                <Image src="/images/logo-farmer.png" alt="전원일기" fill className="object-cover" priority />
+              </div>
             </div>
           </div>
 
@@ -326,26 +329,11 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
         <h3 className="absolute left-6 bottom-4 text-4xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">{province}</h3>
       </div>
 
-      {/* 통계 행 */}
-      <div className="px-5 pt-4 pb-3 flex items-center justify-between text-stone-700">
-        <div className="flex items-center gap-1.5 text-base font-bold">
-          <Users className="w-5 h-5 text-[#225a39]" />
-          <span className="text-[#225a39] tabular-nums">{members.toLocaleString()}</span>
-          <span className="text-stone-500 font-semibold">명</span>
-        </div>
-        <span className="text-stone-300">·</span>
-        <div className="flex items-center gap-1.5 text-base font-bold">
-          <MessageCircle className="w-5 h-5 text-[#225a39]" />
-          <span className="text-stone-500 font-semibold">오늘 글</span>
-          <span className="text-[#225a39] tabular-nums">{postsToday}</span>
-          <span className="text-stone-500 font-semibold">개</span>
-        </div>
-        <span className="text-stone-300">·</span>
-        <div className="flex items-center gap-1.5 text-base font-bold">
-          <MapPin className="w-5 h-5 text-[#225a39]" />
-          <span className="text-[#225a39] tabular-nums">{coverage.length}</span>
-          <span className="text-stone-500 font-semibold">개 동네</span>
-        </div>
+      {/* 통계 — 아이콘 칩 3열 */}
+      <div className="px-4 pt-4 pb-2 grid grid-cols-3 gap-2">
+        <StatChip icon={Users} value={members.toLocaleString()} unit="명" />
+        <StatChip icon={MessageCircle} value={String(postsToday)} unit="오늘 글" />
+        <StatChip icon={MapPin} value={String(coverage.length)} unit="개 동네" />
       </div>
 
       {/* CTA */}
@@ -368,39 +356,68 @@ function BigRegionCard({ plaza, onEnter }: { plaza: Plaza; onEnter: () => void }
   )
 }
 
-// ─── 가로 슬라이드용 작은 마을 카드 (목업) ─────────────────────
+// ─── 큰 카드 통계 칩 ───────────────────────────────────────────
+function StatChip({ icon: Icon, value, unit }: { icon: typeof Users; value: string; unit: string }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5 rounded-2xl bg-[#225a39]/[0.06] py-2.5">
+      <div className="flex items-center gap-1.5">
+        <Icon className="w-4 h-4 text-[#225a39]" />
+        <span className="text-lg font-black text-[#225a39] tabular-nums leading-none">{value}</span>
+      </div>
+      <span className="text-xs font-semibold text-stone-500">{unit}</span>
+    </div>
+  )
+}
+
+// ─── 지역 매거진 카드 (풀사진 + 프로스티드 칩) ──────────────────
 function VillageCard({ plaza, onClick }: { plaza: Plaza; onClick: () => void }) {
   const province = provinceName(plaza.id, plaza.name)
   const coverage = plaza.coverage ?? []
+  const members = plaza.member_count ?? 0
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all border border-stone-200/70 overflow-hidden text-left"
+      className="group relative aspect-[5/6] w-full rounded-3xl overflow-hidden shadow-lg ring-1 ring-black/5 hover:shadow-2xl hover:-translate-y-1 transition-all text-left"
     >
-      <div className="relative h-[110px] overflow-hidden flex items-end px-4 pb-3">
-        <Image src={provincePhoto(plaza.id)} alt="" fill className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#173524]/85 via-[#1f3d2a]/50 to-transparent" />
-        <span
-          className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-white" /> 열림
+      <Image src={provincePhoto(plaza.id)} alt="" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+      {/* 하단→상단 어두운 스크림 */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
+
+      {/* 상단: 라이브 점 + 인원 배지 */}
+      <div className="absolute inset-x-0 top-0 p-2.5 flex items-start justify-between">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-bold shadow">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+          </span>
+          열림
         </span>
-        <p className="relative text-2xl font-black text-white drop-shadow tracking-tight">{province}</p>
+        {members > 0 && (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 text-white text-xs font-bold">
+            <Users className="w-3 h-3" />{members.toLocaleString()}
+          </span>
+        )}
       </div>
-      <div className="px-3 py-3 min-h-[56px] flex items-center">
+
+      {/* 하단: 도명 + 프로스티드 시군 칩 */}
+      <div className="absolute inset-x-0 bottom-0 p-3.5">
+        <p className="text-2xl font-black text-white drop-shadow-md tracking-tight">{province}</p>
         {coverage.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {coverage.slice(0, 3).map((cv) => (
-              <span key={cv} className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-sm font-bold">{cv}</span>
+              <span key={cv} className="px-2 py-0.5 rounded-md bg-white/15 backdrop-blur-md ring-1 ring-white/20 text-white/95 text-xs font-bold">{cv}</span>
             ))}
             {coverage.length > 3 && (
-              <span className="text-xs text-stone-400 font-bold self-center">+{coverage.length - 3}</span>
+              <span className="text-xs text-white/70 font-bold self-center">+{coverage.length - 3}</span>
             )}
           </div>
         ) : (
-          <p className="text-sm text-stone-500">새로 시작하는 동네예요</p>
+          <p className="mt-1.5 text-xs text-white/80 font-semibold">새로 시작하는 동네예요</p>
         )}
+        <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-white/0 group-hover:text-white/95 transition-colors">
+          바로가기 <ArrowRight className="w-3.5 h-3.5" />
+        </span>
       </div>
     </button>
   )
