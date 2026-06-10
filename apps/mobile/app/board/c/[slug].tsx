@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
+import { HeaderActions } from "@/components/HeaderActions"
 
 const GREEN = "#225a39"
 const CATS = [
@@ -82,8 +83,10 @@ export default function BoardCategoryScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
-        <Text style={styles.barTitle}>소식통</Text>
-        <Pressable onPress={() => router.push("/board/create" as any)} hitSlop={10}><Ionicons name="create-outline" size={22} color={GREEN} /></Pressable>
+        <View style={styles.barTitleWrap} pointerEvents="none">
+          <Text style={styles.barTitle}>소식통</Text>
+        </View>
+        <HeaderActions />
       </View>
 
       {/* 녹색 카테고리 탭 */}
@@ -103,7 +106,13 @@ export default function BoardCategoryScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
-        <Text style={styles.h1}>{cur.label}</Text>
+        <View style={styles.h1Row}>
+          <Text style={styles.h1}>{cur.label}</Text>
+          <Pressable style={styles.addBtn} onPress={() => router.push("/board/create" as any)}>
+            <Ionicons name="add" size={20} color="#fff" />
+            <Text style={styles.addBtnText}>올리기</Text>
+          </Pressable>
+        </View>
         <View style={styles.search}>
           <Ionicons name="search" size={18} color="#94a3b8" />
           <TextInput value={search} onChangeText={setSearch} placeholder="게시글 검색..." placeholderTextColor="#94a3b8" style={styles.searchInput} />
@@ -160,13 +169,17 @@ export default function BoardCategoryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f7f6f0" },
-  bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#eee" },
+  bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 52, backgroundColor: "#fff" },
+  barTitleWrap: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" },
   barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
   tabsWrap: { backgroundColor: GREEN, paddingVertical: 8 },
   tab: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
   tabActive: { backgroundColor: "#fff" },
   tabText: { fontSize: 13, fontWeight: "700" },
-  h1: { fontSize: 22, fontWeight: "900", color: "#1e293b", marginBottom: 12 },
+  h1Row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },
+  h1: { fontSize: 22, fontWeight: "900", color: "#1e293b" },
+  addBtn: { flexDirection: "row", alignItems: "center", gap: 4, height: 40, paddingHorizontal: 14, borderRadius: 999, backgroundColor: GREEN },
+  addBtnText: { color: "#fff", fontSize: 14, fontWeight: "800" },
   search: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#fff", borderRadius: 12, borderWidth: 2, borderColor: "#e2e8f0", paddingHorizontal: 14, marginBottom: 16 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 15 },
   regionBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14, paddingHorizontal: 2 },
