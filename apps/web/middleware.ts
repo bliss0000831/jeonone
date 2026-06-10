@@ -71,7 +71,38 @@ async function isMaintenanceActive(): Promise<boolean> {
   return checkMaintenanceFromDB()
 }
 
+// ── 개발 출처(localhost 등) 한정 CORS — Expo 웹(localhost:8081)에서 /api/* 교차출처
+//    호출(업로드·등록 등)을 허용. 프로덕션(같은 출처)엔 헤더가 안 붙어 영향 없음.
+function isDevOrigin(origin: string | null): origin is string {
+  return !!origin && /^https?:\/\/(localhost|127\.0\.0\.1|10\.0\.2\.2|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin)
+}
+function corsHeaders(origin: string): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  }
+}
+
 export async function middleware(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  const devCors = request.nextUrl.pathname.startsWith('/api/') && isDevOrigin(origin)
+
+  // 프리플라이트(OPTIONS) — 세션/점검 로직 건너뛰고 즉시 허용
+  if (devCors && request.method === 'OPTIONS') {
+    return new NextResponse(null, { status: 204, headers: corsHeaders(origin) })
+  }
+
+  const res = await handleRequest(request)
+  if (devCors) {
+    for (const [k, v] of Object.entries(corsHeaders(origin))) res.headers.set(k, v)
+  }
+  return res
+}
+
+async function handleRequest(request: NextRequest): Promise<NextResponse> {
   if (await isMaintenanceActive()) {
     const path = request.nextUrl.pathname
     const allow =
