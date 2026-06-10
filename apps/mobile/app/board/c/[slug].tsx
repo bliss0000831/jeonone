@@ -115,16 +115,16 @@ export default function BoardCategoryScreen() {
         {loading ? <ActivityIndicator color={GREEN} style={{ marginTop: 40 }} /> : filtered.length === 0 ? (
           <Text style={styles.empty}>아직 게시글이 없습니다</Text>
         ) : (
-          <View style={styles.listBox}>
+          <View style={styles.cardList}>
             {filtered.map((p) => {
               const thumb = p.thumbnail_url || p.images?.[0]
               const ex = excerpt(p.content)
               return (
-                <Pressable key={p.id} style={styles.row} onPress={() => router.push(`/board/${p.id}` as any)}>
+                <Pressable key={p.id} style={styles.card} onPress={() => router.push(`/board/${p.id}` as any)}>
                   <View style={{ flex: 1 }}>
                     <View style={styles.chipRow}>
                       <View style={styles.chip}>
-                        <Ionicons name={cur.icon} size={11} color={GREEN} />
+                        <Ionicons name={cur.icon} size={12} color={GREEN} />
                         <Text style={styles.chipText}>{cur.label}</Text>
                       </View>
                       {isSubsidy ? (
@@ -135,7 +135,7 @@ export default function BoardCategoryScreen() {
                         </View>
                       ) : null}
                     </View>
-                    <Text style={styles.rowTitle} numberOfLines={1}>{p.title}</Text>
+                    <Text style={styles.rowTitle} numberOfLines={2}>{p.title}</Text>
                     {ex ? <Text style={styles.rowExcerpt} numberOfLines={1}>{ex}</Text> : null}
                     <Text style={styles.rowMeta}>
                       {p.author_name || "이웃"} · 조회 {p.view_count ?? 0} · ♥ {p.like_count ?? 0} · 💬 {p.comment_count ?? 0}
@@ -167,19 +167,26 @@ const styles = StyleSheet.create({
   regionText: { fontSize: 14, color: "#64748b", flex: 1 },
   regionToggle: { fontSize: 14, fontWeight: "800", color: GREEN },
   empty: { textAlign: "center", color: "#94a3b8", fontSize: 15, paddingVertical: 48 },
-  listBox: { backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: "#eee", overflow: "hidden" },
-  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 14, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: "#f1f5f9" },
-  chipRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 6 },
-  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
-  chipText: { fontSize: 11, fontWeight: "700", color: GREEN },
+  // 메모지·말풍선형 카드 — 둥근 모서리(20) + 부드러운 그림자 + 여백 (테두리 없음)
+  cardList: { gap: 12 },
+  card: {
+    flexDirection: "row", alignItems: "center", gap: 14,
+    backgroundColor: "#fff", borderRadius: 20,
+    paddingHorizontal: 16, paddingVertical: 15,
+    shadowColor: "#1e3a2a", shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
+  chipRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 7 },
+  chip: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "#eaf3ed", paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999 },
+  chipText: { fontSize: 12, fontWeight: "700", color: GREEN },
   regionChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
   regionChipLocal: { backgroundColor: "#fef3c7" },
   regionChipAll: { backgroundColor: "#e0f2fe" },
   regionChipText: { fontSize: 11, fontWeight: "700" },
   regionChipTextLocal: { color: "#b45309" },
   regionChipTextAll: { color: "#0369a1" },
-  rowTitle: { fontSize: 16, fontWeight: "800", color: "#1e293b" },
-  rowExcerpt: { fontSize: 13, color: "#64748b", marginTop: 3, lineHeight: 18 },
-  rowMeta: { fontSize: 12, color: "#94a3b8", marginTop: 6 },
-  rowThumb: { width: 64, height: 64, borderRadius: 8, backgroundColor: "#f1f5f9" },
+  rowTitle: { fontSize: 18, fontWeight: "800", color: "#1e293b", lineHeight: 24 },
+  rowExcerpt: { fontSize: 14, color: "#64748b", marginTop: 4, lineHeight: 19 },
+  rowMeta: { fontSize: 12.5, color: "#94a3b8", marginTop: 8 },
+  rowThumb: { width: 72, height: 72, borderRadius: 16, backgroundColor: "#f1f5f9" },
 })

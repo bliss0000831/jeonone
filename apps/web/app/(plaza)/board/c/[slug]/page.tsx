@@ -179,7 +179,7 @@ export default function BoardCategoryPage() {
               ) : filtered.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">아직 게시글이 없습니다</div>
               ) : (
-                <div className="divide-y divide-border rounded-xl border bg-card overflow-hidden">
+                <div className="space-y-3">
                   {filtered.map((post) => {
                     const thumb = post.thumbnail_url || post.images?.[0]
                     const ex = excerpt(post.content)
@@ -187,7 +187,7 @@ export default function BoardCategoryPage() {
                       <Link
                         key={post.id}
                         href={`/board/${post.id}`}
-                        className="flex gap-3 p-4 hover:bg-secondary/40 transition-colors"
+                        className="flex gap-4 p-5 rounded-3xl bg-card shadow-sm ring-1 ring-emerald-900/5 hover:shadow-md hover:-translate-y-0.5 transition-all"
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
@@ -202,8 +202,8 @@ export default function BoardCategoryPage() {
                               </span>
                             )}
                           </div>
-                          <h3 className="text-lg font-bold leading-snug line-clamp-1">{post.title}</h3>
-                          {ex && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{ex}</p>}
+                          <h3 className="text-xl font-bold leading-snug line-clamp-2">{post.title}</h3>
+                          {ex && <p className="text-[15px] text-muted-foreground mt-1.5 line-clamp-1">{ex}</p>}
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2 flex-wrap">
                             <span className="font-medium text-foreground/70">{post.author_name || "이웃"}</span>
                             <span>·</span><span>{fmtDate(post.created_at)}</span>
@@ -213,7 +213,7 @@ export default function BoardCategoryPage() {
                           </div>
                         </div>
                         {thumb && (
-                          <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted self-center">
+                          <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-muted self-center">
                             <Image src={thumb} alt={post.title} fill className="object-cover" />
                           </div>
                         )}
