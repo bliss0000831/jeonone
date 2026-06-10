@@ -30,20 +30,13 @@ import { plazaName } from "@/lib/constants"
 
 // 사용자 게시글 카테고리 (라벨은 fallback — RecentView.kindLabel 우선)
 const CATEGORY_LABELS: Record<string, string> = {
-  property: "매물",
-  board: "소식통",
-  sharing: "나눔",
-  club: "모임",
-  clubs: "모임",
-  new_store: "신장개업",
-  local_food: "로컬푸드",
-  group_buying: "공동구매",
   secondhand: "농기구/자재",
-  jobs: "구인구직",
-  interior: "인테리어",
-  moving: "이사",
-  cleaning: "청소",
-  repair: "수리",
+  local_food: "로컬푸드",
+  jobs: "일손",
+  sharing: "나눔",
+  board: "소식통",
+  auction: "경매",
+  rental: "대여",
 }
 
 export default function RecentScreen() {

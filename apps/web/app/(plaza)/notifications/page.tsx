@@ -54,11 +54,7 @@ const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: "unread", label: "안 읽음" },
   { key: "read", label: "읽음" },
   { key: "chat", label: "채팅" },
-  { key: "property", label: "매물" },
-  { key: "invitation", label: "초대요청" },
   { key: "board", label: "소식통" },
-  { key: "group_buying", label: "공동구매" },
-  { key: "club", label: "모임" },
 ]
 
 // 초대요청 탭을 노출할 계정 유형 (초대 대상자들)

@@ -33,19 +33,11 @@ import { CategoryPills, type CategoryPillItem } from "@/components/mypage/Catego
 import { ListCardMenu, type ListCardKind } from "@/components/ListCardMenu"
 
 const MY_POST_CATEGORIES: ReadonlyArray<{ kind: string; label: string }> = [
-  { kind: "property", label: "매물" },
-  { kind: "board", label: "소식통" },
-  { kind: "sharing", label: "나눔" },
-  { kind: "club", label: "모임" },
-  { kind: "new_store", label: "신장개업" },
-  { kind: "local_food", label: "로컬푸드" },
-  { kind: "group_buying", label: "공동구매" },
   { kind: "secondhand", label: "농기구/자재" },
-  { kind: "jobs", label: "구인구직" },
-  { kind: "interior", label: "인테리어" },
-  { kind: "moving", label: "이사" },
-  { kind: "cleaning", label: "청소" },
-  { kind: "repair", label: "수리" },
+  { kind: "local_food", label: "로컬푸드" },
+  { kind: "jobs", label: "일손" },
+  { kind: "sharing", label: "나눔" },
+  { kind: "board", label: "소식통" },
 ]
 
 const UNIFIED_TO_CARD_KIND: Record<string, ListCardKind> = {
