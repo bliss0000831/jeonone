@@ -210,7 +210,7 @@ export default function HomeTab() {
 
           {/* 퀵 액션 */}
           <View style={[styles.row3, { marginTop: 18 }]}>
-            <Quick icon="camera" label={"사진으로\n올리기"} onPress={go("/secondhand/register")} />
+            <Quick icon="help-circle" label={"자주 하는\n질문"} onPress={go("/support/faq")} />
             <Quick icon="search" label={"검색하기"} onPress={go("/search")} />
             <Quick icon="headset" label={"고객\n문의"} tint={BROWN} bg="#f3ede1" onPress={go("/support/support")} />
           </View>

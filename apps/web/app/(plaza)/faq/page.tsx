@@ -4,31 +4,16 @@ import { BottomNav } from "@/components/bottom-nav"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentPlaza } from "@/lib/plaza/server"
 import { FaqAccordion } from "@/components/faq-accordion"
+import { listFaqs, type Faq } from "@gwangjang/features/support"
 
 export const dynamic = 'force-dynamic'
-
-interface Faq {
-  id: string
-  category: string
-  question: string
-  answer: string
-  sort_order: number
-}
 
 export default async function FAQPage() {
   const supabase = await createClient()
   const plaza = await getCurrentPlaza()
 
-  let q = supabase
-    .from('faqs')
-    .select('id, category, question, answer, sort_order')
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
-  if (plaza) q = q.eq('plaza_id', plaza)
-
-  const { data } = await q
-  const faqs = (data ?? []) as Faq[]
+  // DB faqs 우선, 없으면 어르신 친화 기본 FAQ(FALLBACK_FAQS) 표시
+  const faqs: Faq[] = await listFaqs(supabase as any, plaza ?? undefined)
 
   // 카테고리별 그룹핑
   const grouped = new Map<string, Faq[]>()
