@@ -191,7 +191,7 @@ export default function BoardCreateScreen() {
     const errors: string[] = []
     if (!title.trim()) errors.push("제목을 입력해주세요")
     if (!content.trim()) errors.push("내용을 입력해주세요")
-    if (!categoryId) errors.push("게시판을 선택해주세요")
+    if (!categoryId) errors.push("카테고리를 선택해주세요")
     if (errors.length > 0) {
       Alert.alert("입력을 확인해주세요", errors.join("\n"))
       return

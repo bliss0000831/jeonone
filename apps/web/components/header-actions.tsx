@@ -121,7 +121,7 @@ export function HeaderActions({
     jobs: useLabel("nav.jobs.label", "구인구직"),
     groupBuying: useLabel("nav.group_buying.label", "공동구매"),
     localFood: useLabel("nav.local_food.label", "로컬푸드"),
-    sectionBoards: useLabel("nav.section.boards", "게시판"),
+    sectionBoards: useLabel("nav.section.boards", "소식통"),
     boardFree: useLabel("nav.board.free.label", "마을 사랑방"),
     boardRestaurant: useLabel("nav.board.restaurant.label", "맛집 추천"),
     boardLiving: useLabel("nav.board.living.label", "살림 정보"),

@@ -85,7 +85,7 @@ export default function BoardDetailScreen() {
   useTrackRecent({
     id: id as string,
     kind: "board",
-    kindLabel: "게시판",
+    kindLabel: "소식통",
     title: post?.title,
     image: (post as any)?.images?.[0] ?? (post as any)?.thumbnail ?? null,
     href: `/board/${id}`,

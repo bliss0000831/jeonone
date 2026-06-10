@@ -235,7 +235,7 @@ export default function CreatePostPage() {
         {/* 뒤로가기 */}
         <Link href="/board" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 group">
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          게시판으로 돌아가기
+          소식통으로 돌아가기
         </Link>
 
         <h1 className="text-2xl font-bold mb-6">새 게시글 작성</h1>
@@ -332,10 +332,10 @@ export default function CreatePostPage() {
           {/* 카테고리 + 지역 — 두 컬럼 */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-base font-medium">게시판 <span className="text-destructive">*</span></label>
+              <label className="text-base font-medium">카테고리 <span className="text-destructive">*</span></label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="게시판 선택" />
+                  <SelectValue placeholder="카테고리 선택" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (

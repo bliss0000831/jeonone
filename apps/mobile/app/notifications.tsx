@@ -52,7 +52,7 @@ const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: "chat", label: "채팅" },
   { key: "property", label: "매물" },
   { key: "invitation", label: "초대요청" },
-  { key: "board", label: "게시판" },
+  { key: "board", label: "소식통" },
   { key: "group_buying", label: "공동구매" },
   { key: "club", label: "모임" },
 ]

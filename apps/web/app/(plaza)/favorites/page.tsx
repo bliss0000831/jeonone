@@ -25,7 +25,7 @@ const DOMAINS: DomainCfg[] = [
   { kind: "secondhand", label: "중고거래", likeTable: "secondhand_likes", col: "post_id", postTable: "secondhand_posts", href: "/secondhand", meta: (r) => (r?.price > 0 ? `${won(r.price)}원` : "가격 제안") },
   { kind: "sharing", label: "나눔", likeTable: "sharing_likes", col: "post_id", postTable: "sharing_posts", href: "/sharing", meta: () => "나눔" },
   { kind: "local-food", label: "로컬푸드", likeTable: "local_food_likes", col: "local_food_id", postTable: "local_food", href: "/local-food", meta: (r) => (won(r?.price) ? `${won(r.price)}원` : null) },
-  { kind: "board", label: "게시판", likeTable: "board_post_likes", col: "post_id", postTable: "board_posts", href: "/board", meta: () => "게시글" },
+  { kind: "board", label: "소식통", likeTable: "board_post_likes", col: "post_id", postTable: "board_posts", href: "/board", meta: () => "게시글" },
 ]
 
 function firstImage(r: any): string | null {

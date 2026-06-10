@@ -343,7 +343,7 @@ export default function PostDetailPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">게시글을 찾을 수 없습니다</p>
-        <Link href="/board"><Button variant="outline">게시판으로 돌아가기</Button></Link>
+        <Link href="/board"><Button variant="outline">소식통으로 돌아가기</Button></Link>
       </div>
     )
   }

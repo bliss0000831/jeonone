@@ -39,7 +39,7 @@ const SAVED_CATEGORIES: ReadonlyArray<{ kind: string; label: string }> = [
   { kind: "new_store", label: "신장개업" },
   { kind: "jobs", label: "구인구직" },
   { kind: "club", label: "모임" },
-  { kind: "board", label: "게시판" },
+  { kind: "board", label: "소식통" },
 ]
 
 export default function FavoritesScreen() {

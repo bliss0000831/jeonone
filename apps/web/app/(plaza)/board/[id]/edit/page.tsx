@@ -288,10 +288,10 @@ export default function EditPostPage() {
 
           {/* 카테고리 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">게시판 <span className="text-destructive">*</span></label>
+            <label className="text-sm font-medium">카테고리 <span className="text-destructive">*</span></label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger>
-                <SelectValue placeholder="게시판 선택" />
+                <SelectValue placeholder="카테고리 선택" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (

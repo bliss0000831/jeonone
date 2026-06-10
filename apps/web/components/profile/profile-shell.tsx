@@ -103,7 +103,7 @@ const POSTS_SOURCES: Array<{
   // 전원일기 핵심 도메인 — 농기구(중고거래) · 일손(구인구직). content 컬럼 없음 → description 만 select.
   { table: "secondhand_posts",   kind: "secondhand",   kindLabel: "농기구",   hrefPrefix: "/secondhand/",   imageField: "images", cols: "id, title, description, images, created_at, status" },
   { table: "jobs_posts",         kind: "jobs",         kindLabel: "일손",     hrefPrefix: "/jobs/",         imageField: "images", cols: "id, title, description, images, created_at, status" },
-  { table: "board_posts",        kind: "board",        kindLabel: "게시판",   hrefPrefix: "/board/",        imageField: "images" },
+  { table: "board_posts",        kind: "board",        kindLabel: "소식통",   hrefPrefix: "/board/",        imageField: "images" },
   { table: "sharing_posts",      kind: "sharing",      kindLabel: "나눔",     hrefPrefix: "/sharing/",      imageField: "images" },
   { table: "local_food",         kind: "local-food",   kindLabel: "로컬푸드", hrefPrefix: "/local-food/",   imageField: "images" },
 ]
@@ -430,7 +430,7 @@ export function ProfileShell({
               items.push({
                 id: String(p.id),
                 kind: "board",
-                kindLabel: "게시판",
+                kindLabel: "소식통",
                 title: p.title,
                 subtitle: p.category || null,
                 image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
@@ -994,7 +994,7 @@ const SAVED_CATEGORIES: Array<{
   { key: "all",          label: "전체" },
   { key: "sharing",      label: "나눔" },
   { key: "local-food",   label: "로컬푸드" },
-  { key: "board",        label: "게시판" },
+  { key: "board",        label: "소식통" },
 ]
 
 function SavedTab({

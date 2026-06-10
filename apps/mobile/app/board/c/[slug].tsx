@@ -74,7 +74,7 @@ export default function BoardCategoryScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
-        <Text style={styles.barTitle}>게시판</Text>
+        <Text style={styles.barTitle}>소식통</Text>
         <Pressable onPress={() => router.push("/board/create" as any)} hitSlop={10}><Ionicons name="create-outline" size={22} color={GREEN} /></Pressable>
       </View>
 

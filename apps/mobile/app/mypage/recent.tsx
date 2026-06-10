@@ -31,7 +31,7 @@ import { plazaName } from "@/lib/constants"
 // 사용자 게시글 카테고리 (라벨은 fallback — RecentView.kindLabel 우선)
 const CATEGORY_LABELS: Record<string, string> = {
   property: "매물",
-  board: "게시판",
+  board: "소식통",
   sharing: "나눔",
   club: "모임",
   clubs: "모임",

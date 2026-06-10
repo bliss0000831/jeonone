@@ -34,7 +34,7 @@ import { ListCardMenu, type ListCardKind } from "@/components/ListCardMenu"
 
 const MY_POST_CATEGORIES: ReadonlyArray<{ kind: string; label: string }> = [
   { kind: "property", label: "매물" },
-  { kind: "board", label: "게시판" },
+  { kind: "board", label: "소식통" },
   { kind: "sharing", label: "나눔" },
   { kind: "club", label: "모임" },
   { kind: "new_store", label: "신장개업" },
