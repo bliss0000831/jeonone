@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
+import { useLoginGate } from "@/components/LoginGate"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -23,6 +24,7 @@ function timeLeft(end: string) {
 
 export default function AuctionDetailScreen() {
   const router = useRouter()
+  const { requireLogin } = useLoginGate()
   const { id } = useLocalSearchParams<{ id: string }>()
   const [a, setA] = useState<any>(null)
   const [bids, setBids] = useState<any[]>([])
@@ -49,6 +51,7 @@ export default function AuctionDetailScreen() {
   const minBid = a ? Math.max(a.start_price, (a.current_price || 0) + a.bid_increment) : 0
 
   const placeBid = async () => {
+    if (!requireLogin("입찰")) return
     const amt = parseInt((amount || "").replace(/[^0-9]/g, ""), 10)
     if (!amt || amt < minBid) { Alert.alert("입찰 실패", `최소 입찰가는 ${won(minBid)} 입니다`); return }
     setSubmitting(true)
@@ -63,6 +66,7 @@ export default function AuctionDetailScreen() {
   }
 
   const buyNow = async () => {
+    if (!requireLogin("즉시구매")) return
     if (!a?.buy_now_price) return
     Alert.alert("즉시구매", `${won(a.buy_now_price)}에 즉시구매하시겠습니까?`, [
       { text: "취소", style: "cancel" },

@@ -8,6 +8,7 @@ import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
 import { useCurrentPlazaState, useCurrentRegion } from "@/lib/plaza"
 import { HeaderActions } from "@/components/HeaderActions"
+import { useLoginGate } from "@/components/LoginGate"
 
 const GREEN = "#225a39"
 const CATS = [
@@ -41,6 +42,7 @@ function fmtDate(s?: string) {
 
 export default function BoardCategoryScreen() {
   const router = useRouter()
+  const { requireLogin } = useLoginGate()
   const plaza = useCurrentPlazaState()
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const cur = CATS.find((c) => c.slug === slug) ?? CATS[0]
@@ -108,7 +110,7 @@ export default function BoardCategoryScreen() {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
         <View style={styles.h1Row}>
           <Text style={styles.h1}>{cur.label}</Text>
-          <Pressable style={styles.addBtn} onPress={() => router.push("/board/create" as any)}>
+          <Pressable style={styles.addBtn} onPress={() => { if (requireLogin("글쓰기")) router.push("/board/create" as any) }}>
             <Ionicons name="add" size={20} color="#fff" />
             <Text style={styles.addBtnText}>올리기</Text>
           </Pressable>

@@ -30,6 +30,7 @@ import "react-native-reanimated"
 
 import { useColorScheme } from "@/components/useColorScheme"
 import { AuthProvider, useAuth } from "@/lib/auth-context"
+import { LoginGateProvider } from "@/components/LoginGate"
 import { loadSelectedPlaza } from "@/lib/plaza"
 import { getSupabase } from "@/lib/supabase"
 import { loadPlazaLabels } from "@/lib/constants"
@@ -174,7 +175,9 @@ function AppProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RootLayoutNav />
+        <LoginGateProvider>
+          <RootLayoutNav />
+        </LoginGateProvider>
       </AuthProvider>
     </QueryClientProvider>
   )

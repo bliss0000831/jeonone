@@ -55,6 +55,7 @@ import { PlatformDisclaimerBand } from "@/components/legal/PlatformDisclaimerBan
 import { usePlazaBusinessInfo } from "@/lib/plaza-business-info"
 import { HeaderActions } from "@/components/HeaderActions"
 import { DomainTabBar } from "@/components/DomainTabBar"
+import { useLoginGate } from "@/components/LoginGate"
 import { formatPriceKR, formatDateKR } from "@/lib/format-price"
 
 
@@ -135,6 +136,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
   const DEFAULT_PLAZA = useCurrentPlaza()
   const router = useRouter()
   const { user } = useAuth()
+  const { requireLogin } = useLoginGate()
   // 등록 권한 — 계정 유형/admin 여부에 따라 + 버튼 노출 제어
   const [accountType, setAccountType] = useState<string>("user")
   const [isAdmin, setIsAdmin] = useState(false)
@@ -549,7 +551,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="올리기"
-            onPress={() => router.push(config.registerPath as any)}
+            onPress={() => { if (requireLogin("등록")) router.push(config.registerPath as any) }}
             hitSlop={8}
             style={styles.heroAddBtnLabeled}
           >
@@ -700,7 +702,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
               {config.registerPath && canRegister ? (
                 <Pressable
                   style={[styles.emptyCta, { backgroundColor: config.heroColor }]}
-                  onPress={() => router.push(config.registerPath as any)}
+                  onPress={() => { if (requireLogin("등록")) router.push(config.registerPath as any) }}
                 >
                   <Ionicons name="add-circle" size={22} color="#fff" />
                   <Text style={styles.emptyCtaText}>첫 글 올리기</Text>

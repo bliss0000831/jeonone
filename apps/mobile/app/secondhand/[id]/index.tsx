@@ -47,6 +47,7 @@ import {
   type SecondhandStatus,
 } from "@gwangjang/features/secondhand"
 import { useAuth } from "@/lib/auth-context"
+import { useLoginGate } from "@/components/LoginGate"
 import { startPostChat } from "@gwangjang/features/chat"
 import { getSupabase, gwangjangFetch } from "@/lib/supabase"
 import { PostActionsMenu } from "@/components/PostActionsMenu"
@@ -84,6 +85,7 @@ export default function SecondhandDetailScreen() {
   const share = useShareModal()
   const router = useRouter()
   const { user } = useAuth()
+  const { requireLogin } = useLoginGate()
   const { width } = useWindowDimensions()
 
   useTrackView("secondhand_posts", id)
@@ -238,10 +240,7 @@ export default function SecondhandDetailScreen() {
   async function openChat() {
     if (!post) return
     if (busy) return // 더블탭 방지 — 중복 채팅방 생성 차단
-    if (!user) {
-      Alert.alert("로그인이 필요합니다")
-      return
-    }
+    if (!requireLogin("채팅") || !user) return
     if (user.id === post.user_id) {
       Alert.alert("알림", "본인 게시물에는 채팅할 수 없습니다")
       return
