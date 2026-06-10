@@ -16,7 +16,6 @@
 import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -27,6 +26,7 @@ import {
   Image as RNImage,
   View,
 } from "react-native"
+import { Alert } from "@/lib/alert"
 import { Image as ExpoImage } from "expo-image"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter } from "expo-router"

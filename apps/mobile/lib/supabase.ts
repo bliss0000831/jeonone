@@ -209,7 +209,16 @@ export async function uploadImage(
     }
 
     const form = new FormData()
-    form.append("file", { uri: localUri, name: filename, type: mime } as any)
+    if (isWeb) {
+      // 웹(Expo web): RN 의 { uri, name, type } 첨부는 동작 안 함 — 실제 Blob/File 로 변환해 첨부.
+      const resp = await fetch(localUri)
+      const blob = await resp.blob()
+      const file =
+        typeof File !== "undefined" ? new File([blob], filename, { type: mime }) : blob
+      form.append("file", file as any, filename)
+    } else {
+      form.append("file", { uri: localUri, name: filename, type: mime } as any)
+    }
     if (folder) form.append("folder", folder)
     const headers: Record<string, string> = {}
     if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
