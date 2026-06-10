@@ -19,9 +19,9 @@ interface TestLog {
 
 export default function MailTestPage() {
   const [to, setTo] = useState('')
-  const [subject, setSubject] = useState('[춘천광장] 메일 발송 테스트')
+  const [subject, setSubject] = useState('[전원일기] 메일 발송 테스트')
   const [body, setBody] = useState(
-    '안녕하세요.\n\n본 메일은 춘천광장 관리자 페이지에서 발송된 테스트 메일입니다.\n\n감사합니다.'
+    '안녕하세요.\n\n본 메일은 전원일기 관리자 페이지에서 발송된 테스트 메일입니다.\n\n감사합니다.'
   )
   const [sending, setSending] = useState(false)
   const [logs, setLogs] = useState<TestLog[]>([])
@@ -177,7 +177,7 @@ export default function MailTestPage() {
             <div className="grid gap-2">
               <Label>발송자 이메일(From)</Label>
               <Input
-                placeholder="춘천광장 <noreply@example.com>"
+                placeholder="전원일기 <noreply@example.com>"
                 value={smtpFrom}
                 onChange={(e) => setSmtpFrom(e.target.value)}
               />

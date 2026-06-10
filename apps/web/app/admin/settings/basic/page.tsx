@@ -29,12 +29,12 @@ interface SiteSettings {
 
 export default function BasicSettingsPage() {
   const [settings, setSettings] = useState<SiteSettings>({
-    site_name: '춘천광장',
-    site_description: '춘천의 집, 지역 정보, 이웃 커뮤니티',
+    site_name: '전원일기',
+    site_description: '농기구·로컬푸드 직거래, 농촌 정보, 마을 커뮤니티',
     admin_email: '',
     site_logo: '',
-    homepage_banner_title: '춘천광장',
-    homepage_banner_subtitle: '더 나은 집, 더 가까운 이웃',
+    homepage_banner_title: '전원일기',
+    homepage_banner_subtitle: '농업인을 위한 따뜻한 마을 장터',
     smtp_enabled: false,
     maintenance_mode: false,
     announcement_enabled: false,
@@ -247,7 +247,7 @@ export default function BasicSettingsPage() {
                 id="site_name"
                 value={settings.site_name}
                 onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
-                placeholder="춘천광장"
+                placeholder="전원일기"
               />
             </div>
 

@@ -89,7 +89,7 @@ export default function SeoBasicPage() {
               id="title_suffix"
               value={form.title_suffix}
               onChange={(e) => setForm({ ...form, title_suffix: e.target.value })}
-              placeholder="| 춘천광장"
+              placeholder="| 전원일기"
             />
           </div>
 

@@ -12,10 +12,10 @@ export interface PageHeroDef {
 }
 
 export const PAGE_HERO_DEFS: PageHeroDef[] = [
-  { key: "board",         label: "동네 게시판",   defaultImage: "/banners/board-banner.jpg",        path: "/board" },
-  { key: "secondhand",    label: "중고거래",       defaultImage: "/banners/secondhand-banner.jpg",   path: "/secondhand" },
+  { key: "board",         label: "소식통",         defaultImage: "/banners/board-banner.jpg",        path: "/board" },
+  { key: "secondhand",    label: "농기구/자재",     defaultImage: "/banners/secondhand-banner.jpg",   path: "/secondhand" },
   { key: "sharing",       label: "나눔",           defaultImage: "/banners/sharing-banner.jpg",      path: "/sharing" },
-  { key: "jobs",          label: "구인구직",       defaultImage: "/banners/jobs-banner.jpg",         path: "/jobs" },
+  { key: "jobs",          label: "일손",           defaultImage: "/banners/jobs-banner.jpg",         path: "/jobs" },
   { key: "clubs",         label: "동네 모임",      defaultImage: "/banners/clubs-banner.jpg",        path: "/clubs" },
   { key: "group-buying",  label: "공동구매",       defaultImage: "/banners/group-buying-banner.jpg", path: "/group-buying" },
   { key: "local-food",    label: "로컬푸드",       defaultImage: "/banners/local-food-banner.jpg",   path: "/local-food" },

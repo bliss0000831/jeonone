@@ -210,7 +210,7 @@ export default function PermissionsPage() {
       {/* 현재 광장 관리자 목록 */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">현재 광장 관리자</CardTitle>
+          <CardTitle className="text-base">현재 전원일기 관리자</CardTitle>
           <CardDescription>관리자의 역할을 변경하려면 셀렉트박스를 사용하세요</CardDescription>
         </CardHeader>
         <CardContent className="p-0">

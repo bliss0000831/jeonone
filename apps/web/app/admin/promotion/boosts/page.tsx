@@ -82,8 +82,8 @@ const TIER_COLOR: Record<string, string> = {
 
 const TARGET_LABEL: Record<string, string> = {
   property: '부동산',
-  secondhand: '중고거래',
-  jobs: '구인구직',
+  secondhand: '농기구/자재',
+  jobs: '일손',
   food: '먹거리',
   service: '서비스',
 }

@@ -395,8 +395,8 @@ const POST_SOURCES: Array<{
   // 매물/중고거래/구인구직 — 누락돼 있어서 "내 글" 에 표시 안 됐던 카테고리들.
   // 다른 도메인과 동일한 코드 경로로 통합 (별도 includeProperties 분기 제거).
   { table: "properties",          kind: "property",     kindLabel: "매물",     hrefBase: "/property",     titleField: "title",      contentField: "description" },
-  { table: "secondhand_posts",    kind: "secondhand",   kindLabel: "중고거래", hrefBase: "/secondhand",   titleField: "title",      contentField: "description" },
-  { table: "jobs_posts",          kind: "jobs",         kindLabel: "구인구직", hrefBase: "/jobs",         titleField: "title",      contentField: "description" },
+  { table: "secondhand_posts",    kind: "secondhand",   kindLabel: "농기구/자재", hrefBase: "/secondhand",   titleField: "title",      contentField: "description" },
+  { table: "jobs_posts",          kind: "jobs",         kindLabel: "일손", hrefBase: "/jobs",         titleField: "title",      contentField: "description" },
 ]
 
 /**

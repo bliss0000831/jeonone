@@ -36,7 +36,7 @@ export default function ThemeBasicInfoPage() {
 
   // 로고 — site_settings.site_logo 에 별개 키로 저장
   const [logoUrl, setLogoUrl] = useState<string>(DEFAULT_LOGO)
-  const [siteName, setSiteName] = useState<string>('춘천광장')
+  const [siteName, setSiteName] = useState<string>('전원일기')
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const logoInputRef = useRef<HTMLInputElement>(null)
 
@@ -339,7 +339,7 @@ export default function ThemeBasicInfoPage() {
               id="site_name"
               value={siteName}
               onChange={(e) => setSiteName(e.target.value)}
-              placeholder="춘천광장"
+              placeholder="전원일기"
             />
             <p className="text-[11px] text-muted-foreground">
               헤더·탭 제목·OG 미리보기에 노출되는 사이트 이름
@@ -358,7 +358,7 @@ export default function ThemeBasicInfoPage() {
               id="company_name"
               value={form.company_name}
               onChange={(e) => setForm({ ...form, company_name: e.target.value })}
-              placeholder="(주)춘천광장"
+              placeholder="(주)전원일기"
             />
           </div>
           <div className="space-y-2">

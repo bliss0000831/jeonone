@@ -906,7 +906,7 @@ export async function loadPostContext(
         image: d.images?.[0] ?? null,
         title: d.title,
         meta: priceStr,
-        badgeLabel: d.category || "중고거래",
+        badgeLabel: d.category || "농기구/자재",
         badgeTone: "primary",
       }
     }

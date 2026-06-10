@@ -209,11 +209,11 @@ export default function AdminPermissionsMatrixPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
             <div className="p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
               <Badge className="bg-purple-500 text-white text-xs mb-1">super</Badge>
-              <p className="text-muted-foreground text-xs">모든 광장 / 모든 권한</p>
+              <p className="text-muted-foreground text-xs">전체 전원일기 / 모든 권한</p>
             </div>
             <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
               <Badge className="bg-blue-500 text-white text-xs mb-1">admin</Badge>
-              <p className="text-muted-foreground text-xs">해당 광장 운영 전반</p>
+              <p className="text-muted-foreground text-xs">해당 전원일기 운영 전반</p>
             </div>
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
               <Badge className="bg-emerald-500 text-white text-xs mb-1">manager</Badge>

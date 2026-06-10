@@ -1,7 +1,7 @@
 /**
  * 슈퍼 어드민 — 업자 자동 차단.
  *
- * 정책: 중고거래는 일반 사용자 전용. 사업자는 입장 자체 금지.
+ * 정책: 농기구/자재는 일반 사용자 전용. 사업자는 입장 자체 금지.
  * 자동 탐지된 의심 사용자(대량 등록 등) 를 관리자가 검토 → 경고 / 정지.
  */
 import { redirect } from 'next/navigation'
@@ -44,7 +44,7 @@ export default async function BusinessFlagsPage() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Shield className="w-6 h-6 text-red-500" />
-              업자 자동 차단 (중고거래)
+              업자 자동 차단 (농기구/자재)
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               자동 탐지된 의심 사용자 검토 → 경고 또는 정지.
@@ -61,7 +61,7 @@ export default async function BusinessFlagsPage() {
             <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="font-bold text-red-900 dark:text-red-200 mb-1">
-                정책: 중고거래는 일반 사용자(C2C) 전용
+                정책: 농기구/자재는 일반 사용자(C2C) 전용
               </p>
               <p className="text-red-800 dark:text-red-200 leading-relaxed">
                 사업자(B2C)는 입장 자체가 금지되며, 별도 카테고리/마크 운영하지 않습니다.
@@ -102,7 +102,7 @@ export default async function BusinessFlagsPage() {
         <section>
           <h2 className="text-lg font-bold mb-3">검토 대기 ({flags.length})</h2>
           <p className="text-xs text-muted-foreground mb-3">
-            매일 03:00 UTC 자동 갱신. 30일 내 20건 이상 중고거래 등록 시 자동 플래그.
+            매일 03:00 UTC 자동 갱신. 30일 내 20건 이상 농기구/자재 등록 시 자동 플래그.
           </p>
           <FlagsReviewClient
             flags={flags}

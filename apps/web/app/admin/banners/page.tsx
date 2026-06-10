@@ -43,9 +43,9 @@ export default function BannerManagementPage() {
   const defaultBanners: Banner[] = [
     {
       id: '0',
-      title: "더 나은 집, 더 가까운 이웃",
-      subtitle: "우리 동네 부동산 정보부터 따뜻한 나눔과 공동구매까지",
-      description: "춘천광장에서 함께하세요",
+      title: "농업인을 위한 따뜻한 마을 장터",
+      subtitle: "농기구·자재 직거래부터 로컬푸드·일손·마을 소식까지",
+      description: "전원일기에서 함께하세요",
       href: "/",
       icon: "Home",
       gradient: "from-primary/80 to-primary",
@@ -163,13 +163,13 @@ export default function BannerManagementPage() {
         banners.length > 0 ? Math.max(...banners.map((b) => b.order_index)) + 1 : 0
       // 진짜 기본 7개 (lib/hero-banners.ts 와 동일). id 는 Supabase 가 UUID 로 자동 생성.
       const seed = [
-        { title: '춘천광장', subtitle: '더 나은 집, 더 가까운 이웃', description: '호수의 도시 춘천에서 따뜻한 이웃을 만나세요', href: '/', icon: 'Home', gradient: 'from-emerald-700 via-teal-600 to-cyan-600', image_url: '/banners/hero-banner.jpg' },
+        { title: '전원일기', subtitle: '농업인을 위한 따뜻한 마을 장터', description: '우리 지역 농업인들과 따뜻한 이웃을 만나세요', href: '/', icon: 'Home', gradient: 'from-emerald-700 via-teal-600 to-cyan-600', image_url: '/banners/hero-banner.jpg' },
         { title: '우리동네 로컬푸드', subtitle: '신선한 동네 먹거리를 한눈에', description: '갓 수확한 제철 농산물을 산지 직거래로', href: '/local-food', icon: 'ShoppingCart', gradient: 'from-green-700 via-emerald-600 to-lime-500', image_url: '/banners/local-food-banner.jpg' },
-        { title: '중고 직거래', subtitle: '우리 동네 중고장터', description: '가까운 이웃과 안전하게 중고거래하세요', href: '/secondhand', icon: 'Store', gradient: 'from-slate-700 via-slate-600 to-slate-500', image_url: '/banners/secondhand-banner.jpg' },
+        { title: '농기구·자재 직거래', subtitle: '우리 동네 농기구 장터', description: '가까운 이웃과 안전하게 농기구·자재를 거래하세요', href: '/secondhand', icon: 'Store', gradient: 'from-slate-700 via-slate-600 to-slate-500', image_url: '/banners/secondhand-banner.jpg' },
         { title: '이웃과 나눔', subtitle: '따뜻한 이웃사촌', description: '안 쓰는 물건, 이웃과 나누면 더 가치있어요', href: '/sharing', icon: 'Heart', gradient: 'from-rose-600 via-pink-500 to-red-400', image_url: '/banners/sharing-banner.jpg' },
         { title: '우리 동네 경매', subtitle: '합리적인 가격에 낙찰받기', description: '동네 이웃과 함께하는 투명한 경매', href: '/auction', icon: 'ShoppingCart', gradient: 'from-blue-700 via-indigo-600 to-violet-500', image_url: '/banners/auction-banner.jpg' },
         { title: '대여 서비스', subtitle: '필요할 때 빌려 쓰세요', description: '가끔 쓰는 물건은 이웃에게 빌려보세요', href: '/rental', icon: 'Store', gradient: 'from-amber-600 via-yellow-500 to-lime-400', image_url: '/banners/rental-banner.jpg' },
-        { title: '동네 일자리', subtitle: '가까운 곳에서 일하기', description: '우리 동네 구인구직 정보를 확인하세요', href: '/jobs', icon: 'Users', gradient: 'from-teal-600 via-emerald-500 to-green-400', image_url: '/banners/jobs-banner.jpg' },
+        { title: '동네 일손', subtitle: '가까운 곳에서 일손 찾기', description: '우리 동네 일손 정보를 확인하세요', href: '/jobs', icon: 'Users', gradient: 'from-teal-600 via-emerald-500 to-green-400', image_url: '/banners/jobs-banner.jpg' },
       ].map((b, i) => ({
         ...b,
         order_index: baseOrder + i,

@@ -23,9 +23,9 @@ export interface BannerData {
 export const defaultBanners: BannerData[] = [
   {
     id: '0',
-    title: "춘천광장",
-    subtitle: "더 나은 집, 더 가까운 이웃",
-    description: "호수의 도시 춘천에서 따뜻한 이웃을 만나세요",
+    title: "전원일기",
+    subtitle: "농업인을 위한 따뜻한 마을 장터",
+    description: "우리 지역 농업인들과 따뜻한 이웃을 만나세요",
     href: "/",
     icon: "Home",
     gradient: "from-emerald-700 via-teal-600 to-cyan-600",

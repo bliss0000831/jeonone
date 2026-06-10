@@ -24,13 +24,13 @@ const CATEGORIES = [
   { key: null, label: '전체 (기본)' },
   { key: 'property', label: '부동산' },
   { key: 'local-food', label: '로컬푸드' },
-  { key: 'secondhand', label: '중고거래' },
+  { key: 'secondhand', label: '농기구/자재' },
   { key: 'group-buying', label: '공동구매' },
   { key: 'interior', label: '인테리어' },
   { key: 'moving', label: '이사' },
   { key: 'cleaning', label: '청소' },
   { key: 'repair', label: '수리' },
-  { key: 'jobs', label: '구인구직' },
+  { key: 'jobs', label: '일손' },
 ]
 
 export default function SuperAdminCommissionPage() {

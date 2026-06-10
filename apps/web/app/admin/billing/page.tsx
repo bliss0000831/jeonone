@@ -473,7 +473,7 @@ function targetTypeLabel(t: string): string {
   const m: Record<string, string> = {
     property: '부동산',
     new_store: '신장개업',
-    job: '구인구직',
+    job: '일손',
     group_buying: '공동구매',
     club: '모임',
   }

@@ -113,7 +113,7 @@ export default function ThemeFooterPage() {
               id="copyright"
               value={form.copyright}
               onChange={(e) => setForm({ ...form, copyright: e.target.value })}
-              placeholder="© 2026 춘천광장. All rights reserved."
+              placeholder="© 2026 전원일기. All rights reserved."
             />
           </div>
 

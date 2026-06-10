@@ -256,7 +256,7 @@ export default function BusinessSettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
-            <Label htmlFor="job_info_number">직업정보제공사업 신고번호 (구인구직 운영 시)</Label>
+            <Label htmlFor="job_info_number">직업정보제공사업 신고번호 (일손 운영 시)</Label>
             <Input
               id="job_info_number"
               value={info.job_info_number}
@@ -264,7 +264,7 @@ export default function BusinessSettingsPage() {
               placeholder="예) 제0000호 / 강원지방고용노동청"
             />
             <p className="text-xs text-muted-foreground">
-              구인구직 게시판을 운영하려면 직업안정법상 신고가 필요합니다. 신고 후 번호를 입력하면 구인구직 메인에 자동 표시됩니다.
+              일손 게시판을 운영하려면 직업안정법상 신고가 필요합니다. 신고 후 번호를 입력하면 일손 메인에 자동 표시됩니다.
             </p>
           </div>
           <div className="grid gap-2">

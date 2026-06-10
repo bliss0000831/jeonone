@@ -22,8 +22,8 @@ interface Keyword {
 
 const SCOPE_LABEL: Record<string, string> = {
   all: "전체",
-  secondhand: "중고거래",
-  jobs: "구인구직",
+  secondhand: "농기구/자재",
+  jobs: "일손",
 }
 
 const SCOPE_COLOR: Record<string, string> = {
@@ -234,8 +234,8 @@ export default function ModerationKeywordsPage() {
             className="h-10 px-3 rounded-md border border-input bg-background text-sm"
           >
             <option value="all">전체 게시판</option>
-            <option value="secondhand">중고거래만</option>
-            <option value="jobs">구인구직만</option>
+            <option value="secondhand">농기구/자재만</option>
+            <option value="jobs">일손만</option>
           </select>
           <select
             value={form.action}
@@ -278,8 +278,8 @@ export default function ModerationKeywordsPage() {
           >
             <option value="all_filter">모든 범위</option>
             <option value="all">전체 게시판</option>
-            <option value="secondhand">중고거래</option>
-            <option value="jobs">구인구직</option>
+            <option value="secondhand">농기구/자재</option>
+            <option value="jobs">일손</option>
           </select>
           <select
             value={actionFilter}

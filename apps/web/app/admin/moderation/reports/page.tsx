@@ -49,8 +49,8 @@ const REASON_COLOR: Record<string, string> = {
 }
 
 const TYPE_LABEL: Record<string, string> = {
-  secondhand: "중고거래",
-  jobs: "구인구직",
+  secondhand: "농기구/자재",
+  jobs: "일손",
   sharing: "나눔",
   clubs: "모임",
   "new-store": "신장개업",
