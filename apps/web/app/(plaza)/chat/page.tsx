@@ -516,7 +516,7 @@ export default function ChatListPage() {
                       <div className="flex items-center justify-between mb-1">
                         <span className={cn("font-medium truncate flex items-center gap-1.5", isAdminNotice ? "text-primary" : "text-foreground")}>
                           <span className="truncate">
-                            {isAdminNotice ? `${plazaChipName(room.plaza_id) ? plazaChipName(room.plaza_id) + "광장" : "광장"} 관리자` : (room.otherUser?.nickname || "사용자")}
+                            {isAdminNotice ? `${plazaChipName(room.plaza_id) ? plazaChipName(room.plaza_id) + " 전원일기" : "전원일기"} 관리자` : (room.otherUser?.nickname || "사용자")}
                           </span>
                           {/* Cross-Plaza 칩 — 상대가 다른 광장 사람이면 표시 */}
                           {!isAdminNotice && room.plaza_id && currentPlaza && room.plaza_id !== currentPlaza && (
@@ -621,7 +621,7 @@ export default function ChatListPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium truncate text-primary">{plazaChipName(room.plaza_id) ? plazaChipName(room.plaza_id) + "광장" : "광장"} 관리자</span>
+                            <span className="font-medium truncate text-primary">{plazaChipName(room.plaza_id) ? plazaChipName(room.plaza_id) + " 전원일기" : "전원일기"} 관리자</span>
                             <span className="text-xs text-muted-foreground flex-shrink-0">{formatTime(room.last_message_at)}</span>
                           </div>
                           <p className="text-sm text-muted-foreground truncate mb-1">

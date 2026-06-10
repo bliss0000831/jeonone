@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const supabase = await createClient()
   const plaza = await getCurrentPlaza()
 
-  let cityName = "광장"
+  let cityName = "전원일기"
   if (plaza) {
     const { data } = await supabase
       .from("plazas")

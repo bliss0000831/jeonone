@@ -493,7 +493,7 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
 
   // 광장 이름 매핑
   const plazaDisplayName = (id: string | null | undefined) => {
-    if (!id) return "광장"
+    if (!id) return "전원일기"
     const map: Record<string, string> = { chuncheon: "춘천광장", gangneung: "강릉광장", gyeongsan: "경산광장", goyang: "고양광장" }
     return map[id] ?? `${id}광장`
   }

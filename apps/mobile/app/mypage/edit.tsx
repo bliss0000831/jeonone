@@ -446,7 +446,7 @@ export default function EditProfileScreen() {
           <Field
             label="가입 지역 (시/군)"
             icon="map-outline"
-            helper="가입 지역은 부동산·중고·게시판 등 지역별 글의 기본 필터로 사용돼요."
+            helper="가입 지역은 농기구·로컬푸드·소식통 등 지역별 글의 기본 필터로 사용돼요."
           >
             <Pressable onPress={() => setCityPickerOpen(true)} style={styles.dongSelect}>
               <Text
@@ -501,11 +501,6 @@ export default function EditProfileScreen() {
                 </Text>
               </View>
             ) : null}
-            <Text style={styles.expertHint}>
-              *{" "}
-              <Text style={{ fontWeight: "700" }}>공인중개사 / 홈즈(인테리어·수리·이사·청소)</Text>
-              {" "}전문가 분들은 이 지역을 기준으로 다른 사용자의 초대하기 후보에 노출돼요.
-            </Text>
           </Field>
 
           {showBusinessHours && (

@@ -189,7 +189,7 @@ export default function PlazaSignupScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
-        <Text style={styles.headerTitle}>{plaza.name || "광장"} 가입</Text>
+        <Text style={styles.headerTitle}>{plaza.name || "전원일기"} 가입</Text>
         <View style={{ width: 36 }} />
       </View>
 
@@ -198,8 +198,8 @@ export default function PlazaSignupScreen() {
           <Ionicons name="information-circle" size={20} color={lightColors.primary} />
           <Text style={styles.infoText}>
             {params.provider === "kakao" ? "카카오 계정" : "계정"}으로 인증되었어요.{"\n"}
-            <Text style={{ fontWeight: "700" }}>{plaza.name || "이 광장"}</Text> 은 별도
-            가입이 필요해요. 이 광장에서 사용할 닉네임과 거주 시/군을 입력해주세요.
+            <Text style={{ fontWeight: "700" }}>{plaza.name || "이 전원일기"}</Text> 는 별도
+            가입이 필요해요. 여기서 사용할 닉네임과 거주 시/군을 입력해주세요.
           </Text>
         </View>
 
@@ -269,7 +269,7 @@ export default function PlazaSignupScreen() {
           {submitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitText}>{plaza.name || "광장"} 가입 완료</Text>
+            <Text style={styles.submitText}>{plaza.name || "전원일기"} 가입 완료</Text>
           )}
         </Pressable>
 

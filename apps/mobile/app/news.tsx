@@ -382,7 +382,7 @@ function NewsTab(props: {
                 value={searchInput}
                 onChangeText={onSearchInput}
                 onSubmitEditing={onSearchSubmit}
-                placeholder="뉴스 검색 (예: 축제, 교통, 부동산)"
+                placeholder="뉴스 검색 (예: 축제, 농사, 날씨)"
                 placeholderTextColor={lightColors.ink500}
                 returnKeyType="search"
                 style={styles.searchInput}

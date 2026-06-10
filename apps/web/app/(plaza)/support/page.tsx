@@ -20,7 +20,7 @@ const SUPPORT_EMAIL = "support@chuncheonplaza.com"
 
 export default async function SupportPage() {
   const plazaId = await getCurrentPlaza()
-  let plazaName = "광장"
+  let plazaName = "전원일기"
   if (plazaId) {
     const supabase = await createClient()
     const { data } = await supabase.from("plazas").select("name").eq("id", plazaId).maybeSingle()

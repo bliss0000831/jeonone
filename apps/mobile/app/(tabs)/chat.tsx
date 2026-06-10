@@ -471,7 +471,7 @@ export default function ChatListTab() {
       <View style={styles.empty}>
         <Ionicons name="chatbubble-ellipses-outline" size={56} color={lightColors.ink300} />
         <Text style={styles.emptyTitle}>채팅 내역이 없습니다</Text>
-        <Text style={styles.emptySub}>매물/모임에서 대화를 시작해보세요</Text>
+        <Text style={styles.emptySub}>농기구·로컬푸드 등에서 대화를 시작해보세요</Text>
       </View>
     )
   }, [error])
@@ -797,7 +797,7 @@ function DirectRow({
               numberOfLines={1}
             >
               {isAdminNotice
-                ? `${plazaName(roomPlaza as string) || "광장"} 관리자`
+                ? `${plazaName(roomPlaza as string) || "전원일기"} 관리자`
                 : (room.participantsCount ?? 2) >= 3
                 ? `${ctx?.title || "다인 채팅"} · ${room.participantsCount}명`
                 : otherName}
