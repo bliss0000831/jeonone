@@ -48,7 +48,7 @@ export default async function PrivacyPage() {
           <p className="mb-2">회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리한 개인정보는 다음의 목적 이외의 용도로는 사용되지 않으며, 이용 목적이 변경될 시에는 별도의 동의를 받는 등 필요한 조치를 이행합니다.</p>
           <ul className="list-disc list-outside ml-5 space-y-1">
             <li>회원가입 및 관리: 회원 식별·인증, 회원자격 유지·관리, 부정이용 방지, 만 14세 미만 아동 회원가입 차단, 각종 고지·통지</li>
-            <li>서비스 제공: 부동산 정보·중고거래·공동구매·로컬푸드·모임·게시판·채팅 등 콘텐츠 제공, 본인인증, 거래 중개</li>
+            <li>서비스 제공: 농기구·자재 직거래·대여·경매, 로컬푸드, 일손, 무료 나눔, 소식통, 채팅 등 콘텐츠 제공, 본인인증, 거래 중개</li>
             <li>고객 문의 응대 및 분쟁 해결</li>
             <li>유료 서비스 제공에 따른 요금 결제·정산, 환불</li>
             <li>마케팅 및 광고 활용(별도 동의 시): 신규 서비스 개발, 이벤트 및 프로모션 안내</li>
@@ -70,8 +70,8 @@ export default async function PrivacyPage() {
 
           <div className="rounded-lg border border-border bg-card p-3 mb-3">
             <h3 className="font-semibold text-foreground text-sm mb-2">[선택] 거래·게시 활동</h3>
-            <p className="text-xs">· 부동산 매물 정보(주소, 면적, 가격, 사진)</p>
-            <p className="text-xs">· 중고거래·나눔·공동구매·로컬푸드 게시 정보, 채팅 메시지, 댓글</p>
+            <p className="text-xs">· 거래 게시 정보(품목, 가격, 사진, 거래 희망 지역)</p>
+            <p className="text-xs">· 농기구·자재·로컬푸드·나눔 게시 정보, 채팅 메시지, 댓글</p>
             <p className="text-xs">· 위치 정보(읍·면·동 단위, 동의 시)</p>
             <p className="text-xs">· 전화번호·카카오 ID(거래 당사자 간 직접 연락용, 본인이 공개 선택 시)</p>
             <p className="text-xs mt-1">· 보유 기간: <strong>회원 탈퇴 시까지</strong>(거래 기록은 아래 법령에 따라 별도 보관)</p>
@@ -85,10 +85,10 @@ export default async function PrivacyPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-3 mb-3">
-            <h3 className="font-semibold text-foreground text-sm mb-2">[전문가 회원] 사업자 인증</h3>
-            <p className="text-xs">· 공인중개사 자격번호, 사업자등록번호, 상호, 대표자명, 사업장 주소·연락처</p>
-            <p className="text-xs">· 본인 신원 확인 자료(자격증 사본, 사업자등록증 사본 등)</p>
-            <p className="text-xs mt-1">· 보유 기간: <strong>전문가 자격 유지 기간 + 5년</strong>(분쟁 대비)</p>
+            <h3 className="font-semibold text-foreground text-sm mb-2">[사업자 회원] 사업자 인증</h3>
+            <p className="text-xs">· 사업자등록번호, 상호, 대표자명, 사업장 주소·연락처</p>
+            <p className="text-xs">· 본인 신원 확인 자료(사업자등록증 사본 등)</p>
+            <p className="text-xs mt-1">· 보유 기간: <strong>사업자 자격 유지 기간 + 5년</strong>(분쟁 대비)</p>
           </div>
 
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
@@ -111,7 +111,7 @@ export default async function PrivacyPage() {
             정보주체의 동의, 법률의 특별한 규정 등 「개인정보 보호법」 제17조에 해당하는 경우에만 제3자에게 제공합니다.
           </p>
           <ul className="list-disc list-outside ml-5 space-y-1">
-            <li>거래 상대방 회원에게 본인이 공개한 닉네임·프로필·게시 정보·연락처(채팅·매물 등록 시)</li>
+            <li>거래 상대방 회원에게 본인이 공개한 닉네임·프로필·게시 정보·연락처(채팅·거래 등록 시)</li>
             <li>법령 또는 수사기관의 적법한 요청이 있는 경우</li>
             <li>분쟁 조정·해결을 위해 관련 기관(한국소비자원·콘텐츠분쟁조정위원회 등)이 적법하게 요청하는 경우</li>
           </ul>
@@ -187,7 +187,7 @@ export default async function PrivacyPage() {
           <h2 className="text-lg font-semibold text-foreground mb-2">제8조 (쿠키 등 자동 수집 장치)</h2>
           <ol className="list-decimal list-outside ml-5 space-y-1.5">
             <li>회사는 이용자에게 개별 맞춤 서비스를 제공하기 위해 쿠키 및 유사 기술(local storage, session storage)을 사용합니다.</li>
-            <li>수집 항목: 로그인 세션, 위치(광장) 선택값, 다크모드 설정, 채팅·검색 등 이용 기록</li>
+            <li>수집 항목: 로그인 세션, 위치(지역) 선택값, 다크모드 설정, 채팅·검색 등 이용 기록</li>
             <li>이용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 거부 시 일부 서비스 이용이 제한될 수 있습니다.</li>
           </ol>
         </section>
