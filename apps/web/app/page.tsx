@@ -152,6 +152,8 @@ export default async function Page() {
   const [userRes, plazaRow, noticesRes] = await Promise.all([
     supabase.auth.getUser(),
     supabase.from('plazas').select('name').eq('id', plaza).single(),
+    // 시군 필터는 클라(NoticeSection)에서 selectedRegion 기준으로 수행하므로
+    // 충분히 받아와야 시군 공지가 최신 전체대상 공지에 밀려 누락되지 않음.
     supabase
       .from('notices')
       .select('id, title, created_at, region')
@@ -159,7 +161,7 @@ export default async function Page() {
       .eq('plaza_id', plaza)
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(40),
+      .limit(500),
   ])
 
   const user = userRes.data.user

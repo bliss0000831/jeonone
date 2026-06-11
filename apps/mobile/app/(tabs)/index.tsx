@@ -76,24 +76,24 @@ export default function HomeTab() {
     let cancelled = false
     ;(async () => {
       try {
-        let q = getSupabase()
-          .from("notices")
-          .select("id, title, created_at, is_pinned, region")
-          .eq("is_published", true)
-          .eq("plaza_id", plaza.id)
-        // 내 시군 전용 + 전체(도 전역) 공지만 (다른 시군 제외)
-        if (region) q = q.or(`region.eq.${region},region.is.null`)
-        const { data, error } = await q
-          .order("is_pinned", { ascending: false })
-          .order("created_at", { ascending: false })
-          .limit(30)
-        if (cancelled || error || !data) return
-        const sorted = [...(data as any[])].sort((a, b) => {
-          // 내 시군 전용 먼저, 전체는 뒤로
-          const am = a.region && a.region === region ? 0 : 1
-          const bm = b.region && b.region === region ? 0 : 1
-          return am - bm
-        }).slice(0, 5)
+        const sb = getSupabase()
+        const base = () =>
+          (sb as any).from("notices")
+            .select("id, title, created_at, is_pinned, region")
+            .eq("is_published", true)
+            .eq("plaza_id", plaza.id)
+        // 내 시군 전용 공지와 전체(도 전역) 공지를 따로 조회 — 내 시군을 먼저 채운다.
+        // (정부24 전체대상 공지가 최신순으로 많아 단일 limit 조회 시 시군 공지가 밀려나는 문제 해결)
+        const [mineRes, allRes] = await Promise.all([
+          region
+            ? base().eq("region", region).order("is_pinned", { ascending: false }).order("created_at", { ascending: false }).limit(5)
+            : Promise.resolve({ data: [] as any[] }),
+          base().is("region", null).order("is_pinned", { ascending: false }).order("created_at", { ascending: false }).limit(5),
+        ])
+        if (cancelled) return
+        const mine = ((mineRes as any).data as any[]) || []
+        const all = ((allRes as any).data as any[]) || []
+        const sorted = [...mine, ...all].slice(0, 5)
         setNotices(
           sorted.map((n: any) => ({
             id: String(n.id),
