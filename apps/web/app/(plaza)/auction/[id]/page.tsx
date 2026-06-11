@@ -77,6 +77,21 @@ export default function AuctionDetailPage() {
     load()
   }
 
+  const markDeal = async (status: "completed" | "no_show") => {
+    const isDone = status === "completed"
+    const msg = isDone
+      ? "낙찰자와 거래를 정상적으로 마치셨나요?"
+      : "낙찰자가 약속을 지키지 않았나요?\n신고하면 낙찰자의 입찰이 제한될 수 있습니다. (누적 2회 7일, 3회 이상 30일)"
+    if (!confirm(msg)) return
+    const supabase = createClient()
+    const { data, error } = await (supabase as any).rpc("mark_auction_deal", { p_auction: id, p_status: status })
+    if (error) { toast.error(error.message); return }
+    const res = data as any
+    if (!res?.ok) { toast.error(res?.error || "처리하지 못했습니다"); return }
+    toast.success(isDone ? "거래 완료로 기록했습니다" : "거래 불이행으로 신고했습니다")
+    load()
+  }
+
   const buyNow = async () => {
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!a?.buy_now_price) return
@@ -141,6 +156,29 @@ export default function AuctionDetailPage() {
                     <Star className="w-4 h-4" /> 판매자 후기 작성
                   </Link>
                 </>
+              )}
+
+              {/* 판매자: 낙찰 후 거래 결과 기록 (예치금 없는 노쇼 방지) */}
+              {user && a.seller_id === user.id && (
+                (a.deal_status === "pending" || !a.deal_status) ? (
+                  <div className="mt-3">
+                    <p className="text-xs text-muted-foreground mb-2">거래를 마친 뒤 결과를 남겨주세요.</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => markDeal("completed")}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2.5 text-sm">
+                        거래 완료
+                      </button>
+                      <button onClick={() => markDeal("no_show")}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-600 font-bold px-4 py-2.5 text-sm hover:bg-rose-100">
+                        불이행 신고
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`mt-3 rounded-xl py-2.5 px-3 text-center text-sm font-bold ${a.deal_status === "completed" ? "bg-primary/10 text-primary" : "bg-rose-50 text-rose-600"}`}>
+                    {a.deal_status === "completed" ? "✓ 거래 완료로 기록됨" : "⚠ 거래 불이행으로 신고됨"}
+                  </div>
+                )
               )}
             </div>
           ) : (
