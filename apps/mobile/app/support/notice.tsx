@@ -70,8 +70,8 @@ export default function NoticeScreen() {
         <View style={styles.regionBar}>
           <Text style={styles.regionText} numberOfLines={1}>
             {regionMode === "mine"
-              ? (myRegion ? `📍 ${myRegion} + 전체 대상 공지` : "📍 전체 대상 공지")
-              : "🗺️ 전체 대상 공지 보는 중"}
+              ? (myRegion ? `📍 ${myRegion} 및 전체 지역 대상 공지` : "📍 전체 지역 대상 공지")
+              : "🗺️ 전체 지역 대상 공지 보는 중"}
           </Text>
           {myRegion ? (
             <Pressable onPress={() => setRegionMode((m) => (m === "mine" ? "all" : "mine"))} hitSlop={8}>

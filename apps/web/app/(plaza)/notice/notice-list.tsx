@@ -44,9 +44,9 @@ export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
           <span className="text-sm md:text-base text-muted-foreground">
             {regionMode === "mine" ? (
               mySigungu ? (
-                <>📍 <b className="text-foreground">{mySigungu}</b> + 전체 대상 공지를 보고 있어요</>
+                <>📍 <b className="text-foreground">{mySigungu}</b> 및 전체 지역 대상 공지를 보고 있어요</>
               ) : (
-                "📍 전체 대상 공지를 보고 있어요"
+                "📍 전체 지역 대상 공지를 보고 있어요"
               )
             ) : (
               "🗺️ 전체 시군 공지를 보고 있어요"
