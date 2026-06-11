@@ -171,6 +171,47 @@ export async function collectAgricultureSubsidies(
   return [...byId.values()]
 }
 
+/**
+ * 강원 지자체 생활·복지·안전 등 "비농업" 서비스 수집 — 일반 공지/안내용.
+ * 농업(농림축산어업)은 정부지원금 게시판이 따로 다루므로 여기선 제외(중복 방지).
+ *   - 소관기관명 LIKE '강원' (강원도/시군 사업)
+ *   - 서비스분야 = '농림축산어업' 인 건 제외
+ */
+export async function collectGangwonLocalNotices(
+  serviceKey: string,
+  limit = 80,
+): Promise<Gov24Service[]> {
+  const rows = await fetchServicePage(serviceKey, 1, limit, [
+    condParam('소관기관명', 'LIKE', '강원'),
+  ])
+  const byId = new Map<string, Gov24Service>()
+  for (const s of rows) {
+    const id = s?.서비스ID
+    if (!id) continue
+    if (s.서비스분야 === AGRI_SERVICE_FIELD) continue // 농업 제외 (정부지원금과 중복 방지)
+    if (!byId.has(id)) byId.set(id, s)
+  }
+  return [...byId.values()]
+}
+
+/** gov24 서비스 항목 → 공지 본문(content) — 지자체 안내용 */
+export function buildNoticeContent(s: Gov24Service): string {
+  const lines: string[] = []
+  const push = (label: string, val?: string) => {
+    const v = (val ?? '').trim()
+    if (v) lines.push(`【${label}】\n${v}`)
+  }
+  push('안내 요약', s.서비스목적요약)
+  push('대상', s.지원대상)
+  push('내용', s.지원내용)
+  push('신청 기한', s.신청기한)
+  push('신청 방법', s.신청방법)
+  push('담당 기관', s.소관기관명)
+  if (s.상세조회URL) lines.push(`\n원문 보기: ${s.상세조회URL}`)
+  lines.push('\n— 정부24에서 자동 수집된 지자체 생활·복지 안내입니다.')
+  return lines.join('\n\n')
+}
+
 /** gov24 서비스 항목 → 게시글 본문(content) 텍스트 생성 */
 export function buildContent(s: Gov24Service): string {
   const lines: string[] = []
