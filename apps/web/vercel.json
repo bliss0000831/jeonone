@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/notice-sync",
       "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/api/cron/notice-scrape-sync",
+      "schedule": "0 1 * * *"
     }
   ]
 }
