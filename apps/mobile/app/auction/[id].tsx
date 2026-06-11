@@ -8,6 +8,7 @@ import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
 import { useLoginGate } from "@/components/LoginGate"
+import { PostActionsMenu } from "@/components/PostActionsMenu"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -120,7 +121,13 @@ export default function AuctionDetailScreen() {
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
         <Text style={styles.barTitle}>경매 상세</Text>
-        <View style={{ width: 24 }} />
+        <PostActionsMenu
+          kind="secondhand"
+          postId={a.post_id}
+          authorId={a.seller_id}
+          editHref={`/secondhand/${a.post_id}/edit`}
+          onDeleted={() => router.back()}
+        />
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>

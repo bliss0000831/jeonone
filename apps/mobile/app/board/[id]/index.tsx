@@ -56,6 +56,7 @@ import { useTrackRecent } from "@/lib/recent-views"
 import { useTrackView } from "@/lib/view-tracker"
 import { useCurrentPlaza, buildShareUrl } from "@/lib/plaza"
 import { AuthorCard } from "@/components/AuthorCard"
+import { useIsAdmin } from "@/lib/useIsAdmin"
 
 
 import { relativeDate } from "@/lib/relative-date"
@@ -68,6 +69,7 @@ export default function BoardDetailScreen() {
   const share = useShareModal()
   const router = useRouter()
   const { user } = useAuth()
+  const isAdmin = useIsAdmin()
   const { width } = useWindowDimensions()
 
   useTrackView("board_posts", id, "view_count")
@@ -521,7 +523,7 @@ export default function BoardDetailScreen() {
                       </View>
                     )}
                   </View>
-                  {c.user_id === user?.id && (
+                  {(c.user_id === user?.id || isAdmin) && (
                     <Pressable onPress={() => handleDeleteComment(c.id)} hitSlop={6} style={{ padding: 4 }}>
                       <Ionicons name="trash-outline" size={14} color="#dc2626" />
                     </Pressable>

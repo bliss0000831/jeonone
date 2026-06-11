@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
+import { PostActionsMenu } from "@/components/PostActionsMenu"
 
 const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
@@ -62,7 +63,13 @@ export default function RentalDetailScreen() {
       <View style={styles.bar}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Ionicons name="chevron-back" size={24} color="#1e293b" /></Pressable>
         <Text style={styles.barTitle}>대여 상세</Text>
-        <View style={{ width: 24 }} />
+        <PostActionsMenu
+          kind="secondhand"
+          postId={r.post_id}
+          authorId={r.owner_id}
+          editHref={`/secondhand/${r.post_id}/edit`}
+          onDeleted={() => router.back()}
+        />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Image source={r.post?.images?.[0] ? { uri: r.post.images[0] } : IMG} style={styles.img} contentFit="cover" />
