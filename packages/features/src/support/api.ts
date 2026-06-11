@@ -115,29 +115,40 @@ export interface NoticePost {
   category: string | null
   created_at: string
   is_pinned: boolean
+  /** 시군(예: '춘천시'). null = 전체(도 전체) 공지 */
+  region: string | null
+  /** 출처(예: '지자체') — 자동수집 공지 구분용. null = 운영자 작성 */
+  source: string | null
 }
 
 export async function listNotices(
   supabase: SupabaseClient,
   plazaId?: string,
 ): Promise<NoticePost[]> {
-  // notices 테이블에서 직접 조회 (admin /admin/board/notice 에서 작성하는 데이터)
-  let q = supabase
-    .from("notices")
-    .select("id, title, content, created_at, is_pinned")
-    .eq("is_published", true)
-    .order("is_pinned", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(50)
-  if (plazaId) q = q.eq("plaza_id", plazaId)
-  const { data, error } = await q
-  if (error) return []
-  return ((data ?? []) as any[]).map((n) => ({
+  // notices 테이블에서 직접 조회 (admin /admin/board/notice 에서 작성 + 자동수집)
+  // region 컬럼 미적용 환경 대비 — 실패하면 region 없이 재조회
+  async function attempt(withRegion: boolean) {
+    let q = supabase
+      .from("notices")
+      .select(withRegion ? "id, title, content, created_at, is_pinned, region, source" : "id, title, content, created_at, is_pinned")
+      .eq("is_published", true)
+      .order("is_pinned", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(100)
+    if (plazaId) q = q.eq("plaza_id", plazaId)
+    return q
+  }
+  let res = await attempt(true)
+  if (res.error) res = await attempt(false)
+  if (res.error) return []
+  return ((res.data ?? []) as any[]).map((n) => ({
     id: n.id,
     title: n.title,
     content: n.content,
     category: null,
     created_at: n.created_at,
     is_pinned: !!n.is_pinned,
+    region: n.region ?? null,
+    source: n.source ?? null,
   }))
 }

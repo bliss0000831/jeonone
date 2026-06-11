@@ -1,36 +1,42 @@
-import { ArrowLeft, Megaphone } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { BottomNav } from "@/components/bottom-nav"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentPlaza } from "@/lib/plaza/server"
+import { NoticeListClient, type NoticeItem } from "./notice-list"
 
 export const dynamic = 'force-dynamic'
-
-interface Notice {
-  id: string
-  title: string
-  content: string
-  is_pinned: boolean
-  view_count: number | null
-  created_at: string
-}
 
 export default async function NoticePage() {
   const supabase = await createClient()
   const plaza = await getCurrentPlaza()
 
-  let query = supabase
-    .from('notices')
-    .select('id, title, content, is_pinned, view_count, created_at')
-    .eq('is_published', true)
-    .order('is_pinned', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(100)
-  if (plaza) query = query.eq('plaza_id', plaza)
+  // region 컬럼 미적용 환경 대비 — 실패하면 region 없이 재조회
+  async function fetchNotices(withRegion: boolean) {
+    let query = supabase
+      .from('notices')
+      .select(withRegion
+        ? 'id, title, content, is_pinned, view_count, created_at, region'
+        : 'id, title, content, is_pinned, view_count, created_at')
+      .eq('is_published', true)
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(100)
+    if (plaza) query = query.eq('plaza_id', plaza)
+    return query
+  }
+  let res = await fetchNotices(true)
+  if (res.error) res = await fetchNotices(false)
 
-  const { data: notices } = await query
-
-  const list = (notices ?? []) as Notice[]
+  const list = ((res.data ?? []) as any[]).map((n) => ({
+    id: n.id,
+    title: n.title,
+    content: n.content,
+    is_pinned: !!n.is_pinned,
+    view_count: n.view_count ?? null,
+    created_at: n.created_at,
+    region: n.region ?? null,
+  })) as NoticeItem[]
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -45,38 +51,7 @@ export default async function NoticePage() {
       </header>
 
       <main className="max-w-2xl mx-auto p-4">
-        {list.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Megaphone className="w-10 h-10 mb-3 text-muted-foreground/40" />
-            <p className="text-sm">등록된 공지사항이 없습니다.</p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-border bg-card rounded-2xl border border-border overflow-hidden">
-            {list.map((n) => (
-              <li key={n.id} className="p-4">
-                <div className="flex items-start gap-2">
-                  {n.is_pinned && (
-                    <span className="shrink-0 mt-0.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 rounded">
-                      고정
-                    </span>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground mb-1">{n.title}</h3>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
-                      {n.content}
-                    </p>
-                    <p className="text-xs text-muted-foreground/70 mt-2">
-                      {new Date(n.created_at).toLocaleDateString('ko-KR')}
-                      {typeof n.view_count === 'number' && (
-                        <span className="ml-2">조회 {n.view_count}</span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <NoticeListClient notices={list} />
       </main>
 
       <BottomNav />

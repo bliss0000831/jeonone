@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getCurrentPlazaClient } from '@/lib/plaza/client'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ type Notice = {
   id: string
   title: string
   content: string
+  region: string | null
   is_pinned: boolean
   is_published: boolean
   author_id: string | null
@@ -43,9 +44,23 @@ export default function NoticeAdminPage() {
   const [form, setForm] = useState({
     title: '',
     content: '',
+    region: '', // '' = 전체(도 전체) 공지, 값 = 해당 시군에만 노출
     is_pinned: false,
     is_published: true,
   })
+  // 시군 옵션 — 현재 광장 coverage
+  const [regionOptions, setRegionOptions] = useState<string[]>([])
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      const plaza = getCurrentPlazaClient()
+      if (!plaza) return
+      const { data } = await supabase.from('plazas').select('coverage').eq('id', plaza).maybeSingle()
+      const cov = (data as any)?.coverage
+      if (alive && Array.isArray(cov)) setRegionOptions(cov as string[])
+    })()
+    return () => { alive = false }
+  }, [supabase])
 
   const {
     rows: items,
@@ -76,14 +91,14 @@ export default function NoticeAdminPage() {
   }, [items, totalCount])
 
   const resetForm = () => {
-    setForm({ title: '', content: '', is_pinned: false, is_published: true })
+    setForm({ title: '', content: '', region: '', is_pinned: false, is_published: true })
     setShowForm(false)
     setEditId(null)
   }
 
   const openCreate = () => {
     setEditId(null)
-    setForm({ title: '', content: '', is_pinned: false, is_published: true })
+    setForm({ title: '', content: '', region: '', is_pinned: false, is_published: true })
     setShowForm(true)
   }
 
@@ -92,6 +107,7 @@ export default function NoticeAdminPage() {
     setForm({
       title: row.title,
       content: row.content,
+      region: row.region ?? '',
       is_pinned: row.is_pinned,
       is_published: row.is_published,
     })
@@ -105,7 +121,7 @@ export default function NoticeAdminPage() {
       if (editId) {
         const { error } = await supabase
           .from('notices')
-          .update({ ...form, updated_at: new Date().toISOString() })
+          .update({ ...form, region: form.region || null, updated_at: new Date().toISOString() })
           .eq('id', editId)
         if (error) return toast.error('수정 실패: ' + error.message)
       } else {
@@ -113,6 +129,7 @@ export default function NoticeAdminPage() {
         const plaza = getCurrentPlazaClient()
         const { error } = await supabase.from('notices').insert({
           ...form,
+          region: form.region || null,
           author_id: user?.id || null,
           ...(plaza ? { plaza_id: plaza } : {}),
         })
@@ -424,6 +441,23 @@ export default function NoticeAdminPage() {
                 className="resize-none"
               />
               <div className="text-[11px] text-muted-foreground text-right">{form.content.length}자</div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>대상 지역 (시군)</Label>
+              <select
+                value={form.region}
+                onChange={(e) => setForm({ ...form, region: e.target.value })}
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+              >
+                <option value="">전체 (도 전체에 노출)</option>
+                {regionOptions.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+              <p className="text-[11px] text-muted-foreground">
+                특정 시군을 고르면 그 지역 주민에게만 보입니다. ‘전체’는 모든 시군에 노출됩니다.
+              </p>
             </div>
 
             <div className="space-y-3">
