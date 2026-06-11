@@ -24,11 +24,18 @@ export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
   const mySigungu = location?.sigungu || null
   const [regionMode, setRegionMode] = useState<"mine" | "all">("mine")
 
-  const filtered = notices.filter((n) => {
-    if (regionMode === "all") return true
-    if (!mySigungu) return true
-    return !n.region || n.region === mySigungu
-  })
+  const filtered = notices
+    .filter((n) => {
+      if (regionMode === "all") return true
+      if (!mySigungu) return true
+      return !n.region || n.region === mySigungu
+    })
+    // 내 시군 전용 공지를 먼저, 전체(도 전역) 공지를 뒤로
+    .sort((a, b) => {
+      const am = a.region && a.region === mySigungu ? 0 : 1
+      const bm = b.region && b.region === mySigungu ? 0 : 1
+      return am - bm
+    })
 
   return (
     <>
@@ -37,9 +44,9 @@ export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
           <span className="text-sm md:text-base text-muted-foreground">
             {regionMode === "mine" ? (
               mySigungu ? (
-                <>📍 <b className="text-foreground">{mySigungu}</b> + 전체 공지를 보고 있어요</>
+                <>📍 <b className="text-foreground">{mySigungu}</b> + 전체 대상 공지를 보고 있어요</>
               ) : (
-                "📍 전체 공지를 보고 있어요"
+                "📍 전체 대상 공지를 보고 있어요"
               )
             ) : (
               "🗺️ 전체 시군 공지를 보고 있어요"

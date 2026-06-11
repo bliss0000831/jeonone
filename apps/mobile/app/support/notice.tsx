@@ -43,11 +43,18 @@ export default function NoticeScreen() {
     }
   }, [])
 
-  const filtered = items.filter((n) => {
-    if (regionMode === "all") return true
-    if (!myRegion) return true
-    return !n.region || n.region === myRegion
-  })
+  const filtered = items
+    .filter((n) => {
+      if (regionMode === "all") return true
+      if (!myRegion) return true
+      return !n.region || n.region === myRegion
+    })
+    // 내 시군 전용 공지를 먼저, 전체(도 전역) 공지를 뒤로
+    .sort((a, b) => {
+      const am = a.region && a.region === myRegion ? 0 : 1
+      const bm = b.region && b.region === myRegion ? 0 : 1
+      return am - bm
+    })
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -63,8 +70,8 @@ export default function NoticeScreen() {
         <View style={styles.regionBar}>
           <Text style={styles.regionText} numberOfLines={1}>
             {regionMode === "mine"
-              ? (myRegion ? `📍 ${myRegion} + 전체 공지` : "📍 전체 공지")
-              : "🗺️ 전체 공지 보는 중"}
+              ? (myRegion ? `📍 ${myRegion} + 전체 대상 공지` : "📍 전체 대상 공지")
+              : "🗺️ 전체 대상 공지 보는 중"}
           </Text>
           {myRegion ? (
             <Pressable onPress={() => setRegionMode((m) => (m === "mine" ? "all" : "mine"))} hitSlop={8}>
