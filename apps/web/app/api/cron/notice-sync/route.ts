@@ -18,7 +18,6 @@ import {
   PROVINCES,
   collectLocalNoticesForProvince,
   buildNoticeContent,
-  regionFromService,
 } from '@/lib/services/subsidy-gov24'
 
 export const dynamic = 'force-dynamic'
@@ -72,7 +71,9 @@ export async function GET(req: Request) {
         author_id: null,
         source: SOURCE,
         source_id: s.서비스ID,
-        region: regionFromService(s, prov.sigungu),
+        // gov24 안내(복지·생활)는 사실상 도 전역 사업 → region=null(도 전체)로 모든 시군 노출.
+        // 진짜 시군 전용 공지(행사·모집)는 관리자 수동 작성에서 시군 지정.
+        region: null,
       }))
       const { error: insErr, count } = await (admin as any)
         .from('notices')
