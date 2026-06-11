@@ -154,12 +154,12 @@ export default async function Page() {
     supabase.from('plazas').select('name').eq('id', plaza).single(),
     supabase
       .from('notices')
-      .select('id, title, created_at')
+      .select('id, title, created_at, region')
       .eq('is_published', true)
       .eq('plaza_id', plaza)
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(5),
+      .limit(40),
   ])
 
   const user = userRes.data.user
@@ -171,6 +171,7 @@ export default async function Page() {
     id: n.id,
     title: n.title,
     created_at: n.created_at,
+    region: n.region ?? null,
     is_new: n.created_at
       ? now - new Date(n.created_at).getTime() < 14 * 24 * 60 * 60 * 1000
       : false,

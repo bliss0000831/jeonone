@@ -17,6 +17,7 @@ export interface NoticeItem {
   title: string
   category?: string | null
   created_at?: string | null
+  region?: string | null
   is_new?: boolean
 }
 

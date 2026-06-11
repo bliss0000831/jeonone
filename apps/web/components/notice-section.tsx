@@ -16,6 +16,16 @@ const farmTips = [
 export function NoticeSection({ notices = [] }: { notices?: NoticeItem[] }) {
   const { selectedRegion } = useRegion()
 
+  // 내 시군 공지 + 전체(도 전역) 공지만 표시, 내 시군 공지를 먼저
+  const visible = notices
+    .filter((n) => !n.region || !selectedRegion || n.region === selectedRegion)
+    .sort((a, b) => {
+      const am = a.region && a.region === selectedRegion ? 0 : 1
+      const bm = b.region && b.region === selectedRegion ? 0 : 1
+      return am - bm
+    })
+    .slice(0, 5)
+
   return (
     <section className="py-8 px-4 bg-muted/50 overflow-hidden">
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-4 md:gap-6">
@@ -27,10 +37,10 @@ export function NoticeSection({ notices = [] }: { notices?: NoticeItem[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 md:space-y-3 px-4 md:px-6">
-            {notices.length === 0 ? (
+            {visible.length === 0 ? (
               <div className="py-6 text-center text-sm md:text-lg text-muted-foreground">아직 등록된 공지가 없어요.</div>
             ) : (
-              notices.map((notice) => (
+              visible.map((notice) => (
                 <Link
                   key={notice.id}
                   href="/notice"

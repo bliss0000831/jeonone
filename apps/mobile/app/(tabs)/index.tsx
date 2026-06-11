@@ -71,22 +71,31 @@ export default function HomeTab() {
     return () => { cancelled = true }
   }, [region])
 
-  // 공지 — supabase notices 실데이터
+  // 공지 — supabase notices 실데이터 (내 시군 + 전체 대상, 내 시군 먼저)
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const { data, error } = await getSupabase()
+        let q = getSupabase()
           .from("notices")
-          .select("id, title, created_at, is_pinned")
+          .select("id, title, created_at, is_pinned, region")
           .eq("is_published", true)
           .eq("plaza_id", plaza.id)
+        // 내 시군 전용 + 전체(도 전역) 공지만 (다른 시군 제외)
+        if (region) q = q.or(`region.eq.${region},region.is.null`)
+        const { data, error } = await q
           .order("is_pinned", { ascending: false })
           .order("created_at", { ascending: false })
-          .limit(5)
+          .limit(30)
         if (cancelled || error || !data) return
+        const sorted = [...(data as any[])].sort((a, b) => {
+          // 내 시군 전용 먼저, 전체는 뒤로
+          const am = a.region && a.region === region ? 0 : 1
+          const bm = b.region && b.region === region ? 0 : 1
+          return am - bm
+        }).slice(0, 5)
         setNotices(
-          data.map((n: any) => ({
+          sorted.map((n: any) => ({
             id: String(n.id),
             title: n.title,
             date: n.created_at ? new Date(n.created_at).toLocaleDateString("ko-KR") : "",
@@ -98,7 +107,7 @@ export default function HomeTab() {
       }
     })()
     return () => { cancelled = true }
-  }, [plaza.id])
+  }, [plaza.id, region])
 
   const go = (p: string) => () => router.push(p as any)
   const comingSoon = () => Alert.alert("준비 중", "곧 열립니다. 조금만 기다려 주세요!")
