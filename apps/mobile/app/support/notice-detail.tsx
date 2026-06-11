@@ -1,24 +1,53 @@
 /**
  * 공지사항 상세 페이지 — 목록에서 전달받은 title/content 표시.
+ * content 가 없으면(예: 홈에서 id 만 전달) id 로 직접 조회한다.
  *
- * params: id, title, content, created_at, is_pinned
+ * params: id, (선택) title, content, created_at, is_pinned
  */
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
+import { useEffect, useState } from "react"
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing, radius } from "@gwangjang/tokens"
+import { getSupabase } from "@/lib/supabase"
 
 export default function NoticeDetailScreen() {
   const router = useRouter()
-  const { title, content, created_at, is_pinned } = useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     id: string
     title: string
     content: string
     created_at: string
     is_pinned: string
   }>()
+
+  const [title, setTitle] = useState(params.title || "")
+  const [content, setContent] = useState(params.content || "")
+  const [created_at, setCreatedAt] = useState(params.created_at || "")
+  const [is_pinned, setIsPinned] = useState(params.is_pinned || "0")
+  const [loading, setLoading] = useState(!params.content && !!params.id)
+
+  // content 미전달(홈에서 id 만 넘어온 경우) → id 로 공지 조회
+  useEffect(() => {
+    if (params.content || !params.id) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await (getSupabase() as any)
+        .from("notices")
+        .select("title, content, created_at, is_pinned")
+        .eq("id", params.id)
+        .maybeSingle()
+      if (cancelled || !data) { if (!cancelled) setLoading(false); return }
+      setTitle(data.title || "")
+      setContent(data.content || "")
+      setCreatedAt(data.created_at || "")
+      setIsPinned(data.is_pinned ? "1" : "0")
+      setLoading(false)
+    })()
+    return () => { cancelled = true }
+  }, [params.id, params.content])
 
   const isPinned = is_pinned === "1"
   const dateStr = created_at
@@ -41,31 +70,38 @@ export default function NoticeDetailScreen() {
         <View style={{ width: 36 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.body}>
-        {/* 제목 영역 */}
-        <View style={styles.titleWrap}>
-          {isPinned && (
-            <View style={styles.pinBadge}>
-              <Ionicons name="bookmark" size={12} color="#dc2626" />
-              <Text style={styles.pinText}>고정</Text>
-            </View>
-          )}
-          <Text style={styles.title}>{title}</Text>
-          {dateStr ? <Text style={styles.date}>{dateStr}</Text> : null}
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={lightColors.primary} />
         </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.body}>
+          {/* 제목 영역 */}
+          <View style={styles.titleWrap}>
+            {isPinned && (
+              <View style={styles.pinBadge}>
+                <Ionicons name="bookmark" size={12} color="#dc2626" />
+                <Text style={styles.pinText}>고정</Text>
+              </View>
+            )}
+            <Text style={styles.title}>{title}</Text>
+            {dateStr ? <Text style={styles.date}>{dateStr}</Text> : null}
+          </View>
 
-        {/* 구분선 */}
-        <View style={styles.divider} />
+          {/* 구분선 */}
+          <View style={styles.divider} />
 
-        {/* 본문 */}
-        <Text style={styles.content}>{content}</Text>
-      </ScrollView>
+          {/* 본문 */}
+          <Text style={styles.content}>{content}</Text>
+        </ScrollView>
+      )}
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: lightColors.background },
+  center: { flex: 1, alignItems: "center", justifyContent: "center" },
   header: {
     flexDirection: "row",
     alignItems: "center",

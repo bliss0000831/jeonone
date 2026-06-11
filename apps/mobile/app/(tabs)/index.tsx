@@ -247,7 +247,13 @@ export default function HomeTab() {
             <Text style={styles.emptyNotice}>아직 등록된 공지가 없어요</Text>
           ) : (
             notices.map((n) => (
-              <View key={n.id} style={styles.noticeRow}>
+              <Pressable
+                key={n.id}
+                style={({ pressed }) => [styles.noticeRow, pressed && { opacity: 0.6 }]}
+                onPress={() =>
+                  router.push({ pathname: "/support/notice-detail" as any, params: { id: n.id, title: n.title } })
+                }
+              >
                 <View style={[styles.tag, { backgroundColor: GREEN_DARK }]}>
                   <Text style={styles.tagText}>공지</Text>
                 </View>
@@ -256,7 +262,7 @@ export default function HomeTab() {
                   <Text style={styles.noticeDate}>{n.date}</Text>
                 </View>
                 {n.isNew && <Text style={styles.newBadge}>NEW</Text>}
-              </View>
+              </Pressable>
             ))
           )}
           <Pressable onPress={go("/support/notice")}><Text style={styles.more}>더보기 →</Text></Pressable>
