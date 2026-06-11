@@ -73,6 +73,25 @@ export function provinceByPlaza(plazaId: string): Province | undefined {
 }
 
 /**
+ * 제목에서 시군을 판별. 제목에 시군명이 박혀 있으면 그 시군 전용으로 본다.
+ *   - '강릉시 시민안전보험' → 강릉시 (정식명)
+ *   - '동해 시민 장학금' / '강릉사랑상품권' → 동해시 / 강릉시 (시/군 떼고 매칭)
+ *   - '가정위탁 양육보조금' → null (도 전체)
+ * 소관기관명(관할청)이 아닌 '제목' 기준 — 도 전역 사업이 관할 시군으로 오태깅되는 것 방지.
+ */
+export function regionFromTitle(title: string, sigungu: string[]): string | null {
+  const t = title ?? ''
+  // 1) 정식 시군명 (강릉시/홍천군 …)
+  for (const sg of sigungu) if (t.includes(sg)) return sg
+  // 2) 시/군 뗀 어간 (강릉/홍천/동해 …) — 2글자 이상만
+  for (const sg of sigungu) {
+    const stem = sg.replace(/(특별자치시|시|군)$/, '')
+    if (stem.length >= 2 && t.includes(stem)) return sg
+  }
+  return null
+}
+
+/**
  * 서비스에서 시군명을 추출. 시군 단위가 아니면 null (= 도 전체에 노출).
  *   - 소관기관명 '농림축산식품부' 등 중앙부처 → null (전국)
  *   - 소관기관명/본문에 시군명 포함 → 그 시군

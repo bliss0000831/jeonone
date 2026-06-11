@@ -18,6 +18,7 @@ import {
   PROVINCES,
   collectLocalNoticesForProvince,
   buildNoticeContent,
+  regionFromTitle,
 } from '@/lib/services/subsidy-gov24'
 
 export const dynamic = 'force-dynamic'
@@ -71,9 +72,9 @@ export async function GET(req: Request) {
         author_id: null,
         source: SOURCE,
         source_id: s.서비스ID,
-        // gov24 안내(복지·생활)는 사실상 도 전역 사업 → region=null(도 전체)로 모든 시군 노출.
-        // 진짜 시군 전용 공지(행사·모집)는 관리자 수동 작성에서 시군 지정.
-        region: null,
+        // 제목에 시군명이 있으면 그 시군 전용, 없으면 도 전체(null).
+        // (소관기관명=관할청이라 도 전역 사업이 오태깅되던 문제 → 제목 기준으로)
+        region: regionFromTitle(s.서비스명 ?? '', prov.sigungu),
       }))
       const { error: insErr, count } = await (admin as any)
         .from('notices')
