@@ -104,6 +104,12 @@ export default function JobsRegisterScreen() {
   async function pickImages() {
     try {
     if (images.length >= MAX_IMAGES) return
+    // 사진 권한 — 거부 시 빈 화면 대신 안내 (다른 등록 화면과 동일)
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!perm.granted) {
+      Alert.alert("권한 필요", "사진 라이브러리 권한이 필요합니다. 설정에서 허용해 주세요.")
+      return
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All, // 이미지 + 동영상 (web 1:1)
       allowsMultipleSelection: true,

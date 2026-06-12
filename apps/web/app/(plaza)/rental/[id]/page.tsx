@@ -56,6 +56,8 @@ export default function RentalDetailPage() {
   const apply = async () => {
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!start || !end || days <= 0) { toast.error("대여 기간을 선택해주세요"); return }
+    const summary = `${days}일 · ${won(total)}${r.deposit ? ` + 보증금 ${won(r.deposit)}` : ""}`
+    if (!confirm(`${summary} 으로 대여를 신청하시겠습니까?\n소유자 승인 후 거래가 진행됩니다.`)) return
     setSubmitting(true)
     const supabase = createClient()
     // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송

@@ -63,7 +63,6 @@ const TX_MENU: Array<{
   { label: "판매내역",   icon: "receipt-outline",       href: "/mypage/sales",  badgeKey: "sales" },
   { label: "구매내역",   icon: "bag-outline",           href: "/mypage/orders", badgeKey: "orders" },
   { label: "내 글 관리", icon: "document-text-outline", href: "/mypage/posts",  badgeKey: "posts" },
-  { label: "포인트 내역", icon: "wallet-outline",        href: "/mypage/points" },
 ]
 
 // 고객지원 메뉴 — HamburgerMenu 의 지원/정책 섹션과 동일 routes

@@ -166,10 +166,9 @@ export default function CreatePostPage() {
     if (loading) return
     setError('')
 
-    if (!title.trim() || !content.trim() || !categoryId) {
-      setError('모든 필드를 입력해주세요')
-      return
-    }
+    if (!categoryId) { setError('카테고리를 선택해주세요'); return }
+    if (!title.trim()) { setError('제목을 입력해주세요'); return }
+    if (!content.trim()) { setError('내용을 입력해주세요'); return }
     if (!user) { setError('로그인이 필요합니다'); return }
 
     setLoading(true)

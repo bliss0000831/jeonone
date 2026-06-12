@@ -24,6 +24,14 @@ export default async function FAQPage() {
   }
   const groups = Array.from(grouped.entries())
 
+  // 영문 카테고리 슬러그가 화면에 그대로 노출되지 않도록 한글 라벨 매핑 (미매핑은 원문 유지)
+  const CATEGORY_LABEL: Record<string, string> = {
+    general: '일반', account: '계정·로그인', posting: '글쓰기', trade: '거래',
+    payment: '결제', points: '포인트', delivery: '배송', shipping: '배송',
+    etc: '기타', other: '기타', faq: '자주 묻는 질문',
+  }
+  const labelFor = (c: string) => CATEGORY_LABEL[c.toLowerCase()] ?? c
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <header className="safe-top sticky top-0 z-50 bg-card border-b border-border">
@@ -44,7 +52,7 @@ export default async function FAQPage() {
         ) : (
           groups.map(([category, items]) => (
             <div key={category} className="mb-6">
-              <h2 className="text-sm font-semibold text-muted-foreground mb-3">{category}</h2>
+              <h2 className="text-sm font-semibold text-muted-foreground mb-3">{labelFor(category)}</h2>
               <FaqAccordion items={items.map((i) => ({ id: i.id, question: i.question, answer: i.answer }))} />
             </div>
           ))
