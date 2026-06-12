@@ -657,6 +657,16 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         </View>
       </View>
 
+      {/* 정렬 메뉴 바깥을 누르면 닫힘 — toolbar(zIndex 50) 아래, 리스트 위(40) */}
+      {sortOpen && (
+        <Pressable
+          style={[StyleSheet.absoluteFill, { zIndex: 40 }]}
+          onPress={() => setSortOpen(false)}
+          accessibilityRole="button"
+          accessibilityLabel="정렬 메뉴 닫기"
+        />
+      )}
+
       {/* List — web ListingListItem (모바일) 1:1 */}
       <FlatList
         key={`${config.domainKind ?? "default"}-${viewMode}`}
@@ -887,6 +897,11 @@ function GridCard({
     cardKind && SERVICE_KINDS.has(cardKind)
       ? buildServiceExtras(item, heroColor)
       : null
+  // 일손(jobs) — 리스트 카드에도 시급 표시 (가장 중요한 정보)
+  const jobsWage =
+    cardKind === "jobs" && typeof item.hourly_wage === "number" && item.hourly_wage > 0
+      ? (item.hourly_wage as number)
+      : null
 
   return (
     <Pressable onPress={onPress} style={styles.listItem}>
@@ -961,6 +976,11 @@ function GridCard({
                 </Text>
               </View>
             ))}
+          </View>
+        )}
+        {jobsWage != null && (
+          <View style={{ marginTop: 6 }}>
+            <Text style={styles.listPrice}>시급 {jobsWage.toLocaleString()}원</Text>
           </View>
         )}
         {showPrice && price != null && (

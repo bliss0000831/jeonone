@@ -8,8 +8,9 @@ import { Header } from "@/components/header"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
-import { Tractor, ArrowLeft, Loader2, CalendarDays } from "lucide-react"
+import { Tractor, ArrowLeft, Loader2, CalendarDays, MessageCircle } from "lucide-react"
 import { CallButton } from "@/components/detail"
+import { usePostChat } from "@/hooks/use-post-chat"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
@@ -23,6 +24,14 @@ export default function RentalDetailPage() {
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  // 채팅 문의 — 대여는 내부적으로 secondhand_posts 라 동일 경로 재사용(서버가 작성자 검증)
+  const { handleChat, chatLoading } = usePostChat({
+    postId: r?.post_id,
+    postType: "secondhand",
+    authorId: r?.owner_id,
+    currentUserId: user?.id,
+    loginRedirectPath: `/rental/${id}`,
+  })
 
   const load = useCallback(async () => {
     const supabase = createClient()
@@ -109,12 +118,20 @@ export default function RentalDetailPage() {
       </main>
 
       <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border p-3 z-40">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
-          <CallButton userId={r.owner_id} />
-          <button onClick={apply} disabled={submitting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
-            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CalendarDays className="w-5 h-5" />} 대여 신청{total > 0 ? ` · ${won(total)}` : ""}
-          </button>
+        <div className="max-w-2xl mx-auto space-y-2">
+          {/* 먼저 물어보기 — 구속력 있는 신청 전에 채팅으로 문의 */}
+          {user?.id !== r.owner_id && (
+            <button onClick={handleChat} disabled={chatLoading} className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary text-primary font-bold py-3 disabled:opacity-50">
+              {chatLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <MessageCircle className="w-5 h-5" />} 채팅으로 문의
+            </button>
+          )}
+          <div className="flex items-center gap-3">
+            {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
+            <CallButton userId={r.owner_id} />
+            <button onClick={apply} disabled={submitting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
+              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CalendarDays className="w-5 h-5" />} 대여 신청{total > 0 ? ` · ${won(total)}` : ""}
+            </button>
+          </div>
         </div>
       </div>
     </div>

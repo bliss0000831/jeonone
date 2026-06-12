@@ -823,9 +823,10 @@ function DirectRow({
           </Text>
         </View>
       )}
+      {/* 원탭 '나가기'는 실수로 대화 삭제 위험 → '⋯' 메뉴(알림/차단/신고/나가기)로 변경 */}
       {!isAdminNotice && !bulkMode && (
-        <Pressable onPress={onLeave} hitSlop={6} style={styles.leaveBtn}>
-          <Ionicons name="exit-outline" size={18} color={lightColors.ink500} />
+        <Pressable onPress={onLongPress} hitSlop={6} style={styles.leaveBtn} accessibilityLabel="대화방 메뉴" accessibilityRole="button">
+          <Ionicons name="ellipsis-vertical" size={18} color={lightColors.ink500} />
         </Pressable>
       )}
     </Pressable>

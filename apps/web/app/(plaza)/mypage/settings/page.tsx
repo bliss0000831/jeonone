@@ -78,6 +78,7 @@ export default function SettingsPage() {
   } | null>(null)
   const [notifications, setNotifications] = useState({
     chat: true,
+    property: true,
     marketing: false,
   })
   const [postsPublic, setPostsPublic] = useState(true)
@@ -95,7 +96,7 @@ export default function SettingsPage() {
       const { data: row } = await supabase
         .from("profiles")
         .select(
-          "nickname, avatar_url, account_type, role, posts_public, notif_chat, notif_marketing",
+          "nickname, avatar_url, account_type, role, posts_public, notif_chat, notif_property, notif_marketing",
         )
         .eq("id", user.id)
         .single()
@@ -103,6 +104,7 @@ export default function SettingsPage() {
         if (typeof row.posts_public === "boolean") setPostsPublic(row.posts_public)
         setNotifications({
           chat: row.notif_chat ?? true,
+          property: row.notif_property ?? true,
           marketing: row.notif_marketing ?? false,
         })
         setProfile({
@@ -116,11 +118,11 @@ export default function SettingsPage() {
     checkUser()
   }, [])
 
-  const persistNotif = async (key: "chat" | "marketing", next: boolean) => {
+  const persistNotif = async (key: "chat" | "property" | "marketing", next: boolean) => {
     if (!user) return
     const prev = notifications
     setNotifications((s) => ({ ...s, [key]: next }))
-    const column = key === "chat" ? "notif_chat" : "notif_marketing"
+    const column = key === "chat" ? "notif_chat" : key === "property" ? "notif_property" : "notif_marketing"
     const { error } = await supabase
       .from("profiles")
       .update({ [column]: next })
@@ -205,6 +207,7 @@ export default function SettingsPage() {
   const sections = useMemo<Section[]>(() => {
     const notifActive = [
       notifications.chat,
+      notifications.property,
       notifications.marketing,
     ].filter(Boolean).length
 
@@ -269,6 +272,16 @@ export default function SettingsPage() {
             helper: "새 메시지가 오면 알려드려요",
             value: notifications.chat,
             onChange: () => persistNotif("chat", !notifications.chat),
+          },
+          {
+            type: "toggle",
+            icon: Bell,
+            iconColor: "text-rose-600",
+            iconBg: "bg-rose-500/10",
+            label: "관심 매물 알림",
+            helper: "찜한 글의 가격 변경·상태 변화를 알려드려요",
+            value: notifications.property,
+            onChange: () => persistNotif("property", !notifications.property),
           },
           {
             type: "toggle",

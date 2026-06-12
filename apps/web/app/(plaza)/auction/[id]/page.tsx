@@ -8,8 +8,9 @@ import { Header } from "@/components/header"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
-import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap, Star } from "lucide-react"
+import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap, Star, MessageCircle } from "lucide-react"
 import { CallButton } from "@/components/detail"
+import { usePostChat } from "@/hooks/use-post-chat"
 
 const FALLBACK_IMG = "/images/card-auction.jpg"
 
@@ -35,6 +36,14 @@ export default function AuctionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [bidAmount, setBidAmount] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  // 채팅 문의 — 경매는 내부적으로 secondhand_posts 라 동일 경로 재사용(서버가 작성자 검증)
+  const { handleChat, chatLoading } = usePostChat({
+    postId: a?.post_id,
+    postType: "secondhand",
+    authorId: a?.seller_id,
+    currentUserId: user?.id,
+    loginRedirectPath: `/auction/${id}`,
+  })
 
   const load = useCallback(async () => {
     const supabase = createClient()
@@ -151,10 +160,16 @@ export default function AuctionDetailPage() {
               {user && a.winner_id === user.id && (
                 <>
                   <p className="text-xs text-muted-foreground mt-1">판매자와 채팅으로 거래를 진행해주세요.</p>
-                  <Link href={`/mypage/write-review?reviewed_user_id=${a.seller_id}&source_type=auction&source_id=${a.id}&target_name=${encodeURIComponent(a.post?.title || "판매자")}`}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2 text-sm">
-                    <Star className="w-4 h-4" /> 판매자 후기 작성
-                  </Link>
+                  <div className="mt-3 flex gap-2">
+                    <button onClick={handleChat} disabled={chatLoading}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2.5 text-sm disabled:opacity-50">
+                      {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />} 판매자와 채팅
+                    </button>
+                    <Link href={`/mypage/write-review?reviewed_user_id=${a.seller_id}&source_type=auction&source_id=${a.id}&target_name=${encodeURIComponent(a.post?.title || "판매자")}`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border-2 border-primary text-primary font-bold px-4 py-2.5 text-sm">
+                      <Star className="w-4 h-4" /> 후기 작성
+                    </Link>
+                  </div>
                 </>
               )}
 
