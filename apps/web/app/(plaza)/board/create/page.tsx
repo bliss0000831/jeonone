@@ -298,25 +298,27 @@ export default function CreatePostPage() {
                         대표
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-                      {item.type === 'image' && idx !== 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setAsThumbnail(idx)}
-                          className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 rounded-full p-2 shadow-md transition-colors"
-                          title="대표이미지로 설정"
-                        >
-                          <Star className="w-4 h-4 fill-current" />
-                        </button>
-                      )}
+                    {/* 삭제 — 항상 표시(터치 기기에서도 보이도록) */}
+                    <button
+                      type="button"
+                      onClick={() => removeMedia(idx)}
+                      className="absolute top-1.5 right-1.5 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center shadow-md"
+                      aria-label="사진 삭제"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    {/* 대표 지정 — 비대표 이미지에만, 항상 표시 */}
+                    {item.type === 'image' && idx !== 0 && (
                       <button
                         type="button"
-                        onClick={() => removeMedia(idx)}
-                        className="bg-destructive hover:bg-destructive/90 text-white rounded-full p-2 shadow-md transition-colors"
+                        onClick={() => setAsThumbnail(idx)}
+                        className="absolute bottom-1.5 right-1.5 w-8 h-8 rounded-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 flex items-center justify-center shadow-md"
+                        title="대표사진으로 지정"
+                        aria-label="대표사진으로 지정"
                       >
-                        <X className="w-4 h-4" />
+                        <Star className="w-4 h-4 fill-current" />
                       </button>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>

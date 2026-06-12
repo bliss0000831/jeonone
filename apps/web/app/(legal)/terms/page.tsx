@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { getCurrentPlazaBusinessInfo } from '@/lib/plaza/business-info'
 
 export const metadata = {
-  title: '이용약관 | 광장',
+  title: '이용약관 | 전원일기',
 }
 
 // 빈 필드는 '[미등록]' 으로 표시

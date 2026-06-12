@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { getCurrentPlazaBusinessInfo } from '@/lib/plaza/business-info'
 
 export const metadata = {
-  title: '개인정보처리방침 | 광장',
+  title: '개인정보처리방침 | 전원일기',
 }
 
 function v(s: string): string {

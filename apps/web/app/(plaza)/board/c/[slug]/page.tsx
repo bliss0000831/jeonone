@@ -238,8 +238,8 @@ export default function BoardCategoryPage() {
         <div className="border-t border-white/10">
           <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
             <div>
-              <p className="font-bold text-white">강원 전원일기</p>
-              <p className="text-white/60 mt-1">강원도 춘천시 중앙로 1길 00</p>
+              <p className="font-bold text-white">전원일기</p>
+              <p className="text-white/60 mt-1">이웃과 함께하는 농촌 생활 커뮤니티</p>
             </div>
             <div className="flex gap-4 text-white/70">
               <Link href="/terms">이용약관</Link>

@@ -110,15 +110,15 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: '/manifest.json',
     appleWebApp: {
       capable: true,
-      title: '광장',
+      title: siteName,
       statusBarStyle: 'default',
     },
     other: {
       'mobile-web-app-capable': 'yes',
       'apple-mobile-web-app-capable': 'yes',
       'apple-mobile-web-app-status-bar-style': 'default',
-      'apple-mobile-web-app-title': '광장',
-      'application-name': '광장',
+      'apple-mobile-web-app-title': siteName,
+      'application-name': siteName,
       'msapplication-TileColor': '#0066CC',
       'theme-color': '#0066CC',
     },

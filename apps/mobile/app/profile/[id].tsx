@@ -480,6 +480,18 @@ export default function PublicProfileScreen() {
           />
         )}
 
+        {/* 받은 후기 — 신뢰도/별점 보기 (거래 전 상대 판단) */}
+        {card && (
+          <Pressable onPress={openReviews} style={styles.reviewsRow}>
+            <Ionicons name="star" size={16} color="#f59e0b" />
+            <Text style={styles.reviewsLabel}>
+              받은 후기 {(card as any)?.review_count ?? 0}개
+              {typeof (card as any)?.trust_score === "number" ? `  ·  별점 ${(card as any).trust_score.toFixed(1)}` : ""}
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color={lightColors.ink500} style={{ marginLeft: "auto" }} />
+          </Pressable>
+        )}
+
         {/* Action Buttons (other only)
             🅲 광장 격리 — cross-plaza 보기일 땐 팔로우 X (광장 간 미연동),
             대신 "다른 광장 멤버" 라벨 + 메시지 버튼만 노출 */}
