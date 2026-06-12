@@ -207,7 +207,7 @@ export function ListCardMenu({
               }
             } else {
               const supabase = getSupabase()
-              const { error } = await supabase
+              const { error } = await (supabase as any)
                 .from(KIND_TABLE[kind])
                 .delete()
                 .eq("id", postId)

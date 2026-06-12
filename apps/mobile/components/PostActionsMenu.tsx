@@ -257,7 +257,7 @@ export function PostActionsMenu({
             } else {
               // board 처럼 API 없음 — supabase 직접 (RLS 가 권한 체크)
               const supabase = getSupabase()
-              const { error } = await supabase
+              const { error } = await (supabase as any)
                 .from(KIND_TABLE[kind])
                 .delete()
                 .eq("id", postId)

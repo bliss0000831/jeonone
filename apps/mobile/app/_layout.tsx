@@ -216,7 +216,7 @@ function RootLayoutNav() {
     if (Platform.OS !== "android") return
     const handler = () => {
       // 홈 탭(첫 화면)에서 뒤로가기 → "한 번 더 누르면 종료" 토스트
-      const isHome = segments[0] === "(tabs)" && (segments.length <= 1 || segments[1] === "index")
+      const isHome = segments[0] === "(tabs)" && (segments.length <= 1 || (segments[1] as string) === "index")
       if (isHome) {
         if (backPressRef.current) {
           BackHandler.exitApp()
@@ -269,7 +269,7 @@ function RootLayoutNav() {
         try {
           const plaza = await AsyncStorage.getItem("selected.plaza")
           if (!plaza) return
-          const { data } = await getSupabase()
+          const { data } = await (getSupabase() as any)
             .from("plaza_settings")
             .select("value")
             .eq("plaza_id", plaza)
@@ -280,7 +280,7 @@ function RootLayoutNav() {
           if (!config.force_update || !config.minimum_version) return
 
           const appVersion =
-            Constants.expoConfig?.version ?? Constants.manifest?.version ?? "0.0.0"
+            Constants.expoConfig?.version ?? (Constants.manifest as any)?.version ?? "0.0.0"
 
           // Semver comparison: returns true if current < minimum
           const isOlder = (current: string, minimum: string): boolean => {

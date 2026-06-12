@@ -84,7 +84,7 @@ export function VideoThumbnailImage({ uri, style, timeMs = 0 }: Props) {
   return (
     <Image
       source={{ uri: thumbUri }}
-      style={style}
+      style={style as any}
       contentFit="cover"
       cachePolicy="memory-disk"
     />

@@ -203,10 +203,10 @@ const styles = StyleSheet.create({
   },
   expandLine: {
     fontSize: 11,
-    color: lightColors.ink600,
+    color: lightColors.ink700,
     lineHeight: 16,
   },
-  expandK: { fontWeight: "700", color: lightColors.ink800 },
+  expandK: { fontWeight: "700", color: lightColors.ink900 },
   expandWarn: {
     color: "#b45309",
     fontWeight: "600",

@@ -437,7 +437,6 @@ export default function NotificationsScreen() {
           data={sections}
           keyExtractor={(s) => s.key}
           contentContainerStyle={{ padding: spacing[3], paddingBottom: 40 }}
-          estimatedItemSize={200}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           onEndReached={() => { loadMore() }}
           onEndReachedThreshold={0.3}

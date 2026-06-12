@@ -179,7 +179,7 @@ export function AddressMapPreview({
           // 옛 글 자동 backfill — 다음 진입부터 initialLat/Lng 로 즉시 표시
           // (fire-and-forget — 실패해도 사용자 경험엔 영향 없음)
           if (persistTo?.table && persistTo?.id) {
-            void getSupabase()
+            void (getSupabase() as any)
               .from(persistTo.table)
               .update({ lat: c.lat, lng: c.lng })
               .eq("id", persistTo.id)

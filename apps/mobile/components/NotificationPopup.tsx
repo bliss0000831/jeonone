@@ -87,7 +87,7 @@ export function NotificationPopup({ visible, onClose }: Props) {
   const handleMarkAllRead = async () => {
     if (!user) return
     const supabase = getSupabase()
-    await markAllNotificationsRead(supabase, user.id, plazaId ?? undefined)
+    await markAllNotificationsRead(supabase, user.id)
     setItems((prev) => prev.map((n) => ({ ...n, is_read: true })))
   }
 

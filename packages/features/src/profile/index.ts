@@ -5,6 +5,7 @@
 export {
   getProfile,
   getProfileCard,
+  PUBLIC_PROFILE_COLUMNS,
   updateProfile,
   listMyPosts,
   countMyPosts,

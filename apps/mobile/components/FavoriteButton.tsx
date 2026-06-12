@@ -87,7 +87,7 @@ export function FavoriteButton({
     let cancelled = false
     const { table, col } = TABLE_MAP[kind]
     const supabase = getSupabase()
-    let q: any = supabase
+    let q: any = (supabase as any)
       .from(table)
       .select("user_id")
       .eq("user_id", user.id)
@@ -127,10 +127,10 @@ export function FavoriteButton({
           [col]: targetId,
         }
         if (plaza) insertRow.plaza_id = plaza
-        const { error } = await supabase.from(table).insert(insertRow)
+        const { error } = await (supabase as any).from(table).insert(insertRow)
         if (error && !String(error.message || "").includes("duplicate")) throw error
       } else {
-        let delQ: any = supabase
+        let delQ: any = (supabase as any)
           .from(table)
           .delete()
           .eq("user_id", user.id)

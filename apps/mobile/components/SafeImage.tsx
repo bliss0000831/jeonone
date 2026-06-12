@@ -10,7 +10,7 @@ import { View, type StyleProp, type ViewStyle } from "react-native"
 import { Image, type ImageProps } from "expo-image"
 import { Ionicons } from "@expo/vector-icons"
 
-interface SafeImageProps extends Omit<ImageProps, "onError"> {
+interface SafeImageProps extends Omit<ImageProps, "onError" | "style"> {
   /** 실패 시 표시할 Ionicons 아이콘 이름 (기본 image-outline) */
   fallbackIcon?: keyof typeof Ionicons.glyphMap
   /** fallback 아이콘 크기 (기본 28) */
@@ -53,7 +53,7 @@ export function SafeImage({
   return (
     <Image
       {...imageProps}
-      style={style}
+      style={style as any}
       onError={handleError}
     />
   )
