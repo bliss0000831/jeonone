@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Megaphone } from "lucide-react"
-import { useUserLocation } from "@/components/location-selector"
+import { useRegion } from "@/lib/region-context"
 
 export interface NoticeItem {
   id: string
@@ -20,8 +20,9 @@ export interface NoticeItem {
  *  - "전체 보기" 토글로 다른 시군 공지까지
  */
 export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
-  const { location } = useUserLocation()
-  const mySigungu = location?.sigungu || null
+  // 웹 홈(NoticeSection)과 동일한 region 소스 — 기본값 '홍천군'
+  const { selectedRegion } = useRegion()
+  const mySigungu = selectedRegion || null
   const [regionMode, setRegionMode] = useState<"mine" | "all">("mine")
 
   const filtered = notices

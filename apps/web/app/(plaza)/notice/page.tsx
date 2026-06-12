@@ -21,7 +21,8 @@ export default async function NoticePage() {
       .eq('is_published', true)
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(100)
+      // 시군 공지가 최신 전체대상 공지에 밀려 누락되지 않게 충분히 가져옴 (클라에서 시군 필터)
+      .limit(500)
     if (plaza) query = query.eq('plaza_id', plaza)
     return query
   }
