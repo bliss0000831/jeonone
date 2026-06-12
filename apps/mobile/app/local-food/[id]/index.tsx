@@ -73,6 +73,7 @@ export default function LocalFoodDetailScreen() {
   useTrackView("local_food_posts", id)
 
   const [post, setPost] = useState<LocalFoodPost | null>(null)
+  const [loadError, setLoadError] = useState(false)
   useTrackRecent({
     id: id as string,
     kind: "local_food",
@@ -93,11 +94,15 @@ export default function LocalFoodDetailScreen() {
     if (!id) return
     const supabase = getSupabase()
     try {
+      setLoadError(false)
       const r = await getLocalFoodPost(supabase, id, DEFAULT_PLAZA, user?.id ?? null)
       setPost(r.post)
       setAuthor(r.author)
       setLiked(r.user_liked)
       setLikeCount(r.post?.like_count ?? 0)
+    } catch {
+      // 일시적 통신 오류 — 빈 화면 대신 재시도 안내
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -233,8 +238,16 @@ export default function LocalFoodDetailScreen() {
       <SafeAreaView style={styles.center} edges={["top"]}>
         <Ionicons name="leaf-outline" size={48} color={lightColors.ink500} />
         <Text style={{ color: lightColors.ink500, marginTop: 12 }}>
-          게시글을 찾을 수 없습니다
+          {loadError ? "불러오지 못했습니다" : "게시글을 찾을 수 없습니다"}
         </Text>
+        {loadError ? (
+          <Pressable
+            onPress={() => { setLoading(true); fetchAll() }}
+            style={{ marginTop: 16, backgroundColor: lightColors.primary, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 }}
+          >
+            <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>다시 시도</Text>
+          </Pressable>
+        ) : null}
       </SafeAreaView>
     )
   }

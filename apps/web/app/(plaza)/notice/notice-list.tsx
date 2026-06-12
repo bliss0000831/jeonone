@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Megaphone } from "lucide-react"
+import { Megaphone, ChevronDown } from "lucide-react"
 import { useRegion } from "@/lib/region-context"
 
 export interface NoticeItem {
@@ -24,6 +24,7 @@ export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
   const { selectedRegion } = useRegion()
   const mySigungu = selectedRegion || null
   const [regionMode, setRegionMode] = useState<"mine" | "all">("mine")
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const filtered = notices
     .filter((n) => {
@@ -73,32 +74,50 @@ export function NoticeListClient({ notices }: { notices: NoticeItem[] }) {
         </div>
       ) : (
         <ul className="divide-y divide-border bg-card rounded-2xl border border-border overflow-hidden">
-          {filtered.map((n) => (
-            <li key={n.id} className="p-4">
-              <div className="flex items-start gap-2 flex-wrap">
-                {n.is_pinned && (
-                  <span className="shrink-0 mt-0.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 rounded">
-                    고정
+          {filtered.map((n) => {
+            const expanded = expandedId === n.id
+            return (
+            <li key={n.id}>
+              <button
+                type="button"
+                onClick={() => setExpandedId(expanded ? null : n.id)}
+                aria-expanded={expanded}
+                className="w-full text-left p-4 hover:bg-muted/40 transition-colors"
+              >
+                <div className="flex items-start gap-2 flex-wrap">
+                  {n.is_pinned && (
+                    <span className="shrink-0 mt-1 inline-flex items-center px-1.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-100 rounded">
+                      고정
+                    </span>
+                  )}
+                  <span
+                    className={`shrink-0 mt-1 inline-flex items-center px-1.5 py-0.5 text-xs font-bold rounded ${
+                      n.region ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"
+                    }`}
+                  >
+                    {n.region ? `📍 ${n.region}` : "🌐 전체"}
                   </span>
-                )}
-                <span
-                  className={`shrink-0 mt-0.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded ${
-                    n.region ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"
-                  }`}
-                >
-                  {n.region ? `📍 ${n.region}` : "🌐 전체"}
-                </span>
-                <div className="flex-1 min-w-0 basis-full sm:basis-0">
-                  <h3 className="font-semibold text-foreground mb-1">{n.title}</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">{n.content}</p>
-                  <p className="text-xs text-muted-foreground/70 mt-2">
-                    {new Date(n.created_at).toLocaleDateString("ko-KR")}
-                    {typeof n.view_count === "number" && <span className="ml-2">조회 {n.view_count}</span>}
-                  </p>
+                  <div className="flex-1 min-w-0 basis-full sm:basis-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-semibold text-foreground mb-1">{n.title}</h3>
+                      <ChevronDown
+                        className={`w-5 h-5 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
+                      />
+                    </div>
+                    <p className={`text-sm text-muted-foreground whitespace-pre-wrap ${expanded ? "" : "line-clamp-2"}`}>
+                      {n.content}
+                    </p>
+                    <p className="text-xs text-muted-foreground/70 mt-2">
+                      {new Date(n.created_at).toLocaleDateString("ko-KR")}
+                      {typeof n.view_count === "number" && <span className="ml-2">조회 {n.view_count}</span>}
+                      <span className="ml-2 text-primary font-medium">{expanded ? "접기" : "전체 보기"}</span>
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </button>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </>

@@ -243,11 +243,11 @@ export default function BoardCategoryPage() {
       <footer className="bg-[#2b2118] text-white/90 mt-8">
         <div className="max-w-3xl mx-auto px-4 py-8 text-center">
           <h3 className="font-bold mb-4">고객센터</h3>
-          <a href="tel:080-000-0000" className="inline-flex items-center gap-3 rounded-xl bg-primary px-6 py-4 font-extrabold text-white">
+          <Link href="/support" className="inline-flex items-center gap-3 rounded-xl bg-primary px-6 py-4 font-extrabold text-white">
             <Phone className="w-6 h-6" />
-            <span className="text-left leading-tight"><span className="block text-xs font-medium">바로 전화걸기</span><span className="text-2xl">080-000-0000</span></span>
-          </a>
-          <p className="text-sm text-white/60 mt-3">평일 09:00 ~ 18:00 (무료 전화)</p>
+            <span className="text-left leading-tight"><span className="block text-xs font-medium">궁금한 점이 있으신가요?</span><span className="text-2xl">고객센터 문의하기</span></span>
+          </Link>
+          <p className="text-sm text-white/60 mt-3">평일 09:00 ~ 18:00 · 이메일로 답변드립니다</p>
         </div>
         <div className="border-t border-white/10">
           <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
@@ -256,8 +256,8 @@ export default function BoardCategoryPage() {
               <p className="text-white/60 mt-1">강원도 춘천시 중앙로 1길 00</p>
             </div>
             <div className="flex gap-4 text-white/70">
-              <Link href="/help">이용약관</Link>
-              <Link href="/help">개인정보처리방침</Link>
+              <Link href="/terms">이용약관</Link>
+              <Link href="/privacy">개인정보처리방침</Link>
               <Link href="/faq">자주 묻는 질문</Link>
             </div>
           </div>

@@ -1,10 +1,11 @@
 /** 대여 상세 + 신청 (RN). 웹 /rental/[id] 과 동일. */
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { View, Text, ScrollView, Pressable, StyleSheet, TextInput, ActivityIndicator, Alert } from "react-native"
+import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert, Platform } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
+import DateTimePicker from "@react-native-community/datetimepicker"
 import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
 import { PostActionsMenu } from "@/components/PostActionsMenu"
@@ -13,6 +14,8 @@ const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
 const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(new Date(s).getTime())
+const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+const todayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }
 
 export default function RentalDetailScreen() {
   const router = useRouter()
@@ -21,6 +24,8 @@ export default function RentalDetailScreen() {
   const [loading, setLoading] = useState(true)
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
+  const [showStart, setShowStart] = useState(false)
+  const [showEnd, setShowEnd] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const load = useCallback(async () => {
@@ -85,13 +90,51 @@ export default function RentalDetailScreen() {
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={{ flex: 1 }}>
               <Text style={styles.fieldLabel}>시작일</Text>
-              <TextInput value={start} onChangeText={setStart} placeholder="2026-06-10" placeholderTextColor="#94a3b8" style={styles.dateInput} />
+              <Pressable onPress={() => setShowStart(true)} style={styles.dateBtn}>
+                <Ionicons name="calendar-outline" size={18} color={GREEN} />
+                <Text style={[styles.dateBtnText, !start && styles.dateBtnPlaceholder]}>
+                  {start || "날짜 선택"}
+                </Text>
+              </Pressable>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.fieldLabel}>반납일</Text>
-              <TextInput value={end} onChangeText={setEnd} placeholder="2026-06-12" placeholderTextColor="#94a3b8" style={styles.dateInput} />
+              <Pressable onPress={() => setShowEnd(true)} style={styles.dateBtn}>
+                <Ionicons name="calendar-outline" size={18} color={GREEN} />
+                <Text style={[styles.dateBtnText, !end && styles.dateBtnPlaceholder]}>
+                  {end || "날짜 선택"}
+                </Text>
+              </Pressable>
             </View>
           </View>
+          {showStart && (
+            <DateTimePicker
+              value={isDate(start) ? new Date(start) : todayStart()}
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              minimumDate={todayStart()}
+              onChange={(e, d) => {
+                setShowStart(false)
+                if (e.type === "set" && d) {
+                  setStart(fmt(d))
+                  // 반납일이 시작일보다 앞서면 초기화
+                  if (isDate(end) && new Date(end) < d) setEnd("")
+                }
+              }}
+            />
+          )}
+          {showEnd && (
+            <DateTimePicker
+              value={isDate(end) ? new Date(end) : (isDate(start) ? new Date(start) : todayStart())}
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              minimumDate={isDate(start) ? new Date(start) : todayStart()}
+              onChange={(e, d) => {
+                setShowEnd(false)
+                if (e.type === "set" && d) setEnd(fmt(d))
+              }}
+            />
+          )}
           {days > 0 && (
             <View style={styles.totalRow}>
               <Text style={{ color: "#64748b" }}>{days}일 대여</Text>
@@ -124,8 +167,10 @@ const styles = StyleSheet.create({
   dep: { fontSize: 13, color: "#94a3b8", marginTop: 4 },
   desc: { fontSize: 14, color: "#334155", lineHeight: 21, marginBottom: 16 },
   label: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 8 },
-  fieldLabel: { fontSize: 12, color: "#94a3b8", marginBottom: 4 },
-  dateInput: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 15 },
+  fieldLabel: { fontSize: 13, color: "#64748b", marginBottom: 4 },
+  dateBtn: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 14 },
+  dateBtnText: { fontSize: 16, color: "#1e293b", fontWeight: "600" },
+  dateBtnPlaceholder: { color: "#94a3b8", fontWeight: "400" },
   totalRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12 },
   total: { fontSize: 17, fontWeight: "900", color: GREEN },
   btnBar: { position: "absolute", bottom: 0, left: 0, right: 0, flexDirection: "row", gap: 8, padding: 12, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
