@@ -294,11 +294,14 @@ export default function SecondhandEditPage() {
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₩</span>
             <input
-              type="number"
-              min="0"
-              step="1000"
-              value={formData.price}
-              onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+              type="text"
+              inputMode="numeric"
+              value={formData.price ? Number(formData.price).toLocaleString() : ""}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "")
+                setFormData((prev) => ({ ...prev, price: raw }))
+              }}
+              placeholder="0 (무료나눔/가격제안)"
               className="w-full pl-8 pr-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
           </div>

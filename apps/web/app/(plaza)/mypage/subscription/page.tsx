@@ -74,7 +74,7 @@ export default async function SubscriptionPage() {
                 {statusLabel(currentSub.status)}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mb-1">플랜 ID: {currentSub.plan_id}</p>
+            <p className="text-sm text-muted-foreground mb-1">플랜: {plans.find((p: any) => p.id === currentSub.plan_id)?.name ?? '구독 플랜'}</p>
             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               {new Date(currentSub.current_period_start).toLocaleDateString('ko-KR')} ~{' '}

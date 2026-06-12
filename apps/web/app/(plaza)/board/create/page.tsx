@@ -33,6 +33,9 @@ export default function CreatePostPage() {
   const router = useRouter()
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const categoryFieldRef = useRef<HTMLDivElement>(null)
+  const titleFieldRef = useRef<HTMLDivElement>(null)
+  const contentFieldRef = useRef<HTMLDivElement>(null)
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -166,9 +169,11 @@ export default function CreatePostPage() {
     if (loading) return
     setError('')
 
-    if (!categoryId) { setError('카테고리를 선택해주세요'); return }
-    if (!title.trim()) { setError('제목을 입력해주세요'); return }
-    if (!content.trim()) { setError('내용을 입력해주세요'); return }
+    const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) =>
+      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (!categoryId) { setError('카테고리를 선택해주세요'); scrollTo(categoryFieldRef); return }
+    if (!title.trim()) { setError('제목을 입력해주세요'); scrollTo(titleFieldRef); return }
+    if (!content.trim()) { setError('내용을 입력해주세요'); scrollTo(contentFieldRef); return }
     if (!user) { setError('로그인이 필요합니다'); return }
 
     setLoading(true)
@@ -332,7 +337,7 @@ export default function CreatePostPage() {
 
           {/* 카테고리 + 지역 — 두 컬럼 */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+            <div className="space-y-1.5" ref={categoryFieldRef}>
               <label className="text-base font-medium">카테고리 <span className="text-destructive">*</span></label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger>
@@ -362,7 +367,7 @@ export default function CreatePostPage() {
           </div>
 
           {/* 제목 */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5" ref={titleFieldRef}>
             <label className="text-base font-medium">제목 <span className="text-destructive">*</span></label>
             <Input
               placeholder="게시글 제목을 입력해주세요"
@@ -374,7 +379,7 @@ export default function CreatePostPage() {
           </div>
 
           {/* 내용 */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5" ref={contentFieldRef}>
             <label className="text-base font-medium">내용 <span className="text-destructive">*</span></label>
             <Textarea
               placeholder="내용을 작성해주세요"

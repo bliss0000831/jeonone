@@ -85,7 +85,7 @@ export default function SubscriptionScreen() {
     if (monetizationOn) {
       Alert.alert(
         "결제 안내",
-        "결제 페이지로 이동합니다. 광장 web 에서 카드 등록을 마쳐주세요.",
+        "카드 결제는 전원일기 웹사이트에서 진행됩니다.\n웹 브라우저(jeonwondiary.vercel.app)로 접속해 카드 등록을 마쳐주세요.",
       )
       return
     }

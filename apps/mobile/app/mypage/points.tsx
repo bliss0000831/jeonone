@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   balanceLabel: {
-    fontSize: 11,
+    fontSize: 13,
     color: "#ffffff",
     opacity: 0.85,
     marginBottom: 4,
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   balanceCellLabel: {
-    fontSize: 11,
+    fontSize: 13,
     color: "#ffffff",
     opacity: 0.7,
   },
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   txTime: {
-    fontSize: 11,
+    fontSize: 13,
     color: lightColors.ink500,
     marginTop: 2,
   },
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
     color: lightColors.ink500,
   },
   emptySub: {
-    fontSize: 11,
+    fontSize: 13,
     color: lightColors.ink500,
     marginTop: 6,
   },
