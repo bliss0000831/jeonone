@@ -220,7 +220,7 @@ export default function SecondhandRegisterPage() {
 
         {/* 미디어 업로드 — 사진 + 동영상 + 대표이미지 지정 */}
         <div>
-          <label className="block text-base font-medium mb-2">사진 / 동영상 (최대 10장)</label>
+          <label className="block text-base font-medium mb-2">사진 / 동영상 (최대 10장) <span className="text-rose-600">· 1장 이상 필수</span></label>
           <MediaUploader
             value={images}
             onChange={setImages}

@@ -34,6 +34,9 @@ export default function JobsRegisterPage() {
   const [images, setImages] = useState<string[]>([])
   const [subRegion, setSubRegion] = useState("")
   const consentRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLInputElement>(null)
+  const wageRef = useRef<HTMLInputElement>(null)
+  const descRef = useRef<HTMLTextAreaElement>(null)
   const focusField = (ref: React.RefObject<HTMLElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
     ref.current?.focus({ preventScroll: true })
@@ -60,12 +63,19 @@ export default function JobsRegisterPage() {
     e.preventDefault()
     if (isSubmitting) return
 
-    if (!formData.title || !formData.description) {
-      toast("제목과 설명을 입력해주세요")
+    if (!formData.title) {
+      toast("제목을 입력해주세요")
+      focusField(titleRef)
+      return
+    }
+    if (!formData.description) {
+      toast("설명을 입력해주세요")
+      focusField(descRef)
       return
     }
     if (!formData.hourlyWage || Number.isNaN(wageNum) || wageNum <= 0) {
       toast("시급을 정확히 입력해주세요 (원 단위, 0보다 큰 숫자)")
+      focusField(wageRef)
       return
     }
     if (!consented) {
@@ -176,6 +186,7 @@ export default function JobsRegisterPage() {
         <div>
           <label className="block text-base font-medium mb-2">제목 *</label>
           <input
+            ref={titleRef}
             type="text"
             value={formData.title}
             onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
@@ -222,6 +233,7 @@ export default function JobsRegisterPage() {
         <div>
           <label className="block text-base font-medium mb-2">시급 * (원)</label>
           <input
+            ref={wageRef}
             type="number"
             min="0"
             step="10"
@@ -310,6 +322,7 @@ export default function JobsRegisterPage() {
         <div>
           <label className="block text-base font-medium mb-2">상세 설명 *</label>
           <textarea
+            ref={descRef}
             value={formData.description}
             onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
             placeholder="업무 내용, 자격 조건, 우대 사항 등을 자세히 작성해주세요"

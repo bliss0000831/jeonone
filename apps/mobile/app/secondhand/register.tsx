@@ -301,7 +301,7 @@ export default function SecondhandRegisterScreen() {
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
           {/* Images */}
           <View>
-            <Text style={styles.label}>사진 (최대 {MAX_IMAGES}장)</Text>
+            <Text style={styles.label}>사진 (최대 {MAX_IMAGES}장) <Text style={{ color: "#e11d48" }}>· 1장 이상 필수</Text></Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {images.map((url, idx) => (
                 <View key={idx} style={styles.imgWrap}>

@@ -25,7 +25,7 @@ export default async function PrivacyPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 text-sm text-muted-foreground leading-relaxed">
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 text-base text-foreground/80 leading-relaxed">
 
         {!isFilled && (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-xs text-amber-700 dark:text-amber-400">

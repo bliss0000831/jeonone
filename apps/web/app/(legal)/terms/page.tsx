@@ -31,7 +31,7 @@ export default async function TermsPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 text-sm text-muted-foreground leading-relaxed">
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 text-base text-foreground/80 leading-relaxed">
 
         {/* 사업자 정보 미입력 시에만 표시되는 운영자 안내 */}
         {!isFilled && (

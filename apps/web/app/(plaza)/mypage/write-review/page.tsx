@@ -12,11 +12,12 @@
  * POST /api/reviews — 응답·정확·친절 3개 별점(1~5) + 내용(<500자).
  */
 
-import { useState, Suspense } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ChevronLeft, Star, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { createClient } from "@/lib/supabase/client"
 
 const STAR_LABELS = {
   response_speed: "응답 속도",
@@ -34,6 +35,21 @@ function WriteReviewContent() {
   const source_type = params.get("source_type") || ""
   const source_id = params.get("source_id") || ""
   const targetName = params.get("target_name") || "거래 상대"
+
+  // 후기 대상의 실제 닉네임·사진 표시 (빈 '?' / '거래 상대' 폴백 개선)
+  const [target, setTarget] = useState<{ nickname?: string | null; avatar_url?: string | null } | null>(null)
+  useEffect(() => {
+    if (!reviewed_user_id) return
+    let alive = true
+    createClient()
+      .from("profiles")
+      .select("nickname, avatar_url")
+      .eq("id", reviewed_user_id)
+      .maybeSingle()
+      .then(({ data }) => { if (alive) setTarget(data as any) })
+    return () => { alive = false }
+  }, [reviewed_user_id])
+  const displayName = target?.nickname || targetName
 
   const [scores, setScores] = useState<Record<StarKey, number>>({
     response_speed: 5,
@@ -111,12 +127,17 @@ function WriteReviewContent() {
 
       <form onSubmit={handleSubmit} className="p-4 max-w-md mx-auto space-y-6">
         <div className="bg-muted p-3 rounded-lg flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center text-muted-foreground">
-            ?
+          <div className="w-10 h-10 rounded-full bg-card overflow-hidden flex items-center justify-center text-muted-foreground">
+            {target?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={target.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              "?"
+            )}
           </div>
           <div>
             <p className="text-xs text-muted-foreground">후기 대상</p>
-            <p className="font-bold text-foreground">{targetName}</p>
+            <p className="font-bold text-foreground">{displayName}</p>
           </div>
         </div>
 

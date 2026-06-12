@@ -816,14 +816,13 @@ function makeStyles(colors: any) {
     marginBottom: spacing[2],
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: "700",
-    color: colors.ink500,
-    letterSpacing: 0.5,
-    textTransform: "uppercase" as const,
+    color: colors.ink700,
+    marginBottom: 2,
   },
   sectionMeta: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "600",
     color: colors.primary,
   },
