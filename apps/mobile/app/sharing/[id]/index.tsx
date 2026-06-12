@@ -174,7 +174,7 @@ export default function SharingDetailScreen() {
 
   async function handleShare() {
     if (!post) return
-    share.open({ title: post.title,
+    share.open({ url: buildShareUrl("sharing", post.id), title: post.title,
         message: `${post.title}\n${buildShareUrl("sharing", post.id)}` })
   }
 

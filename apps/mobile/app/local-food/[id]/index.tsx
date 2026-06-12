@@ -157,7 +157,7 @@ export default function LocalFoodDetailScreen() {
 
   async function handleShare() {
     if (!post) return
-    share.open({ title: post.title,
+    share.open({ url: buildShareUrl("local-food", post.id), title: post.title,
         message: `${post.title}\n${buildShareUrl("local-food", post.id)}` })
   }
 

@@ -165,7 +165,12 @@ export default function NotificationsScreen() {
       })
       if (more.length < PAGE_SIZE) setHasMore(false)
       if (more.length > 0) {
-        setItems((prev) => [...prev, ...more])
+        // 포커스 refetch 가 head 에 항목을 prepend 해 offset 이 어긋나면 겹칠 수 있어 id 중복 제거
+        setItems((prev) => {
+          const seen = new Set(prev.map((n) => n.id))
+          const fresh = more.filter((n) => !seen.has(n.id))
+          return fresh.length > 0 ? [...prev, ...fresh] : prev
+        })
         paginatedRef.current = true
       }
     } catch { /* ignore */ } finally {

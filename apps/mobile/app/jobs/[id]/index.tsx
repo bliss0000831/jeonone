@@ -157,7 +157,7 @@ export default function JobsDetailScreen() {
 
   async function handleShare() {
     if (!post) return
-    share.open({ title: post.title,
+    share.open({ url: buildShareUrl("jobs", post.id), title: post.title,
         message: `${post.title}\n${buildShareUrl("jobs", post.id)}` })
   }
 

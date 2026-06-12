@@ -311,7 +311,7 @@ export default function PublicProfileScreen() {
 
   async function handleShare() {
     if (!profile) return
-    share.open({ title: profile.nickname || "프로필",
+    share.open({ url: buildShareUrl("profile", profile.id), title: profile.nickname || "프로필",
         message: `${profile.nickname || "프로필"}\n${buildShareUrl("profile", profile.id)}` })
   }
 

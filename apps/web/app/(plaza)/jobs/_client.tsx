@@ -63,6 +63,7 @@ function JobsContent() {
   const fetchPosts = useCallback(() => {
     setLoading(true)
     const params = new URLSearchParams({ limit: "50", offset: "0" })
+    if (debounced.trim()) params.set("q", debounced.trim())
     if (sort !== "latest") params.set("sort", sort)
     if (region !== "all") params.set("region", region)
     fetch(`/api/jobs?${params.toString()}`)
@@ -70,7 +71,7 @@ function JobsContent() {
       .then((d) => { const list = d.posts || []; setPosts(list); setHasMore(list.length >= 50) })
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
-  }, [sort, region])
+  }, [debounced, sort, region])
 
   useEffect(() => { fetchPosts() }, [fetchPosts])
 
@@ -78,6 +79,7 @@ function JobsContent() {
     if (loadingMore || !hasMore) return
     setLoadingMore(true)
     const params = new URLSearchParams({ limit: "50", offset: String(posts.length) })
+    if (debounced.trim()) params.set("q", debounced.trim())
     if (sort !== "latest") params.set("sort", sort)
     if (region !== "all") params.set("region", region)
     try {
@@ -89,13 +91,10 @@ function JobsContent() {
     } catch { /* keep current list */ } finally {
       setLoadingMore(false)
     }
-  }, [loadingMore, hasMore, posts.length, sort, region])
+  }, [loadingMore, hasMore, posts.length, debounced, sort, region])
 
-  const filtered = posts.filter((p) => {
-    const mk = kind === "all" || p.kind === kind
-    const ms = !debounced.trim() || p.title?.toLowerCase().includes(debounced.trim().toLowerCase())
-    return mk && ms
-  })
+  // 검색(q)은 서버에서 title·description 으로 처리 → 클라는 구인/구직(kind)만 필터
+  const filtered = posts.filter((p) => kind === "all" || p.kind === kind)
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-20 md:pb-0">

@@ -430,7 +430,7 @@ export default function MyPageTab() {
         }
         if (kind === "avatar") ppPayload.avatar_url = url
         else ppPayload.background_url = url
-        await supabase
+        await (supabase as any)
           .from("plaza_profiles")
           .upsert(ppPayload, { onConflict: "user_id,plaza_id" })
       }

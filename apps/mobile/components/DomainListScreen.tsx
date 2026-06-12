@@ -259,7 +259,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
       const serverSearch = search.trim()
 
       async function attempt(opts: { withRegion: boolean; withEffectiveAt: boolean; withVisibility: boolean }) {
-        let q: any = supabase
+        let q: any = (supabase as any)
           .from(config.table)
           .select("*")
         if (opts.withVisibility && config.crossPlazaVisibility) {
@@ -486,7 +486,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
       </View>
 
       {/* 도메인 탭 바 */}
-      <DomainTabBar current={config.domainKind} />
+      <DomainTabBar current={config.domainKind ?? ""} />
 
       {/* 사진 히어로 (heroImage 있을 때) */}
       {config.heroImage ? (

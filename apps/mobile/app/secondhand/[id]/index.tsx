@@ -178,7 +178,7 @@ export default function SecondhandDetailScreen() {
 
   async function handleShare() {
     if (!post) return
-    share.open({ title: post.title,
+    share.open({ url: buildShareUrl("secondhand", post.id), title: post.title,
         message: `${post.title}\n${buildShareUrl("secondhand", post.id)}` })
   }
 
