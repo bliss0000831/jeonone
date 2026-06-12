@@ -126,6 +126,7 @@ function LoginPageContent() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
+                  className="h-12 text-base"
                 />
               </div>
               <div className="space-y-1.5">
@@ -141,7 +142,7 @@ function LoginPageContent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pr-10"
+                    className="pr-10 h-12 text-base"
                   />
                   <button
                     type="button"
@@ -153,7 +154,7 @@ function LoginPageContent() {
                   </button>
                 </div>
               </div>
-              <Button type="submit" className="w-full font-bold" disabled={loading}>
+              <Button type="submit" className="w-full font-bold h-12 text-base" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

@@ -374,7 +374,7 @@ export default function BoardCreateScreen() {
             maxLength={100}
             accessibilityLabel="게시글 제목 입력"
           />
-          <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+          <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
             {title.length}/100
           </Text>
 
@@ -389,7 +389,7 @@ export default function BoardCreateScreen() {
             style={styles.contentInput}
             accessibilityLabel="게시글 내용 입력"
           />
-          <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+          <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
             {content.length}/3000
           </Text>
 
@@ -414,8 +414,8 @@ export default function BoardCreateScreen() {
                       <Ionicons name="star-outline" size={14} color="#ffffff" />
                     </Pressable>
                   )}
-                  <Pressable onPress={() => removeImage(idx)} style={styles.imgRemove} hitSlop={6}>
-                    <Ionicons name="close" size={12} color="#ffffff" />
+                  <Pressable onPress={() => removeImage(idx)} style={styles.imgRemove} hitSlop={8}>
+                    <Ionicons name="close" size={16} color="#ffffff" />
                   </Pressable>
                 </View>
               ))}
@@ -461,8 +461,8 @@ const styles = StyleSheet.create({
 
   body: { padding: spacing[4], gap: spacing[4], paddingBottom: spacing[6] },
   label: {
-    fontSize: fontSize.sm,
-    fontWeight: "500",
+    fontSize: fontSize.md,
+    fontWeight: "600",
     color: lightColors.ink900,
     marginBottom: spacing[2],
   },
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     minHeight: 200,
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[3],
-    fontSize: fontSize.sm,
+    fontSize: fontSize.md,
     color: lightColors.ink900,
     textAlignVertical: "top",
   },
@@ -494,9 +494,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 2,
     right: 2,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: "#ef4444",
     alignItems: "center",
     justifyContent: "center",

@@ -182,7 +182,7 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
           </div>
 
           {/* Navigation - Desktop (전원일기) */}
-          <nav className="hidden xl:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-6">
             <Link href="/secondhand" className="text-sm text-foreground hover:text-primary transition-colors font-bold flex items-center gap-1.5">
               <Tractor className="w-4 h-4 text-primary" />농기구/자재
             </Link>
@@ -235,7 +235,7 @@ export function Header({ user, location: propLocation, onLocationChange, userRol
 
 
           {/* Mobile Menu */}
-          <div className="flex items-center gap-1 xl:hidden">
+          <div className="flex items-center gap-1 lg:hidden">
             {/* 통합 검색 */}
             <Link
               href="/search"

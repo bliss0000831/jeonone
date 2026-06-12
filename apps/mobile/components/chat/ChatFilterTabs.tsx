@@ -22,7 +22,7 @@ const TABS: Array<{ key: ChatFilterKey; label: string }> = [
   { key: "local_food", label: "로컬푸드" },
   { key: "secondhand", label: "농기구" },
   { key: "jobs", label: "일손" },
-  { key: "direct", label: "DM" },
+  { key: "direct", label: "개인" },
   { key: "notice", label: "공지" },
 ]
 

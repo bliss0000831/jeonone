@@ -382,7 +382,7 @@ export default function SettingsScreen() {
               icon: "megaphone-outline",
               iconColor: "#7c3aed",
               iconBg: "rgba(139,92,246,0.1)",
-              label: "마케팅 알림",
+              label: "마케팅 정보 수신",
               helper: "이벤트·프로모션 소식",
               value: notif.marketing,
               onChange: () => persistNotif("marketing", !notif.marketing),

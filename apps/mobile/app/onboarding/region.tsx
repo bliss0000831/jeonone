@@ -62,6 +62,19 @@ export default function OnboardingRegionScreen() {
     }
   }, [plaza])
 
+  const retry = async () => {
+    if (!plaza) return
+    setLoading(true)
+    try {
+      const list = await listPlazaRegions(plaza)
+      setRegions(list)
+    } catch (e) {
+      console.warn("[onboarding] region load retry failed", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const plazaLabel = useMemo(() => {
     if (plaza === "chuncheon") return "강원특별자치도 춘천시"
     if (plaza === "gangneung") return "강원특별자치도 강릉시"
@@ -129,10 +142,17 @@ export default function OnboardingRegionScreen() {
             <ActivityIndicator color={lightColors.primary} />
           </View>
         ) : regions.length === 0 ? (
-          <View style={{ paddingVertical: spacing[6], alignItems: "center" }}>
+          <View style={{ paddingVertical: spacing[6], alignItems: "center", gap: spacing[3] }}>
             <Text style={styles.subtitle}>
-              지역 목록을 불러오지 못했어요.{"\n"}네트워크 확인 후 앱을 다시 시작해 주세요.
+              지역 목록을 불러오지 못했어요.{"\n"}네트워크 상태를 확인해 주세요.
             </Text>
+            <Pressable onPress={retry} style={styles.retryBtn} hitSlop={8}>
+              <Ionicons name="refresh" size={18} color="#fff" />
+              <Text style={styles.retryText}>다시 시도</Text>
+            </Pressable>
+            <Pressable onPress={() => router.replace("/(tabs)")} hitSlop={8}>
+              <Text style={styles.skipText}>나중에 하기</Text>
+            </Pressable>
           </View>
         ) : (
           <ScrollView
@@ -271,5 +291,27 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: fontSize.md,
     fontWeight: "700",
+  },
+  retryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: lightColors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: radius.md,
+    minHeight: 44,
+  },
+  retryText: {
+    color: "#ffffff",
+    fontSize: fontSize.md,
+    fontWeight: "700",
+  },
+  skipText: {
+    color: lightColors.ink500,
+    fontSize: fontSize.sm,
+    fontWeight: "600",
+    textDecorationLine: "underline",
+    paddingVertical: 6,
   },
 })
