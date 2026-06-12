@@ -230,7 +230,7 @@ export default function SignUpScreen() {
               <Image source={require("../../assets/images/logo-farmer.png")} style={styles.logoImg} contentFit="cover" />
             </View>
             <Text style={styles.title}>{plaza.name} 회원가입</Text>
-            <Text style={styles.subtitle}>더 나은 집, 더 가까운 이웃</Text>
+            <Text style={styles.subtitle}>이웃과 함께하는 농촌 생활</Text>
 
             {/* 카카오 간편 가입 */}
             <Pressable

@@ -483,7 +483,7 @@ export default function SettingsScreen() {
         {/* 앱 버전 */}
         <View style={styles.versionWrap}>
           <Text style={styles.versionMain}>{plazaName} v{Constants.expoConfig?.version ?? "1.0.0"}</Text>
-          <Text style={styles.versionSub}>더 나은 집, 더 가까운 이웃</Text>
+          <Text style={styles.versionSub}>이웃과 함께하는 농촌 생활</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

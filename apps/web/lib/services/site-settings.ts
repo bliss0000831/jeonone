@@ -39,11 +39,11 @@ export interface SiteSettings {
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   site_name: '춘천광장',
-  site_description: '더 나은 집, 더 가까운 이웃. 우리 동네 부동산 정보부터 따뜻한 나눔과 공동구매까지 함께하세요.',
+  site_description: '이웃과 함께하는 농촌 생활. 농기구·자재 거래부터 일손 나눔, 로컬푸드까지 함께하세요.',
   admin_email: '',
   site_logo: '/logo.png?v=3',
   homepage_banner_title: '춘천광장',
-  homepage_banner_subtitle: '더 나은 집, 더 가까운 이웃',
+  homepage_banner_subtitle: '이웃과 함께하는 농촌 생활',
   smtp_enabled: false,
   maintenance_mode: false,
 }

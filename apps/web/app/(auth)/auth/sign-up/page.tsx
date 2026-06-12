@@ -234,7 +234,7 @@ export default function SignUpPage() {
               <Image src="/logo.png?v=3" alt={plazaName} width={48} height={48} className="w-full h-full object-contain" />
             </div>
             <CardTitle className="text-2xl">{plazaName} 회원가입</CardTitle>
-            <CardDescription>더 나은 집, 더 가까운 이웃</CardDescription>
+            <CardDescription>이웃과 함께하는 농촌 생활</CardDescription>
           </CardHeader>
           <CardContent>
             {/* 카카오 간편 가입 */}

@@ -45,7 +45,7 @@ export default function AuctionListScreen() {
         .select("id, start_price, current_price, bid_count, end_at, status, post:secondhand_posts(title, images)")
         .eq("status", "active")
         .order("end_at", { ascending: true })
-        .limit(60)
+        .limit(200)
       if (plaza.id) q = q.eq("plaza_id", plaza.id)
       const { data, error } = await q
       if (error) throw error

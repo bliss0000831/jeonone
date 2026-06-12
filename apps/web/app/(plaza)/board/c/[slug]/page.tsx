@@ -11,7 +11,7 @@ import { useUserLocation } from "@/components/location-selector"
 import type { User } from "@supabase/supabase-js"
 import {
   MessageSquare, Camera, Gift, Lightbulb, Coins, HelpCircle,
-  Plus, Search, Eye, Heart, TrendingUp, User as UserIcon, ImageIcon, Phone, ChevronRight,
+  Plus, Search, Eye, Heart, Phone, ChevronRight,
 } from "lucide-react"
 
 const CATEGORIES = [
@@ -221,20 +221,6 @@ export default function BoardCategoryPage() {
                 </div>
               )}
             </div>
-
-            {/* 사이드바 */}
-            <aside className="w-full lg:w-72 flex-shrink-0 space-y-4">
-              <div className="rounded-2xl border bg-card p-5 text-center">
-                <div className="flex items-center justify-center gap-1.5 font-bold mb-4"><TrendingUp className="w-4 h-4 text-primary" />우리 마을 활동왕</div>
-                <UserIcon className="w-9 h-9 mx-auto text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">활동 데이터가 없습니다</p>
-              </div>
-              <div className="rounded-2xl border bg-card p-5 text-center">
-                <div className="flex items-center justify-center gap-1.5 font-bold mb-4"><Heart className="w-4 h-4 text-rose-500" />주간 인기 BEST 3</div>
-                <ImageIcon className="w-9 h-9 mx-auto text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">아직 인기 게시글이 없습니다</p>
-              </div>
-            </aside>
           </div>
         </div>
       </main>

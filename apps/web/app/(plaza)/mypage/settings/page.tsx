@@ -537,7 +537,7 @@ export default function SettingsPage() {
         {/* App Version */}
         <div className="pt-4 text-center text-xs text-muted-foreground">
           <p>{plazaName} v1.0.0</p>
-          <p className="mt-1">더 나은 집, 더 가까운 이웃</p>
+          <p className="mt-1">이웃과 함께하는 농촌 생활</p>
         </div>
       </div>
     </div>

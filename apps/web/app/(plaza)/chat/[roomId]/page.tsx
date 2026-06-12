@@ -489,7 +489,8 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
   const messageGroups = useMemo(() => groupMessagesByDate(messages), [messages])
 
   const isAdminNotice = room?.post_type === "admin_notice"
-  const isPropertyChat = !room?.post_type || room.post_type === "property"
+  // 농업 도메인/유형 미상 채팅엔 부동산식 '정원 N/3·정원마감'을 띄우지 않음 (명시적 property 만)
+  const isPropertyChat = room?.post_type === "property"
 
   // 광장 이름 매핑
   const plazaDisplayName = (id: string | null | undefined) => {

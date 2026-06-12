@@ -189,7 +189,7 @@ export default function HomeTab() {
               value={q} onChangeText={setQ} onSubmitEditing={search} returnKeyType="search"
               placeholder="무엇을 도와드릴까요?" placeholderTextColor="#94a3b8" style={styles.searchInput}
             />
-            <Pressable onPress={go("/search")} style={styles.micBtn}><Ionicons name="mic" size={16} color={GREEN} /></Pressable>
+            <Pressable onPress={search} style={styles.micBtn} accessibilityLabel="검색"><Ionicons name="search" size={16} color={GREEN} /></Pressable>
           </View>
           <Text style={styles.searchHint}>농기구, 로컬푸드, 지원금 등 원하시는 정보를 검색하세요</Text>
 
