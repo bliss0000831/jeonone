@@ -145,10 +145,10 @@ export function MediaUploader({
               <button
                 type="button"
                 onClick={() => removeAt(idx)}
-                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center"
+                className="absolute top-1 right-1 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center shadow-md"
                 aria-label="삭제"
               >
-                <X className="w-3 h-3" />
+                <X className="w-4 h-4" />
               </button>
 
               {/* 대표 뱃지 또는 대표 지정 버튼 */}
@@ -162,11 +162,11 @@ export function MediaUploader({
                   <button
                     type="button"
                     onClick={() => setAsThumbnail(idx)}
-                    className="absolute bottom-1 left-1 w-5 h-5 rounded-full bg-black/50 hover:bg-yellow-400 text-white hover:text-yellow-900 flex items-center justify-center transition-colors"
+                    className="absolute bottom-1 left-1 w-8 h-8 rounded-full bg-black/50 hover:bg-yellow-400 text-white hover:text-yellow-900 flex items-center justify-center transition-colors shadow-md"
                     aria-label="대표 이미지로 지정"
                     title="대표 이미지로 지정"
                   >
-                    <Star className="w-3 h-3" />
+                    <Star className="w-4 h-4" />
                   </button>
                 )
               )}

@@ -477,7 +477,7 @@ export default function LocalFoodRegisterScreen() {
           <Pressable
             onPress={handleSubmit}
             disabled={submitting || uploading || !consented}
-            style={[styles.submitBtn, (submitting || !consented) && { opacity: 0.5 }]}
+            style={[styles.submitBtn, (submitting || uploading || !consented) && { opacity: 0.5 }]}
           >
             {submitting ? (
               <ActivityIndicator color="#ffffff" />

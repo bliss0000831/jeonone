@@ -102,6 +102,9 @@ export default function SecondhandRegisterPage() {
 
     // 0원 + "나눔으로 올리기" 체크 → 나눔 게시판으로
     const shouldPostToSharing = priceNum === 0 && postAsSharing
+    if (shouldPostToSharing && !confirm("이 글은 농기구/자재가 아닌 '무료 나눔' 게시판에 등록됩니다. 진행할까요?")) {
+      return
+    }
 
     setIsSubmitting(true)
     try {
@@ -386,7 +389,8 @@ export default function SecondhandRegisterPage() {
           </p>
         </div>
 
-        {/* 가격 */}
+        {/* 가격 — 일반 판매에서만 표시 (경매=시작가, 대여=대여료는 거래방식 영역에서 입력) */}
+        {listingType === "sale" && (
         <div>
           <label className="block text-base font-medium mb-2">가격 (원) *</label>
           <div className="relative">
@@ -450,6 +454,7 @@ export default function SecondhandRegisterPage() {
             </label>
           )}
         </div>
+        )}
 
         {/* 설명 */}
         <div>

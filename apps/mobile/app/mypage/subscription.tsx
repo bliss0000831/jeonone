@@ -170,7 +170,7 @@ export default function SubscriptionScreen() {
                 </Text>
               </View>
             </View>
-            <Text style={styles.muted}>플랜 ID: {current.plan_id}</Text>
+            <Text style={styles.muted}>플랜: {plans.find((p) => p.id === current.plan_id)?.name ?? "구독 플랜"}</Text>
             <View style={styles.dateRow}>
               <Ionicons name="calendar-outline" size={12} color={lightColors.ink500} />
               <Text style={styles.muted}>
