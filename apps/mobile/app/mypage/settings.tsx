@@ -369,8 +369,8 @@ export default function SettingsScreen() {
               icon: "home-outline",
               iconColor: "#059669",
               iconBg: "rgba(16,185,129,0.1)",
-              label: "관심 매물 알림",
-              helper: "찜한 매물 가격 변경·새 댓글",
+              label: "관심 글 알림",
+              helper: "찜한 글 가격 변경·새 댓글",
               value: notif.property,
               onChange: () => persistNotif("property", !notif.property),
             }}

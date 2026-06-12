@@ -38,11 +38,11 @@ export interface SiteSettings {
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  site_name: '춘천광장',
+  site_name: '전원일기',
   site_description: '이웃과 함께하는 농촌 생활. 농기구·자재 거래부터 일손 나눔, 로컬푸드까지 함께하세요.',
   admin_email: '',
   site_logo: '/logo.png?v=3',
-  homepage_banner_title: '춘천광장',
+  homepage_banner_title: '전원일기',
   homepage_banner_subtitle: '이웃과 함께하는 농촌 생활',
   smtp_enabled: false,
   maintenance_mode: false,

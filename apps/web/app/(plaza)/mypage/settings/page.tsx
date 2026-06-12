@@ -278,7 +278,7 @@ export default function SettingsPage() {
             icon: Bell,
             iconColor: "text-rose-600",
             iconBg: "bg-rose-500/10",
-            label: "관심 매물 알림",
+            label: "관심 글 알림",
             helper: "찜한 글의 가격 변경·상태 변화를 알려드려요",
             value: notifications.property,
             onChange: () => persistNotif("property", !notifications.property),

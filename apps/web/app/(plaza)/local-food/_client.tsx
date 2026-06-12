@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Carrot, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
-import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
+import { ListSortRegionBar, usePlazaRegions, LoadMoreButton, type ListSortKey } from "@/components/listing"
 
 const DEFAULT_CATEGORIES = ["전체", "채소", "과일", "쌀/잡곡", "축산물", "수산물", "가공식품", "기타"]
 const FALLBACK_IMG = "/images/card-local-food.jpg"
@@ -39,6 +39,8 @@ function LocalFoodContent() {
   const [canWrite, setCanWrite] = useState(false)
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
   const [category, setCategory] = useState("전체")
   const [search, setSearch] = useState("")
@@ -75,17 +77,36 @@ function LocalFoodContent() {
 
   useEffect(() => {
     setLoading(true)
-    const params = new URLSearchParams({ limit: "50" })
+    const params = new URLSearchParams({ limit: "50", offset: "0" })
     if (category !== "전체") params.set("category", category)
     if (debounced.trim()) params.set("q", debounced.trim())
     if (sort !== "latest") params.set("sort", sort)
     if (region !== "all") params.set("region", region)
     fetch(`/api/local-food?${params}`)
       .then((r) => r.json())
-      .then((d) => setPosts(d.posts || []))
+      .then((d) => { const list = d.posts || []; setPosts(list); setHasMore(list.length >= 50) })
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
   }, [category, debounced, sort, region])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const params = new URLSearchParams({ limit: "50", offset: String(posts.length) })
+    if (category !== "전체") params.set("category", category)
+    if (debounced.trim()) params.set("q", debounced.trim())
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
+    try {
+      const r = await fetch(`/api/local-food?${params}`)
+      const d = await r.json()
+      const more = d.posts || []
+      setPosts((prev) => [...prev, ...more])
+      setHasMore(more.length >= 50)
+    } catch { /* keep current list */ } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, posts.length, category, debounced, sort, region])
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-20 md:pb-0">
@@ -176,6 +197,7 @@ function LocalFoodContent() {
             ))}
           </div>
         )}
+        <LoadMoreButton hasMore={hasMore} loading={loadingMore} onClick={loadMore} />
       </main>
 
       <BottomNav />

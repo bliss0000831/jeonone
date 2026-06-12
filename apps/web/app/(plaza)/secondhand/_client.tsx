@@ -11,7 +11,7 @@ import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Calendar, Tractor, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
 import { formatPriceKR, formatDateKR } from "@/lib/format-price"
-import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
+import { ListSortRegionBar, usePlazaRegions, LoadMoreButton, type ListSortKey } from "@/components/listing"
 
 // 농기구/자재 카테고리 (레퍼런스 동일)
 const CATEGORIES = ["전체", "트랙터", "경운기", "이양기", "수확기", "관리기", "하우스자재", "부품", "기타"]
@@ -40,6 +40,8 @@ function SecondhandContent() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [category, setCategory] = useState(searchParams.get("category") ?? "전체")
   const [search, setSearch] = useState("")
   const [debounced, setDebounced] = useState("")
@@ -72,12 +74,34 @@ function SecondhandContent() {
     if (region !== "all") params.set("region", region)
     fetch(`/api/secondhand?${params.toString()}`)
       .then((r) => r.json())
-      .then((d) => setPosts(d.posts || []))
+      .then((d) => { const list = d.posts || []; setPosts(list); setHasMore(list.length >= PAGE_SIZE) })
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
   }, [debounced, category, sort, region])
 
   useEffect(() => { fetchPosts() }, [fetchPosts])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const params = new URLSearchParams()
+    params.set("limit", String(PAGE_SIZE))
+    params.set("offset", String(posts.length))
+    params.set("status", "active")
+    if (debounced.trim()) params.set("q", debounced.trim())
+    if (category !== "전체") params.set("category", category)
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
+    try {
+      const r = await fetch(`/api/secondhand?${params.toString()}`)
+      const d = await r.json()
+      const more = d.posts || []
+      setPosts((prev) => [...prev, ...more])
+      setHasMore(more.length >= PAGE_SIZE)
+    } catch { /* keep current list */ } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, posts.length, debounced, category, sort, region])
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-20 md:pb-0">
@@ -197,6 +221,7 @@ function SecondhandContent() {
             ))}
           </div>
         )}
+        <LoadMoreButton hasMore={hasMore} loading={loadingMore} onClick={loadMore} />
       </main>
 
       <BottomNav />

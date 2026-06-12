@@ -795,7 +795,7 @@ function ListingsTab({
     return <ActivityIndicator style={{ marginVertical: 40 }} color={lightColors.primary} />
   }
   if (items.length === 0) {
-    return <Text style={styles.empty}>등록된 매물이 없습니다</Text>
+    return <Text style={styles.empty}>등록된 글이 없습니다</Text>
   }
   return (
     <View style={{ marginTop: spacing[2] }}>

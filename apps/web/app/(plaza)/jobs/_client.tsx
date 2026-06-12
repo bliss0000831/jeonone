@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Users, Clock, Loader2, ChevronRight } from "lucide-react"
-import { ListSortRegionBar, usePlazaRegions, type ListSortKey } from "@/components/listing"
+import { ListSortRegionBar, usePlazaRegions, LoadMoreButton, type ListSortKey } from "@/components/listing"
 
 const KINDS = [
   { value: "all", label: "전체" },
@@ -41,6 +41,8 @@ function JobsContent() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [kind, setKind] = useState("all")
   const [search, setSearch] = useState("")
   const [debounced, setDebounced] = useState("")
@@ -65,12 +67,29 @@ function JobsContent() {
     if (region !== "all") params.set("region", region)
     fetch(`/api/jobs?${params.toString()}`)
       .then((r) => r.json())
-      .then((d) => setPosts(d.posts || []))
+      .then((d) => { const list = d.posts || []; setPosts(list); setHasMore(list.length >= 50) })
       .catch(() => setPosts([]))
       .finally(() => setLoading(false))
   }, [sort, region])
 
   useEffect(() => { fetchPosts() }, [fetchPosts])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const params = new URLSearchParams({ limit: "50", offset: String(posts.length) })
+    if (sort !== "latest") params.set("sort", sort)
+    if (region !== "all") params.set("region", region)
+    try {
+      const r = await fetch(`/api/jobs?${params.toString()}`)
+      const d = await r.json()
+      const more = d.posts || []
+      setPosts((prev) => [...prev, ...more])
+      setHasMore(more.length >= 50)
+    } catch { /* keep current list */ } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, posts.length, sort, region])
 
   const filtered = posts.filter((p) => {
     const mk = kind === "all" || p.kind === kind
@@ -166,6 +185,7 @@ function JobsContent() {
             ))}
           </div>
         )}
+        <LoadMoreButton hasMore={hasMore} loading={loadingMore} onClick={loadMore} />
       </main>
 
       <BottomNav />
