@@ -258,7 +258,11 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
       // 서버 사이드 검색어 — ilike 으로 title/content 동시 검색
       const serverSearch = search.trim()
 
-      async function attempt(opts: { withRegion: boolean; withEffectiveAt: boolean; withVisibility: boolean }) {
+      // 인기/가격 정렬 컬럼 — local_food 만 view_count/like_count (나머지는 views/likes)
+      const viewsCol = config.domainKind === "local-food" ? "view_count" : "views"
+      const likesCol = config.domainKind === "local-food" ? "like_count" : "likes"
+
+      async function attempt(opts: { withRegion: boolean; withEffectiveAt: boolean; withVisibility: boolean; withSort?: boolean }) {
         let q: any = (supabase as any)
           .from(config.table)
           .select("*")
@@ -282,11 +286,31 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
           const escaped = serverSearch.replace(/%/g, "\\%").replace(/_/g, "\\_")
           q = q.or(`${titleCol}.ilike.%${escaped}%,content.ilike.%${escaped}%`)
         }
-        q = q
-          .order(opts.withEffectiveAt ? "effective_at" : "created_at", {
+        // 서버 사이드 카테고리 — 전체(전 페이지) 대상으로 필터
+        if (category !== "all") {
+          q = q.eq("category", category)
+        }
+        // 서버 사이드 정렬 — 전체 대상 정렬 + created_at tie-breaker(페이지네이션 안정)
+        const useSort = opts.withSort !== false && sort !== "latest"
+        if (useSort && sort === "popular") {
+          q = q
+            .order(viewsCol, { ascending: false })
+            .order(likesCol, { ascending: false })
+            .order("created_at", { ascending: false })
+        } else if (useSort && (sort === "price_asc" || sort === "price_desc")) {
+          q = q
+            .order(priceCol, { ascending: sort === "price_asc" })
+            .order("created_at", { ascending: false })
+        } else if (useSort && sort === "views") {
+          q = q.order(viewsCol, { ascending: false }).order("created_at", { ascending: false })
+        } else if (useSort && sort === "likes") {
+          q = q.order(likesCol, { ascending: false }).order("created_at", { ascending: false })
+        } else {
+          q = q.order(opts.withEffectiveAt ? "effective_at" : "created_at", {
             ascending: false,
           })
-          .range(from, to)
+        }
+        q = q.range(from, to)
         return await q
       }
 
@@ -298,6 +322,8 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
       if (res.error) res = await attempt({ withRegion: true, withEffectiveAt: false, withVisibility: false })
       // 4차: region_id 컬럼 없는 환경 (마이그레이션 전) 대비
       if (res.error) res = await attempt({ withRegion: false, withEffectiveAt: false, withVisibility: false })
+      // 5차: 정렬 컬럼(views/likes/price 등) 없는 환경 대비 — 최신순으로 폴백
+      if (res.error) res = await attempt({ withRegion: false, withEffectiveAt: false, withVisibility: false, withSort: false })
 
       // 응답 도착 시점에 필터가 바뀌었으면 무시
       if (loadTokenRef.current !== token) return
@@ -318,7 +344,7 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
         setHasMore(rows.length === PAGE_SIZE)
       }
     },
-    [config.table, config.statusFilter, config.extraOr, config.disableRegionFilter, config.crossPlazaVisibility, DEFAULT_PLAZA, regionSelection, search, titleCol],
+    [config.table, config.statusFilter, config.extraOr, config.disableRegionFilter, config.crossPlazaVisibility, config.domainKind, DEFAULT_PLAZA, regionSelection, search, titleCol, priceCol, sort, category],
   )
 
   // 초기 로드 / 필터 변경 시 첫 페이지부터 다시 로드
@@ -439,40 +465,12 @@ export function DomainListScreen({ config }: { config: DomainListConfig }) {
     )
   }, [config, viewMode, gridCardWidth, titleCol, priceCol, cardKind, load, router])
 
+  // 검색·카테고리·정렬은 모두 서버 사이드(fetchPage) — 전체 글 대상으로 정확하게.
+  // 클라이언트는 숨김 게시글 제외만 처리(서버 재정렬 시 페이지 순서가 깨지므로 금지).
   const filtered = useMemo(() => {
-    let list = [...items]
-    // 숨김 게시글 제외
-    if (cardKind) {
-      list = list.filter((p) => !isHidden(String(p.id)))
-    }
-    if (category !== "all") {
-      list = list.filter((p) => (p.category ?? "") === category)
-    }
-    // 검색은 서버 사이드 — fetchPage 에서 ilike 으로 처리
-    // Skip sort for "latest" — server already returns in descending date order
-    if (sort !== "latest") {
-      list.sort((a, b) => {
-        switch (sort) {
-          case "popular":
-            return ((b.likes ?? 0) + (b.views ?? 0)) - ((a.likes ?? 0) + (a.views ?? 0))
-          case "price_asc":
-            return (a[priceCol] ?? 0) - (b[priceCol] ?? 0)
-          case "price_desc":
-            return (b[priceCol] ?? 0) - (a[priceCol] ?? 0)
-          case "views":
-            return (b.views ?? 0) - (a.views ?? 0)
-          case "likes":
-            return (b.likes ?? 0) - (a.likes ?? 0)
-          default: {
-            const aT = new Date((a as any).effective_at ?? a.created_at ?? 0).getTime()
-            const bT = new Date((b as any).effective_at ?? b.created_at ?? 0).getTime()
-            return bT - aT
-          }
-        }
-      })
-    }
-    return list
-  }, [items, sort, titleCol, priceCol, category, cardKind, isHidden])
+    if (!cardKind) return items
+    return items.filter((p) => !isHidden(String(p.id)))
+  }, [items, cardKind, isHidden])
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
