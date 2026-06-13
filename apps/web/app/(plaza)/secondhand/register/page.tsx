@@ -10,10 +10,12 @@ import { SECONDHAND_CATEGORIES } from "@/lib/constants/secondhand"
 import { SECONDHAND_CONDITIONS } from "@gwangjang/features/secondhand"
 import { RegisterConsentBlock } from "@/components/legal/register-consent-block"
 import { RegionFormField } from "@/components/region-form-field"
+import { useConfirm } from "@/components/confirm-provider"
 import { toast } from "sonner"
 
 export default function SecondhandRegisterPage() {
   const router = useRouter()
+  const confirm = useConfirm()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formDirty, setFormDirty] = useState(false)
   useBeforeUnload(formDirty)
@@ -102,7 +104,11 @@ export default function SecondhandRegisterPage() {
 
     // 0원 + "나눔으로 올리기" 체크 → 나눔 게시판으로
     const shouldPostToSharing = priceNum === 0 && postAsSharing
-    if (shouldPostToSharing && !confirm("이 글은 농기구/자재가 아닌 '무료 나눔' 게시판에 등록됩니다. 진행할까요?")) {
+    if (shouldPostToSharing && !(await confirm({
+      title: "무료 나눔으로 등록",
+      description: "이 글은 농기구/자재가 아닌 '무료 나눔' 게시판에 등록됩니다. 진행할까요?",
+      confirmText: "진행",
+    }))) {
       return
     }
 

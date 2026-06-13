@@ -80,6 +80,7 @@ export default function BoardDetailScreen() {
   const [imageIndex, setImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+  const [lightboxImages, setLightboxImages] = useState<string[]>([])
   const [isLiked, setIsLiked] = useState(false)
   const [likeLoading, setLikeLoading] = useState(false)
   const [profile, setProfile] = useState<{ nickname: string; avatar_url: string | null } | null>(null)
@@ -335,9 +336,18 @@ export default function BoardDetailScreen() {
   const openLightbox = useCallback((img: string) => {
     const imageOnly = (post?.images ?? []).filter((u: string) => !isVideoUrl(u))
     const idx = imageOnly.indexOf(img)
+    setLightboxImages(imageOnly)
     setLightboxIndex(idx >= 0 ? idx : 0)
     setLightboxOpen(true)
   }, [post?.images])
+
+  // 댓글 사진 확대 — 본문과 별개의 이미지 집합
+  const openCommentLightbox = useCallback((imgs: string[], index: number) => {
+    const imageOnly = imgs.filter((u) => !isVideoUrl(u))
+    setLightboxImages(imageOnly)
+    setLightboxIndex(Math.max(0, Math.min(index, imageOnly.length - 1)))
+    setLightboxOpen(true)
+  }, [])
 
   const renderImageItem = useCallback(
     ({ item: img }: { item: string }) => (
@@ -518,7 +528,9 @@ export default function BoardDetailScreen() {
                     {c.images && c.images.length > 0 && (
                       <View style={styles.commentImages}>
                         {c.images.map((img, i) => (
-                          <Image key={i} source={{ uri: img }} style={styles.commentImg} />
+                          <Pressable key={i} onPress={() => openCommentLightbox(c.images as string[], i)}>
+                            <Image source={{ uri: img }} style={styles.commentImg} />
+                          </Pressable>
                         ))}
                       </View>
                     )}
@@ -627,7 +639,7 @@ export default function BoardDetailScreen() {
       {share.element}
       <ImageLightbox
         visible={lightboxOpen}
-        images={(post?.images ?? []).filter((u: string) => !isVideoUrl(u))}
+        images={lightboxImages}
         initialIndex={lightboxIndex}
         onClose={() => setLightboxOpen(false)}
       />

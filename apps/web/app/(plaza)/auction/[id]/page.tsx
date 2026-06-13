@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { Gavel, Clock, TrendingUp, ArrowLeft, Loader2, Zap, Star, MessageCircle } from "lucide-react"
 import { CallButton } from "@/components/detail"
 import { usePostChat } from "@/hooks/use-post-chat"
+import { useConfirm } from "@/components/confirm-provider"
 
 const FALLBACK_IMG = "/images/card-auction.jpg"
 
@@ -29,6 +30,7 @@ function timeLeft(end: string) {
 
 export default function AuctionDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const id = (typeof params.id === "string" ? params.id : params.id?.[0]) || ""
   const [user, setUser] = useState<User | null>(null)
   const [a, setA] = useState<any>(null)
@@ -36,6 +38,8 @@ export default function AuctionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [bidAmount, setBidAmount] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [winnerChatLoading, setWinnerChatLoading] = useState(false)
+  const confirm = useConfirm()
   // 채팅 문의 — 경매는 내부적으로 secondhand_posts 라 동일 경로 재사용(서버가 작성자 검증)
   const { handleChat, chatLoading } = usePostChat({
     postId: a?.post_id,
@@ -94,10 +98,14 @@ export default function AuctionDetailPage() {
 
   const markDeal = async (status: "completed" | "no_show") => {
     const isDone = status === "completed"
-    const msg = isDone
-      ? "낙찰자와 거래를 정상적으로 마치셨나요?"
-      : "낙찰자가 약속을 지키지 않았나요?\n신고하면 낙찰자의 입찰이 제한될 수 있습니다. (누적 2회 7일, 3회 이상 30일)"
-    if (!confirm(msg)) return
+    if (!(await confirm({
+      title: isDone ? "거래 완료" : "거래 불이행 신고",
+      description: isDone
+        ? "낙찰자와 거래를 정상적으로 마치셨나요?"
+        : "낙찰자가 약속을 지키지 않았나요?\n신고하면 낙찰자의 입찰이 제한될 수 있습니다. (누적 2회 7일, 3회 이상 30일)",
+      confirmText: isDone ? "완료 기록" : "신고",
+      destructive: !isDone,
+    }))) return
     const supabase = createClient()
     const { data, error } = await (supabase as any).rpc("mark_auction_deal", { p_auction: id, p_status: status })
     if (error) { toast.error("처리하지 못했어요. 잠시 후 다시 시도해주세요."); return }
@@ -111,7 +119,11 @@ export default function AuctionDetailPage() {
     if (submitting) return
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!a?.buy_now_price) return
-    if (!confirm(`${won(a.buy_now_price)}에 즉시구매하시겠습니까?`)) return
+    if (!(await confirm({
+      title: "즉시구매",
+      description: `${won(a.buy_now_price)}에 즉시구매하시겠습니까?`,
+      confirmText: "구매",
+    }))) return
     setSubmitting(true)
     try {
       const supabase = createClient()
@@ -125,6 +137,28 @@ export default function AuctionDetailPage() {
       toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const openWinnerChat = async () => {
+    if (winnerChatLoading) return
+    setWinnerChatLoading(true)
+    try {
+      const res = await fetch("/api/chat/rooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auctionId: a.id }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data?.room?.id) {
+        router.push(`/chat/${data.room.id}`)
+      } else {
+        toast.error(data?.error || "채팅방을 열지 못했어요. 잠시 후 다시 시도해주세요.")
+      }
+    } catch {
+      toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setWinnerChatLoading(false)
     }
   }
 
@@ -189,6 +223,10 @@ export default function AuctionDetailPage() {
               {user && a.seller_id === user.id && (
                 (a.deal_status === "pending" || !a.deal_status) ? (
                   <div className="mt-3">
+                    <button onClick={openWinnerChat} disabled={winnerChatLoading}
+                      className="w-full mb-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-bold px-4 py-2.5 text-sm disabled:opacity-50">
+                      {winnerChatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />} 낙찰자와 채팅
+                    </button>
                     <p className="text-xs text-muted-foreground mb-2">거래를 마친 뒤 결과를 남겨주세요.</p>
                     <div className="flex gap-2">
                       <button onClick={() => markDeal("completed")}

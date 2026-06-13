@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { Tractor, ArrowLeft, Loader2, CalendarDays, MessageCircle } from "lucide-react"
 import { CallButton } from "@/components/detail"
 import { usePostChat } from "@/hooks/use-post-chat"
+import { useConfirm } from "@/components/confirm-provider"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
@@ -24,6 +25,7 @@ export default function RentalDetailPage() {
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const confirm = useConfirm()
   // 채팅 문의 — 대여는 내부적으로 secondhand_posts 라 동일 경로 재사용(서버가 작성자 검증)
   const { handleChat, chatLoading } = usePostChat({
     postId: r?.post_id,
@@ -58,7 +60,11 @@ export default function RentalDetailPage() {
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!start || !end || days <= 0) { toast.error("대여 기간을 선택해주세요"); return }
     const summary = `${days}일 · ${won(total)}${r.deposit ? ` + 보증금 ${won(r.deposit)}` : ""}`
-    if (!confirm(`${summary} 으로 대여를 신청하시겠습니까?\n소유자 승인 후 거래가 진행됩니다.`)) return
+    if (!(await confirm({
+      title: "대여 신청",
+      description: `${summary} 으로 대여를 신청하시겠습니까?\n소유자 승인 후 거래가 진행됩니다.`,
+      confirmText: "신청",
+    }))) return
     setSubmitting(true)
     try {
       const supabase = createClient()

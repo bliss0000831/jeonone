@@ -247,6 +247,15 @@ export default function LocalFoodCheckoutPage({
           </div>
         </div>
 
+        {/* 온라인 결제 준비 중 — 진입 즉시 안내(폼 입력 전 헛수고 방지) */}
+        <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900/40 p-4 mb-5">
+          <p className="text-sm font-bold text-amber-700 dark:text-amber-400 mb-1">온라인 결제는 준비 중입니다</p>
+          <p className="text-sm text-amber-700/90 dark:text-amber-400/90 leading-relaxed">
+            지금은 앱에서 바로 결제할 수 없어요. 아래 정보는 미리 입력해 두실 수 있지만, 실제 구매는{" "}
+            <Link href={`/local-food/${id}`} className="underline font-medium">상품 화면</Link>에서 판매자에게 채팅·전화로 문의해 진행해주세요.
+          </p>
+        </div>
+
         {/* 상품 카드 */}
         <div className="rounded-xl border border-border bg-card p-4 mb-5 flex gap-3">
           <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
@@ -524,8 +533,8 @@ export default function LocalFoodCheckoutPage({
         )}
       </main>
 
-      {/* 결제 버튼 — 하단 고정 */}
-      <div className="fixed bottom-0 left-0 right-0 md:relative md:max-w-2xl md:mx-auto bg-background border-t border-border md:border-0 px-4 py-3 md:py-0 md:pb-6 z-40">
+      {/* 결제 버튼 — 하단 고정 (모바일: 하단 네비 64px 위로 띄움) */}
+      <div className="fixed bottom-16 md:bottom-0 left-0 right-0 md:relative md:max-w-2xl md:mx-auto bg-background border-t border-border md:border-0 px-4 py-3 md:py-0 md:pb-6 z-40">
         <Button
           size="lg"
           disabled

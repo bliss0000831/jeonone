@@ -169,7 +169,68 @@ export async function POST(request: NextRequest) {
   if (!body) {
     return NextResponse.json({ error: "잘못된 요청" }, { status: 400 })
   }
-  const { propertyId, sellerId, postId, postType } = body
+  const { propertyId, sellerId, postId, postType, auctionId } = body
+
+  // 경매 낙찰 후: 판매자 → 낙찰자 채팅
+  // 일반 경로(POST postId)는 작성자(판매자) 시작을 막으므로, 낙찰 거래를 위해
+  // 판매자가 낙찰자에게 먼저 연락할 수 있는 유일한 경로. 엄격 검증:
+  //   호출자 = 경매 판매자 && 낙찰자 존재 → buyer=낙찰자, seller=호출자 로 방 생성/반환.
+  if (auctionId) {
+    const { data: auc } = await (supabase as any)
+      .from("auction_listings")
+      .select("seller_id, winner_id, post_id, plaza_id")
+      .eq("id", auctionId)
+      .maybeSingle()
+    if (!auc) {
+      return NextResponse.json({ error: "경매를 찾을 수 없습니다" }, { status: 404 })
+    }
+    if (auc.seller_id !== user.id) {
+      return NextResponse.json({ error: "권한이 없습니다" }, { status: 403 })
+    }
+    if (!auc.winner_id) {
+      return NextResponse.json({ error: "낙찰자가 없습니다" }, { status: 400 })
+    }
+    if (plaza && auc.plaza_id && auc.plaza_id !== plaza) {
+      return NextResponse.json({ error: "경매를 찾을 수 없습니다" }, { status: 404 })
+    }
+
+    let reader: any = supabase
+    if (tokenSource === "bearer") {
+      try { reader = createAdminClient() } catch {}
+    }
+    const { data: existingRoom } = await reader
+      .from("chat_rooms")
+      .select("id")
+      .eq("property_id", auc.post_id)
+      .eq("buyer_id", auc.winner_id)
+      .eq("seller_id", user.id)
+      .maybeSingle()
+    if (existingRoom) {
+      return NextResponse.json({ room: existingRoom })
+    }
+
+    const sellerPlazaId = auc.plaza_id ?? plaza
+    let writer: any = supabase
+    if (tokenSource === "bearer") {
+      try { writer = createAdminClient() } catch (e) { console.error("[chat/rooms auction] admin client unavailable", e) }
+    }
+    const { data: newRoom, error } = await writer
+      .from("chat_rooms")
+      .insert({
+        property_id: auc.post_id,
+        buyer_id: auc.winner_id,
+        seller_id: user.id,
+        post_type: "secondhand",
+        ...(sellerPlazaId ? { plaza_id: sellerPlazaId, buyer_plaza_id: sellerPlazaId } : {}),
+      })
+      .select()
+      .single()
+    if (error) {
+      console.error("[chat/rooms auction] insert failed:", { error, tokenSource })
+      return NextResponse.json({ error: "채팅방 생성에 실패했습니다" }, { status: 500 })
+    }
+    return NextResponse.json({ room: newRoom })
+  }
 
   // 부동산 매물 채팅 (기존 로직)
   if (propertyId && sellerId) {
