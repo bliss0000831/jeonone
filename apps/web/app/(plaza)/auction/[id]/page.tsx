@@ -172,7 +172,7 @@ export default function AuctionDetailPage() {
   const ended = a.status !== "active" || new Date(a.end_at).getTime() <= Date.now()
 
   return (
-    <div className="min-h-screen flex flex-col bg-background pb-24">
+    <div className={`min-h-screen flex flex-col bg-background ${ended ? "pb-8" : "pb-44"}`}>
       <Header user={user} />
       <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-5">
         <Link href="/auction" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-3"><ArrowLeft className="w-4 h-4" />경매장</Link>

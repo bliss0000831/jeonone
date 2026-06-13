@@ -90,13 +90,25 @@ export function MessageBubble({
           <View style={styles.avatarSpacer} />
         )}
 
-        {isMe && showTime && (
-          <View style={styles.timeWrap}>
-            {/* 읽음 표시 — 내가 보낸 메시지가 상대방이 읽음 처리되면 노출 */}
-            {message.is_read && <Text style={styles.readMark}>읽음</Text>}
-            <Text style={styles.time}>{formatTime(message.created_at)}</Text>
-          </View>
-        )}
+        {isMe && (() => {
+          // temp- id = 아직 서버 응답 전(전송 중). 응답 오면 실제 메시지로 교체됨
+          const pending = String(message.id).startsWith("temp-")
+          if (pending) {
+            return (
+              <View style={styles.timeWrap}>
+                <Text style={styles.sendingMark}>보내는 중…</Text>
+              </View>
+            )
+          }
+          if (!showTime) return null
+          return (
+            <View style={styles.timeWrap}>
+              {/* 읽음 표시 — 내가 보낸 메시지가 상대방이 읽음 처리되면 노출 */}
+              {message.is_read && <Text style={styles.readMark}>✓ 읽음</Text>}
+              <Text style={styles.time}>{formatTime(message.created_at)}</Text>
+            </View>
+          )
+        })()}
 
         {imageUrl ? (
           /* 사진 메시지 — 썸네일. 탭하면 전체화면 확대. */
@@ -330,9 +342,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   readMark: {
-    fontSize: 10,
+    fontSize: 12,
     color: lightColors.primary,
     fontWeight: "700",
+  },
+  sendingMark: {
+    fontSize: 12,
+    color: lightColors.ink500,
+    fontWeight: "600",
   },
   systemRow: {
     alignItems: "center",

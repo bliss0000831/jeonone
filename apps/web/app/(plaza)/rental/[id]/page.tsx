@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
@@ -18,6 +18,7 @@ const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
 
 export default function RentalDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const id = (typeof params.id === "string" ? params.id : params.id?.[0]) || ""
   const [user, setUser] = useState<User | null>(null)
   const [r, setR] = useState<any>(null)
@@ -77,7 +78,10 @@ export default function RentalDetailPage() {
       if (error) { toast.error("신청에 실패했어요. 잠시 후 다시 시도해주세요."); return }
       const res = data as any
       if (!res?.ok) { toast.error(res?.error || "신청에 실패했어요."); return }
-      toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.")
+      toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.", {
+        action: { label: "신청 현황 보기", onClick: () => router.push("/rental/manage?tab=sent") },
+        duration: 6000,
+      })
       setStart(""); setEnd("")
     } catch {
       toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")

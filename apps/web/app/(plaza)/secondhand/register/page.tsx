@@ -11,6 +11,7 @@ import { SECONDHAND_CONDITIONS } from "@gwangjang/features/secondhand"
 import { RegisterConsentBlock } from "@/components/legal/register-consent-block"
 import { RegionFormField } from "@/components/region-form-field"
 import { useConfirm } from "@/components/confirm-provider"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 export default function SecondhandRegisterPage() {
@@ -34,6 +35,18 @@ export default function SecondhandRegisterPage() {
     const t = new URLSearchParams(window.location.search).get("type")
     if (t === "auction" || t === "rental") setListingType(t)
   }, [])
+
+  // 로그인 게이트 — 비로그인 진입 시 폼을 채우기 전에 로그인으로 (board create 와 동일)
+  useEffect(() => {
+    const check = async () => {
+      const { data: { user } } = await createClient().auth.getUser()
+      if (!user) {
+        const here = window.location.pathname + window.location.search
+        router.push(`/auth/login?redirect=${encodeURIComponent(here)}`)
+      }
+    }
+    check()
+  }, [router])
   const titleRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
   const descRef = useRef<HTMLTextAreaElement>(null)

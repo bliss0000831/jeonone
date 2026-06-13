@@ -47,6 +47,11 @@ export default function RentalManagePage() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
 
+  // ?tab=sent 로 진입 시 '보낸 신청' 탭으로 (대여 신청 완료 토스트에서 연결)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tab") === "sent") setTab("sent")
+  }, [])
+
   const load = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()

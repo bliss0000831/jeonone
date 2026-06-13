@@ -20,6 +20,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -428,16 +429,32 @@ export default function JobsDetailScreen() {
             </View>
           )}
 
-          {/* 연락하기 */}
-          {!!post.contact && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>연락하기</Text>
+          {/* 연락하기 — 전화번호 형태면 탭하면 전화 걸기 */}
+          {!!post.contact && (() => {
+            const tel = String(post.contact).replace(/[^0-9+]/g, "")
+            const isPhone = tel.replace(/\D/g, "").length >= 9
+            const Inner = (
               <View style={styles.contactBox}>
                 <Ionicons name="call-outline" size={18} color={TEAL} />
-                <Text style={styles.contactText}>{post.contact}</Text>
+                <Text style={[styles.contactText, isPhone && { color: TEAL, textDecorationLine: "underline" }]}>{post.contact}</Text>
+                {isPhone && <Ionicons name="open-outline" size={14} color={TEAL} style={{ marginLeft: "auto" }} />}
               </View>
-            </View>
-          )}
+            )
+            return (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>연락하기</Text>
+                {isPhone ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`전화 걸기 ${post.contact}`}
+                    onPress={() => Linking.openURL(`tel:${tel}`).catch(() => Alert.alert("전화 연결 실패", "전화 기능을 사용할 수 없습니다."))}
+                  >
+                    {Inner}
+                  </Pressable>
+                ) : Inner}
+              </View>
+            )
+          })()}
 
           {/* 위치 — 매물 상세 톤 (주소 + 지도) */}
           {!!post.location && (
