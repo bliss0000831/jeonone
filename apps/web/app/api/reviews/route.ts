@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     if (order.seller_id !== reviewed_user_id) {
       return NextResponse.json({ error: "거래 상대가 아닙니다" }, { status: 400 })
     }
-    if (!["confirmed", "settled"].includes(order.status)) {
+    if (!["completed", "confirmed", "settled"].includes(order.status)) {
       return NextResponse.json(
         { error: "구매확정 후에 후기를 남길 수 있습니다" },
         { status: 400 },
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     if (order.seller_id !== reviewed_user_id) {
       return NextResponse.json({ error: "거래 상대가 아닙니다" }, { status: 400 })
     }
-    if (!["shipped", "confirmed", "settled"].includes(order.status)) {
+    if (!["completed", "shipped", "confirmed", "settled"].includes(order.status)) {
       return NextResponse.json(
         { error: "발송 후에 후기를 남길 수 있습니다" },
         { status: 400 },

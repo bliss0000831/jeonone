@@ -15,7 +15,7 @@ import {
   View,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { useFocusEffect, useLocalSearchParams } from "expo-router"
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing } from "@gwangjang/tokens"
 import {
@@ -33,6 +33,7 @@ type Tab = "lf" | "gb"
 
 export default function OrdersScreen() {
   const { user } = useAuth()
+  const router = useRouter()
   const params = useLocalSearchParams<{ type?: string }>()
   const initialTab: Tab =
     params.type === "group-buying" || params.type === "gb" ? "gb" : "lf"
@@ -130,6 +131,13 @@ export default function OrdersScreen() {
             <OrderRow
               order={item}
               role="buyer"
+              onWriteReview={(o) => {
+                // reviews API 는 source_type 으로 '{domain}_order' 를 기대함
+                const sourceType = o.domain === "local_food" ? "local_food_order" : "group_buying_order"
+                router.push(
+                  `/mypage/write-review?reviewed_user_id=${o.seller_id}&source_type=${sourceType}&source_id=${o.id}&target_name=${encodeURIComponent(o.product_name || "판매자")}` as any,
+                )
+              }}
               onConfirmReceived={(o) =>
                 Alert.alert(
                   "수령 확인",

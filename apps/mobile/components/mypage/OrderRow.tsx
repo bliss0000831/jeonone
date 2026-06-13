@@ -47,12 +47,16 @@ interface OrderRowProps {
   role?: "buyer" | "seller"
   /** 수령 완료 버튼 콜백 (status='shipped' 일 때만) */
   onConfirmReceived?: (order: OrderEntry) => void
+  /** 후기 작성 콜백 (구매자·수령완료·미작성일 때만) */
+  onWriteReview?: (order: OrderEntry) => void
 }
 
-export function OrderRow({ order, role = "buyer", onConfirmReceived }: OrderRowProps) {
+export function OrderRow({ order, role = "buyer", onConfirmReceived, onWriteReview }: OrderRowProps) {
   const status = STATUS_LABEL[order.status] ?? { label: order.status, tone: "muted" }
   const canConfirm =
     role === "buyer" && order.status === "shipped" && !!onConfirmReceived
+  const canReview =
+    role === "buyer" && order.status === "completed" && !!onWriteReview
 
   function openTracking() {
     if (!order.tracking_number) return
@@ -114,6 +118,15 @@ export function OrderRow({ order, role = "buyer", onConfirmReceived }: OrderRowP
             >
               <Ionicons name="checkmark-circle-outline" size={14} color="#ffffff" />
               <Text style={styles.confirmBtnText}>수령 완료</Text>
+            </Pressable>
+          )}
+          {canReview && (
+            <Pressable
+              onPress={() => onWriteReview?.(order)}
+              style={({ pressed }) => [styles.reviewBtn, pressed && { opacity: 0.85 }]}
+            >
+              <Ionicons name="star" size={14} color="#ffffff" />
+              <Text style={styles.confirmBtnText}>후기 작성</Text>
             </Pressable>
           )}
         </View>
@@ -203,6 +216,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     backgroundColor: "#10b981",
+  },
+  reviewBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "#225a39",
+  },
+  reviewedText: {
+    fontSize: 12,
+    color: lightColors.ink500,
+    fontWeight: "600",
   },
   confirmBtnText: {
     fontSize: 11,

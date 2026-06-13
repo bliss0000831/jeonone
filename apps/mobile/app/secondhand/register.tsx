@@ -13,7 +13,8 @@
  *   - 등록 버튼 (createSecondhandPost)
  */
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -51,6 +52,7 @@ import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
 const MAX_IMAGES = 10
 const AMBER = "#f59e0b"
+const DRAFT_KEY = "draft.secondhand.register"
 // 농기구/자재 카테고리 (전원일기)
 const FARM_CATEGORIES = ["트랙터", "경운기", "이양기", "수확기", "관리기", "방제기/드론", "운반기", "하우스자재", "부품/소모품", "농자재", "기타"]
 
@@ -81,6 +83,65 @@ export default function SecondhandRegisterScreen() {
   const [auctionDays, setAuctionDays] = useState("7")
   const [rentalDaily, setRentalDaily] = useState("")
   const [rentalDeposit, setRentalDeposit] = useState("")
+
+  // ── 임시저장(draft) — 작성 중 이탈해도 내용 보존, 재진입 시 복원 ──
+  const draftReadyRef = useRef(false)
+
+  // 1) 진입 시: 저장된 임시글이 있으면 이어쓰기 제안
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const raw = await AsyncStorage.getItem(DRAFT_KEY)
+        const d = raw ? JSON.parse(raw) : null
+        if (alive && d && (d.title || d.description || (Array.isArray(d.images) && d.images.length))) {
+          Alert.alert("임시저장 불러오기", "작성하던 내용이 있어요. 이어서 작성할까요?", [
+            {
+              text: "새로 작성",
+              style: "destructive",
+              onPress: () => { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); draftReadyRef.current = true },
+            },
+            {
+              text: "이어서 작성",
+              onPress: () => {
+                if (typeof d.title === "string") setTitle(d.title)
+                if (typeof d.description === "string") setDescription(d.description)
+                if (typeof d.category === "string") setCategory(d.category)
+                if (typeof d.price === "string") setPrice(d.price)
+                setIsPriceNegotiable(!!d.isPriceNegotiable)
+                setPostAsSharing(!!d.postAsSharing)
+                if (typeof d.location === "string") setLocation(d.location)
+                if (typeof d.condition === "string") setCondition(d.condition)
+                if (Array.isArray(d.images)) setImages(d.images)
+                if (d.listingType === "sale" || d.listingType === "auction" || d.listingType === "rental") setListingType(d.listingType)
+                if (typeof d.auctionStartPrice === "string") setAuctionStartPrice(d.auctionStartPrice)
+                if (typeof d.auctionDays === "string") setAuctionDays(d.auctionDays)
+                if (typeof d.rentalDaily === "string") setRentalDaily(d.rentalDaily)
+                if (typeof d.rentalDeposit === "string") setRentalDeposit(d.rentalDeposit)
+                if (d.regionId === null || typeof d.regionId === "string") setRegionId(d.regionId)
+                draftReadyRef.current = true
+              },
+            },
+          ])
+          return
+        }
+      } catch { /* 무시 */ }
+      draftReadyRef.current = true
+    })()
+    return () => { alive = false }
+  }, [])
+
+  // 2) 작성 중: 디바운스 저장 (내용 없으면 삭제)
+  useEffect(() => {
+    if (!draftReadyRef.current) return
+    const hasContent = !!(title.trim() || description.trim() || images.length)
+    const t = setTimeout(() => {
+      if (!hasContent) { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); return }
+      const d = { title, description, category, price, isPriceNegotiable, postAsSharing, location, condition, images, listingType, auctionStartPrice, auctionDays, rentalDaily, rentalDeposit, regionId }
+      AsyncStorage.setItem(DRAFT_KEY, JSON.stringify(d)).catch(() => {})
+    }, 600)
+    return () => clearTimeout(t)
+  }, [title, description, category, price, isPriceNegotiable, postAsSharing, location, condition, images, listingType, auctionStartPrice, auctionDays, rentalDaily, rentalDeposit, regionId])
 
   useEffect(() => {
     if (title.trim() || description.trim() || images.length > 0) setFormDirty(true)
@@ -217,6 +278,7 @@ export default function SecondhandRegisterScreen() {
           return
         }
         if (r.postId) await setPostRegion("sharing_posts", r.postId, regionId)
+        await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {})
         Alert.alert("등록 완료", "나눔 글이 성공적으로 등록되었습니다 💝")
         setFormDirty(false)
         if (r.postId) router.replace(`/sharing/${r.postId}` as any)
@@ -256,6 +318,7 @@ export default function SecondhandRegisterScreen() {
       }
       if (r.postId) await setPostRegion("secondhand_posts", r.postId, regionId)
       setFormDirty(false)
+      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {})
 
       // 경매/대여 매물은 서버가 생성하여 listingId 를 돌려준다. 별도 insert 없음.
       if (listingType === "auction") {
