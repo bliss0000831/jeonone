@@ -52,14 +52,13 @@ export default function EditProfilePage() {
     kakao_id: "",
   })
   
-  // 지역 선택 상태 (춘천시 동만 선택)
+  // 지역 선택 상태 — 시/도 → 시/군/구 → 동/읍/면 (동적)
+  const [selectedProvince, setSelectedProvince] = useState("강원특별자치도")
+  const [selectedSigungu, setSelectedSigungu] = useState("")
   const [selectedDong, setSelectedDong] = useState("")
 
-  // 춘천시 동 목록 가져오기
-  const chuncheonDongs = koreaRegions
-    .find(r => r.name === "강원특별자치도")
-    ?.subRegions?.find(r => r.name === "춘천시")
-    ?.subRegions || []
+  const sigunguList = koreaRegions.find((r) => r.name === selectedProvince)?.subRegions ?? []
+  const dongList = sigunguList.find((r) => r.name === selectedSigungu)?.subRegions ?? []
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -81,8 +80,10 @@ export default function EditProfilePage() {
 
         // 기존 location 파싱 (예: "강원특별자치도 춘천시 효자동")
         if (profileData.location) {
-          const parts = profileData.location.split(" ")
-          if (parts.length >= 3) setSelectedDong(parts[2])
+          const parts = profileData.location.split(" ").filter(Boolean)
+          if (parts[0]) setSelectedProvince(parts[0])
+          if (parts[1]) setSelectedSigungu(parts[1])
+          if (parts[2]) setSelectedDong(parts[2])
         }
         
         setFormData({
@@ -156,9 +157,9 @@ export default function EditProfilePage() {
     setSaving(true)
 
     try {
-      // location 조합 (모든 사용자, 춘천시 고정 · 선택한 동이 있을 때만)
-      const location = selectedDong
-        ? `강원특별자치도 춘천시 ${selectedDong}`
+      // location 조합 — 시/도 + 시/군/구(+동). 시/군/구 이상 선택 시 저장
+      const location = selectedSigungu
+        ? [selectedProvince, selectedSigungu, selectedDong].filter(Boolean).join(" ")
         : null
 
       const splitTags = (s: string): string[] | null => {
@@ -321,41 +322,65 @@ export default function EditProfilePage() {
             </p>
           </div>
 
-          {/* 내 지역 - 춘천시 고정, 동만 선택 (모든 사용자) */}
+          {/* 내 지역 — 시/도 → 시/군/구 → 동/읍/면 동적 선택 (모든 지역) */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <Label>내 지역</Label>
             </div>
 
-            <div className="flex gap-2 items-center">
-              {/* 고정된 지역 표시 */}
-              <div className="bg-secondary/50 rounded-lg px-3 py-2 text-sm text-muted-foreground">
-                강원특별자치도 춘천시
-              </div>
-
-              {/* 동 선택 */}
-              <Select value={selectedDong} onValueChange={setSelectedDong}>
-                <SelectTrigger className="bg-card flex-1">
-                  <SelectValue placeholder="동 선택" />
-                </SelectTrigger>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* 시/도 */}
+              <Select
+                value={selectedProvince}
+                onValueChange={(v) => { setSelectedProvince(v); setSelectedSigungu(""); setSelectedDong("") }}
+              >
+                <SelectTrigger className="bg-card"><SelectValue placeholder="시/도" /></SelectTrigger>
                 <SelectContent>
-                  {chuncheonDongs.map(dong => (
-                    <SelectItem key={dong.name} value={dong.name}>{dong.name}</SelectItem>
+                  {koreaRegions.map((p) => (
+                    <SelectItem key={p.name} value={p.name}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* 시/군/구 */}
+              <Select
+                value={selectedSigungu}
+                onValueChange={(v) => { setSelectedSigungu(v); setSelectedDong("") }}
+                disabled={sigunguList.length === 0}
+              >
+                <SelectTrigger className="bg-card"><SelectValue placeholder="시/군/구" /></SelectTrigger>
+                <SelectContent>
+                  {sigunguList.map((s) => (
+                    <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* 동/읍/면 */}
+              <Select
+                value={selectedDong}
+                onValueChange={setSelectedDong}
+                disabled={dongList.length === 0}
+              >
+                <SelectTrigger className="bg-card"><SelectValue placeholder="동/읍/면" /></SelectTrigger>
+                <SelectContent>
+                  {dongList.map((d) => (
+                    <SelectItem key={d.name} value={d.name}>{d.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             {/* 선택된 주소 표시 */}
-            {selectedDong && (
+            {selectedSigungu && (
               <div className="bg-secondary/30 rounded-lg p-3 text-sm text-foreground">
-                <strong>선택한 지역:</strong> 강원특별자치도 춘천시 {selectedDong}
+                <strong>선택한 지역:</strong> {[selectedProvince, selectedSigungu, selectedDong].filter(Boolean).join(" ")}
               </div>
             )}
 
             <p className="text-xs text-muted-foreground">
-              내 프로필에 표시될 동네를 선택해주세요. (선택)
+              내 프로필에 표시될 동네를 선택해주세요. (시/군/구까지 선택하면 저장됩니다)
             </p>
           </div>
 
