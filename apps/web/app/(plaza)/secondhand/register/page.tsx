@@ -288,7 +288,10 @@ export default function SecondhandRegisterPage() {
                 </select>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">마감 5분 전 입찰 시 자동 5분 연장됩니다.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              마감 5분 전 입찰 시 자동 5분 연장됩니다.
+              {auctionStartPrice ? ` · 입찰 단위(한 번에 오르는 값) ${Math.max(1000, Math.round((parseInt(auctionStartPrice || "0", 10) * 0.05) / 1000) * 1000).toLocaleString()}원 · 자동` : ""}
+            </p>
           </div>
         )}
 

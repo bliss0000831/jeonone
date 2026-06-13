@@ -413,7 +413,7 @@ export default function NotificationsScreen() {
       {/* 롱프레스 삭제 힌트 */}
       {filtered.length > 0 && (
         <View style={{ paddingHorizontal: spacing[3], paddingBottom: 4 }}>
-          <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right" }}>
+          <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right" }}>
             길게 눌러 삭제
           </Text>
         </View>

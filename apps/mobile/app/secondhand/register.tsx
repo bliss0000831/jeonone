@@ -347,7 +347,7 @@ export default function SecondhandRegisterScreen() {
               maxLength={100}
               style={styles.input}
             />
-            <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
               {title.length}/100
             </Text>
           </Field>
@@ -362,6 +362,13 @@ export default function SecondhandRegisterScreen() {
                 </Pressable>
               ))}
             </View>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6, lineHeight: 18 }}>
+              {listingType === "sale"
+                ? "한 가격에 바로 판매합니다."
+                : listingType === "rental"
+                ? "일정 기간 빌려주고 대여료를 받아요. 보증금은 반납 후 돌려줍니다."
+                : "여러 사람이 값을 올려 부르고, 가장 높은 분께 팝니다."}
+            </Text>
           </Field>
 
           {listingType === "auction" && (
@@ -369,6 +376,11 @@ export default function SecondhandRegisterScreen() {
               <Field label="경매 시작가 (원)">
                 <TextInput value={auctionStartPrice} onChangeText={(v) => setAuctionStartPrice(v.replace(/[^0-9]/g, ""))}
                   keyboardType="number-pad" placeholder="예: 1000000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+                {auctionStartPrice ? (
+                  <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6, lineHeight: 18 }}>
+                    입찰 단위(한 번에 오르는 값): {Math.max(1000, Math.round((parseInt(auctionStartPrice || "0", 10) * 0.05) / 1000) * 1000).toLocaleString()}원 · 자동 설정
+                  </Text>
+                ) : null}
               </Field>
               <Field label="경매 기간 (일)">
                 <View style={{ flexDirection: "row", gap: 6 }}>
@@ -392,6 +404,9 @@ export default function SecondhandRegisterScreen() {
               <Field label="보증금 (원, 선택)">
                 <TextInput value={rentalDeposit} onChangeText={(v) => setRentalDeposit(v.replace(/[^0-9]/g, ""))}
                   keyboardType="number-pad" placeholder="예: 200000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+                <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6, lineHeight: 18 }}>
+                  빌려줄 때 잠시 맡아두고, 반납·정상 확인 후 돌려주는 금액이에요.
+                </Text>
               </Field>
             </>
           )}
@@ -510,7 +525,7 @@ export default function SecondhandRegisterScreen() {
               maxLength={3000}
               style={[styles.input, styles.textarea]}
             />
-            <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
               {description.length}/3000
             </Text>
           </Field>

@@ -332,7 +332,7 @@ export default function JobsRegisterScreen() {
               maxLength={80}
               style={styles.input}
             />
-            <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
               {title.length}/80
             </Text>
           </Field>
@@ -479,7 +479,7 @@ export default function JobsRegisterScreen() {
               maxLength={3000}
               style={[styles.input, styles.textarea]}
             />
-            <Text style={{ fontSize: 11, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, textAlign: "right", marginTop: 2 }}>
               {description.length}/3000
             </Text>
           </Field>
