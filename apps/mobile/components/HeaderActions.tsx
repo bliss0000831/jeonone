@@ -46,11 +46,15 @@ export function HeaderActions({ cityName: cityNameProp }: { cityName?: string })
     let alive = true
     const supabase = getSupabase()
     ;(async () => {
+      // 안읽음 카운트 — 알림 목록 화면과 동일 기준(현재 광장으로 필터)으로 맞춰
+      // 뱃지 숫자와 목록 개수가 일치하도록 한다(탭 시 뱃지가 안 꺼지던 문제 해소).
+      let notifQ: any = supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false)
+      if (plazaId) notifQ = notifQ.eq("plaza_id", plazaId)
       const [ppRes, notifRes] = await Promise.all([
         plazaId
           ? supabase.from("plaza_profiles").select("avatar_url").eq("user_id", user.id).eq("plaza_id", plazaId).maybeSingle()
           : supabase.from("profiles").select("avatar_url").eq("id", user.id).maybeSingle(),
-        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false),
+        notifQ,
       ])
       if (!alive) return
       const av = ppRes?.data?.avatar_url ?? null

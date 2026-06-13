@@ -85,7 +85,7 @@ export default function MySalesPage() {
       acc.total += 1
       if (o.status === "paid") acc.toShip += 1
       if (o.status === "shipped" || o.status === "delivered") acc.shipped += 1
-      if (["confirmed", "settled"].includes(o.status)) {
+      if (["confirmed", "completed", "settled"].includes(o.status)) {
         acc.completed += 1
         acc.revenue += o.settlement_amount || 0
       }

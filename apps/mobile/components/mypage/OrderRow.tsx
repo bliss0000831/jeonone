@@ -11,7 +11,7 @@ const STATUS_LABEL: Record<string, { label: string; tone: string }> = {
   pending_payment: { label: "결제 대기", tone: "amber" },
   reserved: { label: "결제 대기", tone: "amber" }, // 레거시
   paid: { label: "결제 완료", tone: "primary" },
-  confirmed: { label: "결제 완료", tone: "primary" }, // 레거시
+  confirmed: { label: "구매 확정", tone: "emerald" }, // 웹 구매확정 종료상태(=completed 와 동일 취급)
   shipped: { label: "배송중", tone: "primary" },
   received: { label: "수령 완료", tone: "emerald" }, // 레거시
   completed: { label: "수령 완료", tone: "emerald" },
@@ -56,7 +56,7 @@ export function OrderRow({ order, role = "buyer", onConfirmReceived, onWriteRevi
   const canConfirm =
     role === "buyer" && order.status === "shipped" && !!onConfirmReceived
   const canReview =
-    role === "buyer" && order.status === "completed" && !!onWriteReview
+    role === "buyer" && (order.status === "completed" || order.status === "confirmed") && !!onWriteReview
 
   function openTracking() {
     if (!order.tracking_number) return

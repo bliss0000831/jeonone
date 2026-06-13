@@ -261,7 +261,7 @@ export default function MyOrdersPage() {
                       </Button>
                     )}
                     {/* 구매확정/정산 후 — 후기 남기기 (이미 작성한 주문은 비활성) */}
-                    {(order.status === "confirmed" || order.status === "settled") && (
+                    {(order.status === "confirmed" || order.status === "completed" || order.status === "settled") && (
                       reviewedOrders.has(order.id) ? (
                         <Button size="sm" variant="outline" disabled className="gap-1">
                           <Star className="w-4 h-4 fill-amber-400 stroke-amber-400" />

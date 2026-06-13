@@ -360,15 +360,15 @@ export default function LocalFoodCheckoutScreen() {
             onChange={setConsented}
           />
 
-          <Pressable onPress={handleSubmit} disabled={submitting || !consented} style={[styles.payBtn, (submitting || !consented) && { opacity: 0.5 }]}>
-            {submitting ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <>
-                <Ionicons name="card" size={18} color="#ffffff" />
-                <Text style={styles.payBtnText}>{total.toLocaleString()}원 결제하기</Text>
-              </>
-            )}
+          {/* 온라인 결제 준비 중 — 웹과 동일하게 차단(모바일만 mock 으로 '결제 완료'되던 문제 해소) */}
+          <View style={styles.payNotice}>
+            <Text style={styles.payNoticeText}>
+              온라인 결제는 준비 중입니다. 지금은 상품 화면에서 판매자에게 채팅·전화로 문의해 거래해주세요.
+            </Text>
+          </View>
+          <Pressable onPress={handleSubmit} disabled style={[styles.payBtn, { opacity: 0.5 }]}>
+            <Ionicons name="card" size={18} color="#ffffff" />
+            <Text style={styles.payBtnText}>정식 출시 후 결제 가능</Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -442,4 +442,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14, borderRadius: radius.md, backgroundColor: GREEN,
   },
   payBtnText: { color: "#ffffff", fontWeight: "700", fontSize: fontSize.md },
+  payNotice: {
+    backgroundColor: "#fffbeb", borderColor: "#fcd34d", borderWidth: 1,
+    borderRadius: radius.md, padding: 12, marginBottom: 10,
+  },
+  payNoticeText: { color: "#92400e", fontSize: fontSize.sm, lineHeight: 20 },
 })

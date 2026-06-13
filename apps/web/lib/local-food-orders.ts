@@ -11,6 +11,7 @@ export type LocalFoodOrderStatus =
   | "shipped"            // 발송됨 (운송장 등록)
   | "delivered"          // 배송완료 (택배사 API 추후)
   | "confirmed"          // 구매확정 → 정산 트리거
+  | "completed"          // 수령확정 (자동완료 cron·모바일 수령) — confirmed 와 동일 종료상태
   | "refund_requested"   // 환불요청 (구매자)
   | "refunded"           // 환불완료
   | "cancelled"          // 취소됨 (결제 전)
@@ -22,6 +23,7 @@ export const STATUS_LABELS: Record<LocalFoodOrderStatus, string> = {
   shipped: "배송 중",
   delivered: "배송 완료",
   confirmed: "구매 확정",
+  completed: "수령 완료",
   refund_requested: "환불 요청",
   refunded: "환불 완료",
   cancelled: "주문 취소",
@@ -34,6 +36,7 @@ export const STATUS_TONES: Record<LocalFoodOrderStatus, string> = {
   shipped: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
   delivered: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
   confirmed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  completed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   refund_requested: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
   refunded: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
   cancelled: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
