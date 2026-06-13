@@ -16,6 +16,7 @@ import {
   Image as RNImage,
   KeyboardAvoidingView,
   Platform,
+  ToastAndroid,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -186,6 +187,7 @@ export default function BoardCreateScreen() {
       next.unshift(picked)
       return next
     })
+    if (Platform.OS === "android") ToastAndroid.show("대표 사진으로 지정했어요", ToastAndroid.SHORT)
   }
 
   async function handleSubmit() {

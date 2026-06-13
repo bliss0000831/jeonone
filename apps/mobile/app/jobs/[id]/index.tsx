@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: lightColors.border,
   },
-  infoChipLabel: { fontSize: 11, color: lightColors.ink500 },
+  infoChipLabel: { fontSize: 12, color: lightColors.ink500 },
   infoChipVal: {
     fontSize: fontSize.sm,
     fontWeight: "500",

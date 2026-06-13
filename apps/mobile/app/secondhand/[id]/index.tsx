@@ -642,7 +642,7 @@ function makeStyles(colors: any) {
     borderColor: "rgba(245,158,11,0.2)",
   },
   safetyTitle: { fontSize: fontSize.xs, fontWeight: "700", color: colors.ink900 },
-  safetyBody: { fontSize: 11, color: colors.ink500, lineHeight: 16 },
+  safetyBody: { fontSize: 13, color: colors.ink500, lineHeight: 18 },
 
   actionBar: {
     position: "absolute",

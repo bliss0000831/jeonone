@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     backgroundColor: lightColors.background,
   },
   originCell: { flex: 1, gap: 4 },
-  originLabel: { fontSize: 11, color: lightColors.ink500, fontWeight: "600" },
+  originLabel: { fontSize: 12, color: lightColors.ink500, fontWeight: "600" },
   originValueRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   originValue: { fontSize: fontSize.sm, color: lightColors.ink900, fontWeight: "500" },
 

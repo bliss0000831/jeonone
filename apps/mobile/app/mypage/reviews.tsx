@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     color: lightColors.ink500,
   },
   date: {
-    fontSize: 11,
+    fontSize: 13,
     color: lightColors.ink500,
     marginTop: 4,
   },

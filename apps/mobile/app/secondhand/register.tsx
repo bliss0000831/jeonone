@@ -19,6 +19,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ToastAndroid,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -162,6 +163,7 @@ export default function SecondhandRegisterScreen() {
       next.unshift(picked)
       return next
     })
+    if (Platform.OS === "android") ToastAndroid.show("대표 사진으로 지정했어요", ToastAndroid.SHORT)
   }
 
   async function pickImages() {

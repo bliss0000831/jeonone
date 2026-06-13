@@ -19,6 +19,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Upload, X, Star, Loader2, Play } from "lucide-react"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 interface Props {
@@ -109,6 +110,7 @@ export function MediaUploader({
     const [picked] = next.splice(idx, 1)
     next.unshift(picked)
     onChange(next)
+    toast.success("대표 사진으로 지정했어요")
   }
 
   const accept = videoEnabled ? "image/*,video/*" : "image/*"
