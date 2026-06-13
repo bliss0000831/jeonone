@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { timeAgoKo } from "@/components/listing/time-ago"
 import { useParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { getCurrentPlazaClient } from "@/lib/plaza/client"
@@ -238,15 +239,8 @@ export default function SecondhandDetailPage() {
     }
   }
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    const now = new Date()
-    const days = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-    if (days === 0) return "오늘"
-    if (days === 1) return "어제"
-    if (days < 7) return `${days}일 전`
-    return date.toLocaleDateString("ko-KR")
-  }
+  // 날짜 표기 — 카드와 동일한 상대시간(timeAgoKo)으로 통일
+  const formatDate = (dateStr: string) => timeAgoKo(dateStr)
 
   if (loading) {
     return (

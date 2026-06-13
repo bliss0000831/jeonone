@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, use } from "react"
+import { timeAgoKo } from "@/components/listing/time-ago"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
@@ -179,17 +180,8 @@ export default function LocalFoodDetailPage({
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffDays = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
-    )
-    if (diffDays === 0) return "오늘"
-    if (diffDays === 1) return "어제"
-    if (diffDays < 7) return `${diffDays}일 전`
-    return date.toLocaleDateString("ko-KR")
-  }
+  // 날짜 표기 — 카드와 동일한 상대시간(timeAgoKo)으로 통일
+  const formatDate = (dateString: string) => timeAgoKo(dateString)
 
   if (isLoading) {
     return (

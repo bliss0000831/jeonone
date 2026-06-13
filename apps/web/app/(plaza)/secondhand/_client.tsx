@@ -10,7 +10,8 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { UserLocation } from "@/components/location-selector"
 import { Plus, Search, MapPin, Calendar, Tractor, Heart, Eye, Loader2, ChevronRight } from "lucide-react"
-import { formatPriceKR, formatDateKR } from "@/lib/format-price"
+import { formatPriceKR } from "@/lib/format-price"
+import { timeAgoKo } from "@/components/listing/time-ago"
 import { ListSortRegionBar, usePlazaRegions, LoadMoreButton, type ListSortKey } from "@/components/listing"
 
 // 농기구/자재 카테고리 (레퍼런스 동일)
@@ -204,7 +205,7 @@ function SecondhandContent() {
                     {item.location && (
                       <div className="flex items-center gap-1.5">
                         <MapPin className="w-4 h-4" />
-                        <span>{item.location}{item.created_at ? ` · ${formatDateKR(item.created_at)}` : ""}</span>
+                        <span>{item.location}{item.created_at ? ` · ${timeAgoKo(item.created_at)}` : ""}</span>
                       </div>
                     )}
                     {(item.model_year || item.condition) && (
