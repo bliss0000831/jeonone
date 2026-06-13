@@ -26,7 +26,7 @@ export function SiteFooterClient({
 
   const copyright =
     settings.copyright ||
-    `© ${new Date().getFullYear()} 광장. All rights reserved.`
+    `© ${new Date().getFullYear()} 전원일기. All rights reserved.`
   const links = Array.isArray(settings.links)
     ? settings.links.filter((l) => l.label && l.href)
     : []

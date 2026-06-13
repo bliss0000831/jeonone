@@ -225,7 +225,7 @@ export default function PlazaSignupScreen() {
           <TextInput
             value={nickname}
             onChangeText={setNickname}
-            placeholder="이 광장에서 사용할 닉네임"
+            placeholder="전원일기에서 사용할 닉네임"
             placeholderTextColor={lightColors.ink500}
             maxLength={10}
             style={styles.input}

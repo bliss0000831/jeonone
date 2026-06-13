@@ -27,7 +27,7 @@ export default function PointsGuideScreen() {
           <View style={styles.heroCoin}>
             <Text style={styles.heroCoinText}>P</Text>
           </View>
-          <Text style={styles.heroTitle}>광장 포인트로</Text>
+          <Text style={styles.heroTitle}>전원일기 포인트로</Text>
           <Text style={styles.heroSub}>활동도 거래도 더 즐겁게</Text>
         </View>
 

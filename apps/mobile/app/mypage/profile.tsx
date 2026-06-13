@@ -671,7 +671,7 @@ export default function MyPageTab() {
       <ShareModal
         visible={shareOpen}
         url={buildShareUrl("profile", user?.id ?? "")}
-        title={`${profile?.nickname || "프로필"} · 광장`}
+        title={`${profile?.nickname || "프로필"} · 전원일기`}
         message={profile?.bio || `${role.label} 프로필`}
         onClose={() => setShareOpen(false)}
       />

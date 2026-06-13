@@ -18,7 +18,7 @@ const SERVER_CLEARTEXT = process.env.CAP_SERVER_CLEARTEXT === "true"
 
 const config: CapacitorConfig = {
   appId: "app.gwangjang",
-  appName: "광장",
+  appName: "전원일기",
   webDir: "out",  // Next.js export 용 (현재는 사용 안 함, server.url 가 우선)
   server: {
     url: SERVER_URL,

@@ -446,7 +446,7 @@ export default function LocalFoodRegisterScreen() {
                       { color: visibility === v ? "#ffffff" : lightColors.ink900 },
                     ]}
                   >
-                    {v === "plaza" ? "현재 광장" : "전체 광장"}
+                    {v === "plaza" ? "현재 지역" : "전국"}
                   </Text>
                 </Pressable>
               ))}

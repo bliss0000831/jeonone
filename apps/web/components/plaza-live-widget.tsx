@@ -344,7 +344,7 @@ export function PlazaLiveWidget({
         {/* 하단 통계 */}
         {statBits.length > 0 ? (
           <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]">
-            <span className="text-muted-foreground">오늘의 광장</span>
+            <span className="text-muted-foreground">오늘의 전원일기</span>
             {statBits.map((s, i) => (
               <span key={i} className="inline-flex items-center gap-1">
                 <span className="text-muted-foreground">{s.label}</span>

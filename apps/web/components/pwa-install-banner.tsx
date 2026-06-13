@@ -126,7 +126,7 @@ export function PWAInstallBanner() {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground text-sm">
-              광장 앱으로 더 편하게
+              전원일기 앱으로 더 편하게
             </h3>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
               {variant === "ios"

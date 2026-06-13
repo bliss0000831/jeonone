@@ -184,7 +184,7 @@ export default function CreatePostPage() {
 
       const plaza = getCurrentPlazaClient()
       if (!plaza) {
-        setError('광장 도메인에서 작성해주세요')
+        setError('전원일기 도메인에서 작성해주세요')
         setLoading(false)
         return
       }

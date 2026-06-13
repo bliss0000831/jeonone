@@ -560,7 +560,7 @@ export default function PublicProfileScreen() {
                   <Text style={{ fontWeight: "700" }}>
                     {plazaLabel(profilePlaza)}
                   </Text>{" "}
-                  멤버입니다. 광장 간 팔로우는 지원되지 않아요.
+                  멤버입니다. 다른 지역 간에는 팔로우가 지원되지 않아요.
                 </Text>
               </View>
             ) : (
@@ -706,8 +706,8 @@ export default function PublicProfileScreen() {
 
 // plaza id → 한글 라벨 (cross-plaza 표시용)
 const PLAZA_NAME_MAP: Record<string, string> = {
-  chuncheon: "춘천광장",
-  gangneung: "강릉광장",
+  chuncheon: "춘천 전원일기",
+  gangneung: "강릉 전원일기",
 }
 function plazaLabel(id: string | null | undefined): string {
   if (!id) return ""

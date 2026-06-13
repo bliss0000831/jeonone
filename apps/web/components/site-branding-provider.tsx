@@ -55,8 +55,8 @@ export async function SiteBrandingProvider({
     }
   }
 
-  // 우선순위: 광장이면 광장 이름, 허브이면 "전국 광장"
-  const name = plazaName || (plaza ? '광장' : '전국 광장')
+  // 우선순위: 지역이면 지역 이름, 허브이면 "전국 전원일기"
+  const name = plazaName || (plaza ? '전원일기' : '전국 전원일기')
   // 로고: 광장이면 plazas.theme.logoUrl, 허브이면 site_settings.hub_logo, 둘 다 없으면 기본
   const logo = plaza
     ? (plazaLogo || '/logo.png?v=3')

@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) return { title: "게시글을 찾을 수 없습니다" }
 
-  const desc = data.description?.slice(0, 160) || `${data.title} — 광장`
+  const desc = data.description?.slice(0, 160) || `${data.title} — 전원일기`
 
   return {
     title: data.title,

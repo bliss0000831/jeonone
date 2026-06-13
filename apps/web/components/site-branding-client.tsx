@@ -9,7 +9,7 @@ export interface SiteBranding {
 }
 
 const SiteBrandingContext = createContext<SiteBranding>({
-  name: '광장',
+  name: '전원일기',
   logo: '/logo.png?v=3',
 })
 

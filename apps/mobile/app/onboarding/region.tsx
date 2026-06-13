@@ -133,7 +133,7 @@ export default function OnboardingRegionScreen() {
 
         <Text style={styles.title}>지역을 선택해주세요</Text>
         <Text style={styles.subtitle}>
-          광장에서 글을 보고 쓰려면 활동 지역(시/군)이 필요해요.{"\n"}
+          전원일기에서 글을 보고 쓰려면 활동 지역(시/군)이 필요해요.{"\n"}
           마이페이지에서 언제든 변경할 수 있어요.
         </Text>
 
