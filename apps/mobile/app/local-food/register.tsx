@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useRef, useState } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -48,6 +49,7 @@ import { RegisterConsentBlock } from "@/components/legal/RegisterConsentBlock"
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
 const MAX_IMAGES = 10
+const DRAFT_KEY = "draft.localfood.register"
 const GREEN = "#16a34a"
 
 export default function LocalFoodRegisterScreen() {
@@ -76,6 +78,61 @@ export default function LocalFoodRegisterScreen() {
   const [shippingFee, setShippingFee] = useState("")
   const [freeShipping, setFreeShipping] = useState(false)
   const [visibility, setVisibility] = useState<"plaza" | "national">("plaza")
+
+  // ── 임시저장(draft) — 작성 중 이탈해도 내용 보존, 재진입 시 복원 ──
+  const draftReadyRef = useRef(false)
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const raw = await AsyncStorage.getItem(DRAFT_KEY)
+        const d = raw ? JSON.parse(raw) : null
+        if (alive && d && (d.title || d.description || (Array.isArray(d.images) && d.images.length))) {
+          Alert.alert("임시저장 불러오기", "작성하던 내용이 있어요. 이어서 작성할까요?", [
+            {
+              text: "새로 작성",
+              style: "destructive",
+              onPress: () => { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); draftReadyRef.current = true },
+            },
+            {
+              text: "이어서 작성",
+              onPress: () => {
+                if (typeof d.title === "string") setTitle(d.title)
+                if (typeof d.description === "string") setDescription(d.description)
+                if (typeof d.content === "string") setContent(d.content)
+                if (typeof d.price === "string") setPrice(d.price)
+                if (typeof d.originalPrice === "string") setOriginalPrice(d.originalPrice)
+                if (typeof d.unit === "string") setUnit(d.unit)
+                if (typeof d.category === "string") setCategory(d.category)
+                if (typeof d.origin === "string") setOrigin(d.origin)
+                if (typeof d.farmName === "string") setFarmName(d.farmName)
+                if (typeof d.shippingFee === "string") setShippingFee(d.shippingFee)
+                setFreeShipping(!!d.freeShipping)
+                if (d.visibility === "plaza" || d.visibility === "national") setVisibility(d.visibility)
+                if (Array.isArray(d.images)) setImages(d.images)
+                draftReadyRef.current = true
+              },
+            },
+          ])
+          return
+        }
+      } catch { /* 무시 */ }
+      draftReadyRef.current = true
+    })()
+    return () => { alive = false }
+  }, [])
+
+  useEffect(() => {
+    if (!draftReadyRef.current) return
+    const hasContent = !!(title.trim() || description.trim() || images.length)
+    const t = setTimeout(() => {
+      if (!hasContent) { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); return }
+      const d = { title, description, content, price, originalPrice, unit, category, origin, farmName, shippingFee, freeShipping, visibility, images }
+      AsyncStorage.setItem(DRAFT_KEY, JSON.stringify(d)).catch(() => {})
+    }, 600)
+    return () => clearTimeout(t)
+  }, [title, description, content, price, originalPrice, unit, category, origin, farmName, shippingFee, freeShipping, visibility, images])
 
   useEffect(() => {
     if (title.trim()) setFormDirty(true)
@@ -206,6 +263,7 @@ export default function LocalFoodRegisterScreen() {
       }
       Alert.alert("등록 완료", "로컬푸드 글이 등록되었습니다")
       setFormDirty(false)
+      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {})
       if (r.postId) router.replace(`/local-food/${r.postId}` as any)
       else router.back()
     } finally {

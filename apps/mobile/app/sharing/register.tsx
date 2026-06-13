@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useRef, useState } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import {
   ActivityIndicator,
   Image as RNImage,
@@ -43,6 +44,7 @@ import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
 const DEFAULT_CATEGORIES = ["농기구/자재", "종자·모종", "농산물", "생활용품", "의류", "기타"]
 const MAX_IMAGES = 10
+const DRAFT_KEY = "draft.sharing.register"
 
 export default function SharingRegisterScreen() {
   const router = useRouter()
@@ -60,6 +62,54 @@ export default function SharingRegisterScreen() {
   const [location, setLocation] = useState("")
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
   const [regionId, setRegionId] = useState<string | null>(null)
+
+  // ── 임시저장(draft) — 작성 중 이탈해도 내용 보존, 재진입 시 복원 ──
+  const draftReadyRef = useRef(false)
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const raw = await AsyncStorage.getItem(DRAFT_KEY)
+        const d = raw ? JSON.parse(raw) : null
+        if (alive && d && (d.title || d.description || (Array.isArray(d.images) && d.images.length))) {
+          Alert.alert("임시저장 불러오기", "작성하던 내용이 있어요. 이어서 작성할까요?", [
+            {
+              text: "새로 작성",
+              style: "destructive",
+              onPress: () => { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); draftReadyRef.current = true },
+            },
+            {
+              text: "이어서 작성",
+              onPress: () => {
+                if (typeof d.title === "string") setTitle(d.title)
+                if (typeof d.description === "string") setDescription(d.description)
+                if (typeof d.category === "string") setCategory(d.category)
+                if (typeof d.location === "string") setLocation(d.location)
+                if (Array.isArray(d.images)) setImages(d.images)
+                if (d.regionId === null || typeof d.regionId === "string") setRegionId(d.regionId)
+                draftReadyRef.current = true
+              },
+            },
+          ])
+          return
+        }
+      } catch { /* 무시 */ }
+      draftReadyRef.current = true
+    })()
+    return () => { alive = false }
+  }, [])
+
+  useEffect(() => {
+    if (!draftReadyRef.current) return
+    const hasContent = !!(title.trim() || description.trim() || images.length)
+    const t = setTimeout(() => {
+      if (!hasContent) { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); return }
+      const d = { title, description, category, location, images, regionId }
+      AsyncStorage.setItem(DRAFT_KEY, JSON.stringify(d)).catch(() => {})
+    }, 600)
+    return () => clearTimeout(t)
+  }, [title, description, category, location, images, regionId])
 
   useEffect(() => {
     if (title.trim() || description.trim() || images.length > 0) setFormDirty(true)
@@ -199,6 +249,7 @@ export default function SharingRegisterScreen() {
       if (r.postId) await setPostRegion("sharing_posts", r.postId, regionId)
       Alert.alert("등록 완료", "나눔 글이 성공적으로 등록되었습니다")
       setFormDirty(false)
+      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {})
       if (r.postId) router.replace(`/sharing/${r.postId}` as any)
       else router.replace("/(tabs)/mypage" as any)
     } finally {

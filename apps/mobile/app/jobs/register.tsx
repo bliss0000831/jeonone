@@ -15,7 +15,8 @@
  *   - 등록 버튼
  */
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -53,6 +54,7 @@ import { JobsConsentExtras } from "@/components/legal/JobsConsentExtras"
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard"
 
 const MAX_IMAGES = 10
+const DRAFT_KEY = "draft.jobs.register"
 const TEAL = "#0d9488"
 
 export default function JobsRegisterScreen() {
@@ -82,6 +84,61 @@ export default function JobsRegisterScreen() {
       : workStart || workEnd || ""
   const [location, setLocation] = useState("")
   const [contact, setContact] = useState("")
+
+  // ── 임시저장(draft) — 작성 중 이탈해도 내용 보존, 재진입 시 복원 ──
+  const draftReadyRef = useRef(false)
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const raw = await AsyncStorage.getItem(DRAFT_KEY)
+        const d = raw ? JSON.parse(raw) : null
+        if (alive && d && (d.title || d.description || (Array.isArray(d.images) && d.images.length))) {
+          Alert.alert("임시저장 불러오기", "작성하던 내용이 있어요. 이어서 작성할까요?", [
+            {
+              text: "새로 작성",
+              style: "destructive",
+              onPress: () => { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); draftReadyRef.current = true },
+            },
+            {
+              text: "이어서 작성",
+              onPress: () => {
+                if (d.kind === "hiring" || d.kind === "seeking") setKind(d.kind)
+                if (typeof d.title === "string") setTitle(d.title)
+                if (typeof d.description === "string") setDescription(d.description)
+                if (typeof d.category === "string") setCategory(d.category)
+                if (typeof d.workType === "string") setWorkType(d.workType)
+                if (typeof d.hourlyWage === "string") setHourlyWage(d.hourlyWage)
+                if (typeof d.workDays === "string") setWorkDays(d.workDays)
+                if (typeof d.workStart === "string") setWorkStart(d.workStart)
+                if (typeof d.workEnd === "string") setWorkEnd(d.workEnd)
+                if (typeof d.location === "string") setLocation(d.location)
+                if (typeof d.contact === "string") setContact(d.contact)
+                if (Array.isArray(d.images)) setImages(d.images)
+                if (d.regionId === null || typeof d.regionId === "string") setRegionId(d.regionId)
+                draftReadyRef.current = true
+              },
+            },
+          ])
+          return
+        }
+      } catch { /* 무시 */ }
+      draftReadyRef.current = true
+    })()
+    return () => { alive = false }
+  }, [])
+
+  useEffect(() => {
+    if (!draftReadyRef.current) return
+    const hasContent = !!(title.trim() || description.trim() || images.length)
+    const t = setTimeout(() => {
+      if (!hasContent) { AsyncStorage.removeItem(DRAFT_KEY).catch(() => {}); return }
+      const d = { kind, title, description, category, workType, hourlyWage, workDays, workStart, workEnd, location, contact, images, regionId }
+      AsyncStorage.setItem(DRAFT_KEY, JSON.stringify(d)).catch(() => {})
+    }, 600)
+    return () => clearTimeout(t)
+  }, [kind, title, description, category, workType, hourlyWage, workDays, workStart, workEnd, location, contact, images, regionId])
 
   useEffect(() => {
     if (title.trim() || description.trim() || images.length > 0) setFormDirty(true)
@@ -225,6 +282,7 @@ export default function JobsRegisterScreen() {
         Alert.alert("등록 완료", "공고가 성공적으로 등록되었습니다")
       }
       setFormDirty(false)
+      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {})
       if (r.postId && !r.flagged) router.replace(`/jobs/${r.postId}` as any)
       else router.replace("/(tabs)/mypage" as any)
     } catch (e: any) {
