@@ -25,6 +25,13 @@ export default function SecondhandEditPage() {
   const [images, setImages] = useState<string[]>([])
   const [subRegion, setSubRegion] = useState("")
   const [listingType, setListingType] = useState<string>("sale")
+  // 경매/대여 거래조건
+  const [auctionStartPrice, setAuctionStartPrice] = useState("")
+  const [auctionBuyNow, setAuctionBuyNow] = useState("")
+  const [auctionDays, setAuctionDays] = useState("7")
+  const [auctionBidCount, setAuctionBidCount] = useState(0)
+  const [rentalDaily, setRentalDaily] = useState("")
+  const [rentalDeposit, setRentalDeposit] = useState("")
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -80,6 +87,33 @@ export default function SecondhandEditPage() {
       setImages(p.images || [])
       setSubRegion(p.sub_region || "")
       setListingType(p.listing_type || "sale")
+      // 경매/대여 거래조건 로드
+      try {
+        if (p.listing_type === "auction") {
+          const { data } = await (supabase as any)
+            .from("auction_listings")
+            .select("start_price, buy_now_price, end_at, start_at, bid_count")
+            .eq("post_id", postId)
+            .maybeSingle()
+          if (data) {
+            setAuctionStartPrice(String(data.start_price ?? ""))
+            setAuctionBuyNow(data.buy_now_price ? String(data.buy_now_price) : "")
+            setAuctionBidCount(data.bid_count ?? 0)
+            const ms = new Date(data.end_at).getTime() - new Date(data.start_at).getTime()
+            setAuctionDays(String(Math.max(1, Math.round(ms / 86400000))))
+          }
+        } else if (p.listing_type === "rental") {
+          const { data } = await (supabase as any)
+            .from("rental_listings")
+            .select("daily_price, deposit")
+            .eq("post_id", postId)
+            .maybeSingle()
+          if (data) {
+            setRentalDaily(data.daily_price ? String(data.daily_price) : "")
+            setRentalDeposit(data.deposit ? String(data.deposit) : "")
+          }
+        }
+      } catch { /* 무시 — 거래조건 로드 실패해도 제목/설명 수정 가능 */ }
       setIsLoading(false)
     }
 
@@ -159,6 +193,28 @@ export default function SecondhandEditPage() {
       })
 
       if (response.ok) {
+        // 경매/대여 거래조건 수정 — 서버 RPC(소유자·입찰없음 검증)
+        const supabase = createClient()
+        if (listingType === "auction" && auctionBidCount === 0) {
+          const start = parseInt(auctionStartPrice || "0", 10)
+          if (!start || start <= 0) { toast.error("경매 시작가를 입력해주세요"); setIsSubmitting(false); return }
+          const { data, error } = await (supabase as any).rpc("update_auction_listing", {
+            p_post_id: postId,
+            p_start_price: start,
+            p_buy_now_price: auctionBuyNow ? parseInt(auctionBuyNow, 10) : null,
+            p_days: Math.max(1, parseInt(auctionDays || "7", 10)),
+          })
+          if (error || !(data as any)?.ok) { toast.error((data as any)?.error || error?.message || "경매 조건 수정 실패"); setIsSubmitting(false); return }
+        } else if (listingType === "rental") {
+          const daily = parseInt(rentalDaily || "0", 10)
+          if (!daily || daily <= 0) { toast.error("일 대여료를 입력해주세요"); setIsSubmitting(false); return }
+          const { data, error } = await (supabase as any).rpc("update_rental_listing", {
+            p_post_id: postId,
+            p_daily_price: daily,
+            p_deposit: parseInt(rentalDeposit || "0", 10) || 0,
+          })
+          if (error || !(data as any)?.ok) { toast.error((data as any)?.error || error?.message || "대여 조건 수정 실패"); setIsSubmitting(false); return }
+        }
         setFormDirty(false)
         toast.success("수정되었습니다")
         router.replace(`/secondhand/${postId}`)
@@ -320,13 +376,62 @@ export default function SecondhandEditPage() {
               <span className="text-sm">가격 제안 환영</span>
             </label>
           </div>
-        ) : (
-          <div>
-            <label className="block text-sm font-medium mb-2">{listingType === "auction" ? "경매 상품" : "대여 상품"}</label>
-            <div className="rounded-lg bg-muted/60 border border-border p-3 text-sm text-foreground/80 leading-relaxed">
-              {listingType === "auction" ? "경매" : "대여"} 상품입니다. 시작가·{listingType === "auction" ? "기간" : "대여료·보증금"} 등 거래 조건은 이 화면에서 바꿀 수 없습니다.
-              여기서는 제목·설명·사진·카테고리만 수정됩니다.
+        ) : listingType === "auction" ? (
+          auctionBidCount > 0 ? (
+            <div>
+              <label className="block text-sm font-medium mb-2">경매 상품</label>
+              <div className="rounded-lg bg-muted/60 border border-border p-3 text-sm text-foreground/80 leading-relaxed">
+                이미 입찰이 있어 시작가·기간 등 거래 조건은 수정할 수 없습니다. 여기서는 제목·설명·사진·카테고리만 수정됩니다.
+              </div>
             </div>
+          ) : (
+            <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
+              <div className="font-bold text-primary">🔨 경매 설정</div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-1">시작가(원)</label>
+                  <input value={auctionStartPrice} onChange={(e) => setAuctionStartPrice(e.target.value.replace(/[^0-9]/g, ""))}
+                    inputMode="numeric" placeholder="예: 1000000"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-1">경매 기간(일)</label>
+                  <select value={auctionDays} onChange={(e) => setAuctionDays(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40">
+                    {["1", "3", "5", "7", "10", "14"].map((d) => <option key={d} value={d}>{d}일</option>)}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm text-muted-foreground mb-1">즉시구매가(원, 선택)</label>
+                  <input value={auctionBuyNow} onChange={(e) => setAuctionBuyNow(e.target.value.replace(/[^0-9]/g, ""))}
+                    inputMode="numeric" placeholder="비워두면 즉시구매 없음"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {auctionStartPrice ? `입찰 단위 ${Math.max(1000, Math.round((parseInt(auctionStartPrice || "0", 10) * 0.05) / 1000) * 1000).toLocaleString()}원(자동) · ` : ""}
+                저장 시 지금부터 선택한 기간으로 다시 시작됩니다.
+              </p>
+            </div>
+          )
+        ) : (
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
+            <div className="font-bold text-primary">🚜 대여 설정</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-sm text-muted-foreground mb-1">일 대여료(원)</label>
+                <input value={rentalDaily} onChange={(e) => setRentalDaily(e.target.value.replace(/[^0-9]/g, ""))}
+                  inputMode="numeric" placeholder="예: 50000"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+              <div>
+                <label className="block text-sm text-muted-foreground mb-1">보증금(원)</label>
+                <input value={rentalDeposit} onChange={(e) => setRentalDeposit(e.target.value.replace(/[^0-9]/g, ""))}
+                  inputMode="numeric" placeholder="예: 200000"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">변경은 이후 새 예약부터 적용됩니다(기존 예약은 그대로).</p>
           </div>
         )}
 

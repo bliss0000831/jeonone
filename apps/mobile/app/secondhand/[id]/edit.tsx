@@ -61,12 +61,20 @@ export default function SecondhandEditScreen() {
   const [regionId, setRegionId] = useState<string | null>(null)
   const [condition, setCondition] = useState<string>("")
   const [listingType, setListingType] = useState<string>("sale")
+  // 경매/대여 거래조건
+  const [auctionStartPrice, setAuctionStartPrice] = useState("")
+  const [auctionBuyNow, setAuctionBuyNow] = useState("")
+  const [auctionDays, setAuctionDays] = useState("7")
+  const [auctionBidCount, setAuctionBidCount] = useState(0)
+  const [rentalDaily, setRentalDaily] = useState("")
+  const [rentalDeposit, setRentalDeposit] = useState("")
 
   useEffect(() => {
     if (!id) return
-    getSecondhandPost(getSupabase(), id, DEFAULT_PLAZA, null).then(({ post }) => {
+    getSecondhandPost(getSupabase(), id, DEFAULT_PLAZA, null).then(async ({ post }) => {
       if (post) {
-        setListingType((post as any).listing_type || "sale")
+        const lt = (post as any).listing_type || "sale"
+        setListingType(lt)
         setTitle(post.title || "")
         setDescription(post.description || "")
         setCategory(post.category || SECONDHAND_CATEGORIES[0])
@@ -76,6 +84,34 @@ export default function SecondhandEditScreen() {
         setLocation(post.location || "")
         setCondition(((post as any).condition as string) || "")
         setRegionId((post as any).region_id ?? null)
+        // 경매/대여 거래조건 로드
+        try {
+          if (lt === "auction") {
+            const { data } = await (getSupabase() as any)
+              .from("auction_listings")
+              .select("start_price, buy_now_price, end_at, start_at, bid_count")
+              .eq("post_id", id)
+              .maybeSingle()
+            if (data) {
+              setAuctionStartPrice(String(data.start_price ?? ""))
+              setAuctionBuyNow(data.buy_now_price ? String(data.buy_now_price) : "")
+              setAuctionBidCount(data.bid_count ?? 0)
+              const ms = new Date(data.end_at).getTime() - new Date(data.start_at).getTime()
+              const d = Math.max(1, Math.round(ms / 86400000))
+              setAuctionDays(String(d))
+            }
+          } else if (lt === "rental") {
+            const { data } = await (getSupabase() as any)
+              .from("rental_listings")
+              .select("daily_price, deposit")
+              .eq("post_id", id)
+              .maybeSingle()
+            if (data) {
+              setRentalDaily(data.daily_price ? String(data.daily_price) : "")
+              setRentalDeposit(data.deposit ? String(data.deposit) : "")
+            }
+          }
+        } catch { /* 무시 — 거래조건 로드 실패해도 제목/설명 수정은 가능 */ }
       }
       setLoading(false)
       loadedRef.current = true
@@ -188,8 +224,29 @@ export default function SecondhandEditScreen() {
         Alert.alert("수정 실패", r.error ?? "")
         return
       }
+      // 경매/대여 거래조건 수정 — 서버 RPC(소유자·입찰없음 검증)
+      if (listingType === "auction" && auctionBidCount === 0) {
+        const start = parseInt(auctionStartPrice || "0", 10)
+        if (!start || start <= 0) { Alert.alert("입력 필요", "경매 시작가를 입력해주세요"); return }
+        const { data, error } = await (getSupabase() as any).rpc("update_auction_listing", {
+          p_post_id: id,
+          p_start_price: start,
+          p_buy_now_price: auctionBuyNow ? parseInt(auctionBuyNow, 10) : null,
+          p_days: Math.max(1, parseInt(auctionDays || "7", 10)),
+        })
+        if (error || !(data as any)?.ok) { Alert.alert("경매 조건 수정 실패", (data as any)?.error || error?.message || ""); return }
+      } else if (listingType === "rental") {
+        const daily = parseInt(rentalDaily || "0", 10)
+        if (!daily || daily <= 0) { Alert.alert("입력 필요", "일 대여료를 입력해주세요"); return }
+        const { data, error } = await (getSupabase() as any).rpc("update_rental_listing", {
+          p_post_id: id,
+          p_daily_price: daily,
+          p_deposit: parseInt(rentalDeposit || "0", 10) || 0,
+        })
+        if (error || !(data as any)?.ok) { Alert.alert("대여 조건 수정 실패", (data as any)?.error || error?.message || ""); return }
+      }
       await setPostRegion("secondhand_posts", id, regionId)
-      Alert.alert("수정 완료", "농기구/자재 글이 수정되었습니다")
+      Alert.alert("수정 완료", "글이 수정되었습니다")
       setFormDirty(false)
       router.replace(`/secondhand/${id}` as any)
     } finally {
@@ -309,14 +366,55 @@ export default function SecondhandEditScreen() {
                 <Text style={styles.checkLabel}>가격 제안 받기</Text>
               </Pressable>
             </Field>
+          ) : listingType === "auction" ? (
+            auctionBidCount > 0 ? (
+              <Field label="경매 상품">
+                <View style={{ backgroundColor: lightColors.muted, borderRadius: 10, padding: 12 }}>
+                  <Text style={{ fontSize: 14, color: lightColors.ink700, lineHeight: 20 }}>
+                    이미 입찰이 있어 시작가·기간 등 거래 조건은 수정할 수 없어요.{"\n"}여기서는 제목·설명·사진·카테고리만 수정됩니다.
+                  </Text>
+                </View>
+              </Field>
+            ) : (
+              <>
+                <Field label="경매 시작가 (원)">
+                  <TextInput value={auctionStartPrice} onChangeText={(v) => setAuctionStartPrice(v.replace(/[^0-9]/g, ""))}
+                    keyboardType="number-pad" placeholder="예: 1000000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+                  {auctionStartPrice ? (
+                    <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6 }}>
+                      입찰 단위(한 번에 오르는 값): {Math.max(1000, Math.round((parseInt(auctionStartPrice || "0", 10) * 0.05) / 1000) * 1000).toLocaleString()}원 · 자동
+                    </Text>
+                  ) : null}
+                </Field>
+                <Field label="즉시구매가 (원, 선택)">
+                  <TextInput value={auctionBuyNow} onChangeText={(v) => setAuctionBuyNow(v.replace(/[^0-9]/g, ""))}
+                    keyboardType="number-pad" placeholder="비워두면 즉시구매 없음" placeholderTextColor={lightColors.ink500} style={styles.input} />
+                </Field>
+                <Field label="경매 기간 (일)">
+                  <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
+                    {["1", "3", "5", "7", "10", "14"].map((d) => (
+                      <Pressable key={d} onPress={() => setAuctionDays(d)}
+                        style={[styles.chip, auctionDays === d ? { backgroundColor: "#225a39" } : { backgroundColor: lightColors.muted }]}>
+                        <Text style={[styles.chipText, { color: auctionDays === d ? "#fff" : lightColors.ink900 }]}>{d}일</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                  <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6 }}>저장 시 지금부터 선택한 기간으로 다시 시작됩니다.</Text>
+                </Field>
+              </>
+            )
           ) : (
-            <Field label={listingType === "auction" ? "경매 상품" : "대여 상품"}>
-              <View style={{ backgroundColor: lightColors.muted, borderRadius: 10, padding: 12 }}>
-                <Text style={{ fontSize: 14, color: lightColors.ink700, lineHeight: 20 }}>
-                  {listingType === "auction" ? "경매" : "대여"} 상품이에요. 시작가·{listingType === "auction" ? "기간" : "대여료·보증금"} 등 거래 조건은 이 화면에서 바꿀 수 없어요.{"\n"}여기서는 제목·설명·사진·카테고리만 수정됩니다.
-                </Text>
-              </View>
-            </Field>
+            <>
+              <Field label="일 대여료 (원)">
+                <TextInput value={rentalDaily} onChangeText={(v) => setRentalDaily(v.replace(/[^0-9]/g, ""))}
+                  keyboardType="number-pad" placeholder="예: 50000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+              </Field>
+              <Field label="보증금 (원, 선택)">
+                <TextInput value={rentalDeposit} onChangeText={(v) => setRentalDeposit(v.replace(/[^0-9]/g, ""))}
+                  keyboardType="number-pad" placeholder="예: 200000" placeholderTextColor={lightColors.ink500} style={styles.input} />
+                <Text style={{ fontSize: 13, color: lightColors.ink500, marginTop: 6 }}>변경은 이후 새 예약부터 적용돼요(기존 예약은 그대로).</Text>
+              </Field>
+            </>
           )}
 
           <Field label="설명 *">
