@@ -30,6 +30,7 @@ import {
 import { Image } from "expo-image"
 import { MediaItem } from "@/components/MediaItem"
 import { ImageLightbox } from "@/components/ImageLightbox"
+import { relativeDate } from "@/lib/relative-date"
 import { useShareModal } from "@/components/mypage/ShareModal"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router"
@@ -65,13 +66,9 @@ const STATUS_BADGE: Record<string, { label: string; bg: string }> = {
   completed: { label: "나눔완료", bg: "#6b7280" },
 }
 
+// 날짜 표시 — 앱 전체 공통 상대시간(@/lib/relative-date)으로 통일
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24))
-  if (diff === 0) return "오늘"
-  if (diff === 1) return "어제"
-  if (diff < 7) return `${diff}일 전`
-  return d.toLocaleDateString("ko-KR")
+  return relativeDate(iso)
 }
 
 export default function SharingDetailScreen() {

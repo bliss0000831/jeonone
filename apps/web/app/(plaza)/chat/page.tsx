@@ -6,7 +6,6 @@ import Image from "next/image"
 import {
   ArrowLeft,
   MessageCircle,
-  LogOut,
   MoreVertical,
   BellOff,
   Bell,
@@ -552,13 +551,16 @@ export default function ChatListPage() {
                     {!isAdminNotice && !bulkMode && (
                       <button
                         type="button"
-                        onClick={(e) => { e.stopPropagation(); handleLeaveRoom(room.id, "대화방에서 나가시겠습니까?") }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setRoomMenu({ kind: "direct", id: room.id, label: room.otherUser?.nickname || room.property?.title || "대화방" })
+                        }}
                         disabled={leavingRoomId === room.id}
-                        aria-label="대화방 나가기"
-                        title="대화방 나가기"
-                        className="flex-shrink-0 p-2 -mr-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                        aria-label="대화방 메뉴 (알림·차단·신고·나가기)"
+                        title="더보기"
+                        className="flex-shrink-0 p-2 -mr-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <MoreVertical className="w-5 h-5" />
                       </button>
                     )}
                   </div>

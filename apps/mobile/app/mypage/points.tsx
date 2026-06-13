@@ -52,7 +52,7 @@ const SOURCE_LABEL: Record<string, string> = {
   "sharing.create": "나눔 등록",
   "local_food.create": "로컬푸드 등록",
   "jobs.create": "일손 등록",
-  "like.received": "좋아요 받음",
+  "like.received": "찜 받음",
   "signup.bonus": "가입 보너스",
   "daily.login": "일일 출석",
   "local_food.purchase": "로컬푸드 결제",

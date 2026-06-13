@@ -2,7 +2,8 @@
  * ImageLightbox — 풀스크린 이미지 뷰어 (탭하여 열기)
  *
  * 상세 화면 이미지 갤러리에서 이미지를 탭하면 전체화면으로 확대.
- * 좌우 스와이프로 이미지 전환, 우상단 X 또는 배경 탭으로 닫기.
+ * 좌우 스와이프로 이미지 전환, 두 손가락으로 확대(핀치), 우상단 X 로 닫기.
+ * (이미지 탭으로는 닫지 않음 — 어르신 손떨림 오작동 방지)
  */
 import { useEffect, useRef, useState } from "react"
 import {
@@ -67,14 +68,25 @@ export function ImageLightbox({ visible, images, initialIndex = 0, onClose }: Im
           }}
         >
           {images.map((uri, i) => (
-            <Pressable key={i} style={styles.imageWrap} onPress={onClose}>
+            // 각 페이지를 줌 가능한 ScrollView 로 — 두 손가락 핀치 확대(iOS 네이티브).
+            // 이미지 탭으로는 닫지 않음(오작동 방지). 닫기는 우상단 X.
+            <ScrollView
+              key={i}
+              style={styles.imageWrap}
+              contentContainerStyle={styles.zoomContent}
+              maximumZoomScale={3}
+              minimumZoomScale={1}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              centerContent
+            >
               <Image
                 source={uri}
                 style={styles.image}
                 contentFit="contain"
                 cachePolicy="memory-disk"
               />
-            </Pressable>
+            </ScrollView>
           ))}
         </ScrollView>
 
@@ -108,6 +120,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   imageWrap: {
+    width: SCREEN_W,
+    height: SCREEN_H,
+  },
+  zoomContent: {
     width: SCREEN_W,
     height: SCREEN_H,
     alignItems: "center",

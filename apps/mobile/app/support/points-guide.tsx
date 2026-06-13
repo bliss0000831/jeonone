@@ -34,7 +34,7 @@ export default function PointsGuideScreen() {
         <Section title="적립 방법">
           <Item icon="document-text-outline" color="#2563eb" label="게시글·매물 등록" desc="첫 등록 시 보너스 적립" />
           <Item icon="chatbubble-outline" color="#059669" label="댓글 작성" desc="댓글마다 소량 적립" />
-          <Item icon="heart-outline" color="#e11d48" label="좋아요 받음" desc="다른 회원이 내 글에 좋아요 시 적립" />
+          <Item icon="heart-outline" color="#e11d48" label="찜 받음" desc="다른 회원이 내 글을 찜하면 적립" />
           <Item icon="trophy-outline" color="#d97706" label="첫 가입 / 일일 출석" desc="가입 보너스, 매일 첫 접속 시" />
         </Section>
 
