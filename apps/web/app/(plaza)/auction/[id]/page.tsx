@@ -71,19 +71,25 @@ export default function AuctionDetailPage() {
   const minBid = a ? Math.max(a.start_price, (a.current_price || 0) + a.bid_increment) : 0
 
   const placeBid = async () => {
+    if (submitting) return
     if (!user) { toast.error("로그인이 필요합니다"); return }
     const amt = parseInt(bidAmount.replace(/[^0-9]/g, ""), 10)
     if (!amt || amt < minBid) { toast.error(`최소 입찰가는 ${won(minBid)} 입니다`); return }
     setSubmitting(true)
-    const supabase = createClient()
-    const { data, error } = await (supabase as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
-    setSubmitting(false)
-    if (error) { toast.error("입찰 실패: " + error.message); return }
-    const res = data as any
-    if (!res?.ok) { toast.error(res?.error || "입찰 실패"); return }
-    toast.success("입찰 완료!")
-    setBidAmount("")
-    load()
+    try {
+      const supabase = createClient()
+      const { data, error } = await (supabase as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
+      if (error) { toast.error("입찰에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+      const res = data as any
+      if (!res?.ok) { toast.error(res?.error || "입찰에 실패했어요."); return }
+      toast.success("입찰 완료!")
+      setBidAmount("")
+      load()
+    } catch {
+      toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const markDeal = async (status: "completed" | "no_show") => {
@@ -94,7 +100,7 @@ export default function AuctionDetailPage() {
     if (!confirm(msg)) return
     const supabase = createClient()
     const { data, error } = await (supabase as any).rpc("mark_auction_deal", { p_auction: id, p_status: status })
-    if (error) { toast.error(error.message); return }
+    if (error) { toast.error("처리하지 못했어요. 잠시 후 다시 시도해주세요."); return }
     const res = data as any
     if (!res?.ok) { toast.error(res?.error || "처리하지 못했습니다"); return }
     toast.success(isDone ? "거래 완료로 기록했습니다" : "거래 불이행으로 신고했습니다")
@@ -102,18 +108,24 @@ export default function AuctionDetailPage() {
   }
 
   const buyNow = async () => {
+    if (submitting) return
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!a?.buy_now_price) return
     if (!confirm(`${won(a.buy_now_price)}에 즉시구매하시겠습니까?`)) return
     setSubmitting(true)
-    const supabase = createClient()
-    const { data, error } = await (supabase as any).rpc("buy_now_auction", { p_auction: id })
-    setSubmitting(false)
-    if (error) { toast.error("구매 실패: " + error.message); return }
-    const res = data as any
-    if (!res?.ok) { toast.error(res?.error || "구매 실패"); return }
-    toast.success("즉시구매 완료! 🎉")
-    load()
+    try {
+      const supabase = createClient()
+      const { data, error } = await (supabase as any).rpc("buy_now_auction", { p_auction: id })
+      if (error) { toast.error("구매에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+      const res = data as any
+      if (!res?.ok) { toast.error(res?.error || "구매에 실패했어요."); return }
+      toast.success("즉시구매 완료! 🎉")
+      load()
+    } catch {
+      toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) return <div className="min-h-screen grid place-items-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>

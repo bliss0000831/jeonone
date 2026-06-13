@@ -766,6 +766,21 @@ export default function ChatRoomScreen() {
           setMenuOpen(false)
           setReportOpen(true)
         }}
+        onBlock={() => {
+          setMenuOpen(false)
+          Alert.alert(
+            "차단",
+            "이 사용자와의 대화를 차단하시겠습니까?\n대화 목록에서 숨겨지고 알림이 오지 않습니다.",
+            [
+              { text: "취소", style: "cancel" },
+              {
+                text: "차단",
+                style: "destructive",
+                onPress: () => { chatPrefs.block(muteKey); router.back() },
+              },
+            ],
+          )
+        }}
         onLeave={handleLeave}
       />
 

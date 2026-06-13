@@ -132,6 +132,7 @@ export function ProfileShell({
   const [followers, setFollowers] = useState(0)
   const [following, setFollowing] = useState(0)
   const [isFollowing, setIsFollowing] = useState(false)
+  const [followBusy, setFollowBusy] = useState(false)
 
   const [businessInfo, setBusinessInfo] = useState<BusinessInfo | null>(null)
 
@@ -492,12 +493,26 @@ export function ProfileShell({
   const handleFollowToggle = async () => {
     if (!currentUserId) { router.push(`/auth/login?redirect=/profile/${userId}`); return }
     if (currentUserId === userId) return
-    if (isFollowing) {
-      await supabase.from("follows").delete().eq("follower_id", currentUserId).eq("following_id", userId)
-      setIsFollowing(false); setFollowers((n) => Math.max(0, n - 1))
-    } else {
-      await (supabase as any).from("follows").insert({ follower_id: currentUserId, following_id: userId })
-      setIsFollowing(true); setFollowers((n) => n + 1)
+    if (followBusy) return // 이중 탭 방지 — 중복 INSERT/카운트 깨짐 차단
+    setFollowBusy(true)
+    const wasFollowing = isFollowing
+    // 낙관적 업데이트 — 즉시 반영하고, 실패 시 롤백
+    setIsFollowing(!wasFollowing)
+    setFollowers((n) => (wasFollowing ? Math.max(0, n - 1) : n + 1))
+    try {
+      if (wasFollowing) {
+        const { error } = await supabase.from("follows").delete().eq("follower_id", currentUserId).eq("following_id", userId)
+        if (error) throw error
+      } else {
+        const { error } = await (supabase as any).from("follows").insert({ follower_id: currentUserId, following_id: userId })
+        if (error) throw error
+      }
+    } catch {
+      setIsFollowing(wasFollowing)
+      setFollowers((n) => (wasFollowing ? n + 1 : Math.max(0, n - 1)))
+      toast.error("잠시 후 다시 시도해주세요.")
+    } finally {
+      setFollowBusy(false)
     }
   }
 
@@ -685,6 +700,7 @@ export function ProfileShell({
           role={role}
           mode={mode}
           isFollowing={isFollowing}
+          followBusy={followBusy}
           onFollowToggle={handleFollowToggle}
           onMessage={handleMessage}
           onShare={handleShare}

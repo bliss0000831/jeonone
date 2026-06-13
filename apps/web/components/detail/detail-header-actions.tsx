@@ -49,7 +49,7 @@ export function DetailHeaderActions({
           onClick={onLike}
           disabled={likeLoading}
           className="p-2 hover:bg-secondary rounded-full transition-colors disabled:opacity-50"
-          aria-label={isLiked ? "관심 해제" : "관심 추가"}
+          aria-label={isLiked ? "찜 해제" : "찜하기"}
         >
           {likeLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />

@@ -29,6 +29,7 @@ import {
 } from "react-native"
 import { Image } from "expo-image"
 import { MediaItem } from "@/components/MediaItem"
+import { ImageLightbox } from "@/components/ImageLightbox"
 import { useShareModal } from "@/components/mypage/ShareModal"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router"
@@ -85,6 +86,7 @@ export default function LocalFoodDetailScreen() {
   const [author, setAuthor] = useState<LocalFoodAuthor | null>(null)
   const [loading, setLoading] = useState(true)
   const [imageIndex, setImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
   const [busy, setBusy] = useState(false)
@@ -308,8 +310,10 @@ export default function LocalFoodDetailScreen() {
                 const i = Math.round(e.nativeEvent.contentOffset.x / width)
                 setImageIndex(i)
               }}
-              renderItem={({ item }) => (
-                <MediaItem uri={item} style={{ width, aspectRatio: 1 }} />
+              renderItem={({ item, index }) => (
+                <Pressable onPress={() => { setImageIndex(index); setLightboxOpen(true) }}>
+                  <MediaItem uri={item} style={{ width, aspectRatio: 1 }} />
+                </Pressable>
               )}
             />
           ) : (
@@ -488,6 +492,12 @@ export default function LocalFoodDetailScreen() {
         )}
       </View>
       {share.element}
+      <ImageLightbox
+        visible={lightboxOpen}
+        images={images}
+        initialIndex={imageIndex}
+        onClose={() => setLightboxOpen(false)}
+      />
     </SafeAreaView>
   )
 }

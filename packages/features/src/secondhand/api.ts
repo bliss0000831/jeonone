@@ -150,8 +150,8 @@ export async function deleteSecondhandPost(
 /** 가격 포맷터 — 광장 web @/components/secondhand-card 의 formatPrice 와 동일 */
 export function formatSecondhandPrice(price: number): string {
   if (!price || price <= 0) return "무료나눔"
-  // web 1:1: ₩520,000 형식 (KRW 통화 기호)
-  return `₩${price.toLocaleString("ko-KR")}`
+  // web 1:1: "30,000원" 형식 (₩ 접두 대신 원 접미 — 앱 전체 통일)
+  return `${price.toLocaleString("ko-KR")}원`
 }
 
 /**

@@ -1,6 +1,6 @@
 /** 대여 상세 + 신청 (RN). 웹 /rental/[id] 과 동일. */
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert, Platform } from "react-native"
+import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert, Platform, FlatList, useWindowDimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
@@ -9,6 +9,7 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
 import { PostActionsMenu } from "@/components/PostActionsMenu"
+import { ImageLightbox } from "@/components/ImageLightbox"
 
 const GREEN = "#225a39"
 const IMG = require("../../assets/images/card-farm-equipment.jpg")
@@ -27,6 +28,9 @@ export default function RentalDetailScreen() {
   const [showStart, setShowStart] = useState(false)
   const [showEnd, setShowEnd] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [imageIndex, setImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const { width } = useWindowDimensions()
 
   const load = useCallback(async () => {
     const { data } = await (getSupabase() as any).from("rental_listings")
@@ -43,21 +47,27 @@ export default function RentalDetailScreen() {
   const total = r ? days * (r.daily_price || 0) : 0
 
   const apply = async () => {
+    if (submitting) return
     const sb = getSupabase()
     const { data: { user } } = await sb.auth.getUser()
     if (!user) { Alert.alert("로그인 필요", "로그인이 필요합니다"); return }
     if (days <= 0) { Alert.alert("기간 확인", "대여 기간을 올바르게 입력해주세요 (YYYY-MM-DD)"); return }
     setSubmitting(true)
-    // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
-    const { data, error } = await (sb as any).rpc("create_rental_booking", {
-      p_rental: id, p_start: start, p_end: end,
-    })
-    setSubmitting(false)
-    if (error) { Alert.alert("신청 실패", error.message); return }
-    const res = data as any
-    if (!res?.ok) { Alert.alert("신청 실패", res?.error || "오류"); return }
-    Alert.alert("신청 완료", "대여 신청이 접수되었습니다. 소유자 승인을 기다려주세요.")
-    setStart(""); setEnd("")
+    try {
+      // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
+      const { data, error } = await (sb as any).rpc("create_rental_booking", {
+        p_rental: id, p_start: start, p_end: end,
+      })
+      if (error) { Alert.alert("신청 실패", "신청에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+      const res = data as any
+      if (!res?.ok) { Alert.alert("신청 실패", res?.error || "신청에 실패했어요."); return }
+      Alert.alert("신청 완료", "대여 신청이 접수되었습니다. 소유자 승인을 기다려주세요.")
+      setStart(""); setEnd("")
+    } catch {
+      Alert.alert("신청 실패", "네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) return <SafeAreaView style={styles.safe}><ActivityIndicator color={GREEN} style={{ marginTop: 60 }} /></SafeAreaView>
@@ -77,7 +87,32 @@ export default function RentalDetailScreen() {
         />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        <Image source={r.post?.images?.[0] ? { uri: r.post.images[0] } : IMG} style={styles.img} contentFit="cover" />
+        {(r.post?.images?.length ?? 0) > 0 ? (
+          <View>
+            <FlatList
+              data={r.post.images as string[]}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(it, idx) => `${idx}-${it}`}
+              onMomentumScrollEnd={(e) => setImageIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
+              renderItem={({ item, index }) => (
+                <Pressable onPress={() => { setImageIndex(index); setLightboxOpen(true) }}>
+                  <Image source={{ uri: item }} style={{ width, height: 240 }} contentFit="cover" />
+                </Pressable>
+              )}
+            />
+            {r.post.images.length > 1 && (
+              <View style={styles.dots}>
+                {(r.post.images as string[]).map((_, i) => (
+                  <View key={i} style={[styles.dot, i === imageIndex && styles.dotActive]} />
+                ))}
+              </View>
+            )}
+          </View>
+        ) : (
+          <Image source={IMG} style={styles.img} contentFit="cover" />
+        )}
         <View style={{ padding: 16 }}>
           <Text style={styles.title}>{r.post?.title || "농기구"}</Text>
           <View style={styles.priceBox}>
@@ -150,6 +185,12 @@ export default function RentalDetailScreen() {
           {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
         </Pressable>
       </View>
+      <ImageLightbox
+        visible={lightboxOpen}
+        images={(r.post?.images as string[]) ?? []}
+        initialIndex={imageIndex}
+        onClose={() => setLightboxOpen(false)}
+      />
     </SafeAreaView>
   )
 }
@@ -160,6 +201,9 @@ const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, borderBottomWidth: 1, borderBottomColor: "#eee" },
   barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
   img: { width: "100%", height: 240 },
+  dots: { flexDirection: "row", justifyContent: "center", gap: 6, paddingVertical: 10 },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#cbd5e1" },
+  dotActive: { backgroundColor: "#225a39", width: 18 },
   title: { fontSize: 22, fontWeight: "900", color: "#1e293b", marginBottom: 12 },
   priceBox: { borderWidth: 2, borderColor: "rgba(34,90,57,0.2)", borderRadius: 16, padding: 16, marginBottom: 14 },
   price: { fontSize: 26, fontWeight: "900", color: GREEN },

@@ -29,6 +29,7 @@ interface ProfileCardProps {
   role: RoleConfig
   mode: "self" | "other"
   isFollowing?: boolean
+  followBusy?: boolean
   onFollowToggle?: () => void
   onMessage?: () => void
   onShare?: () => void
@@ -43,6 +44,7 @@ export function ProfileCard({
   role,
   mode,
   isFollowing,
+  followBusy,
   onFollowToggle,
   onMessage,
   onShare,
@@ -201,6 +203,7 @@ export function ProfileCard({
               variant={isFollowing ? "outline" : "default"}
               className="flex-1 min-w-[100px]"
               onClick={onFollowToggle}
+              disabled={followBusy}
             >
               {isFollowing ? "팔로잉" : "팔로우"}
             </Button>

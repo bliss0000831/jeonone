@@ -13,6 +13,7 @@ interface Props {
   onClose: () => void
   onToggleMute: () => void
   onReport: () => void
+  onBlock: () => void
   onLeave: () => void
 }
 
@@ -22,6 +23,7 @@ export function ChatRoomMenu({
   onClose,
   onToggleMute,
   onReport,
+  onBlock,
   onLeave,
 }: Props) {
   return (
@@ -42,6 +44,7 @@ export function ChatRoomMenu({
             label={isMuted ? "알림 켜기" : "알림 끄기"}
             onPress={onToggleMute}
           />
+          <Item icon="ban-outline" label="차단하기" onPress={onBlock} />
           <Item icon="flag-outline" label="신고하기" onPress={onReport} />
           <Item
             icon="exit-outline"

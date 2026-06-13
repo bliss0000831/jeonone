@@ -323,7 +323,7 @@ export default function SecondhandDetailScreen() {
           <Text style={styles.headerTitle} numberOfLines={1}>농기구/자재</Text>
         </View>
         <View style={styles.headerRight}>
-          <Pressable accessibilityRole="button" accessibilityLabel="좋아요" onPress={handleLike} hitSlop={8} style={styles.headerBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="찜하기" onPress={handleLike} hitSlop={8} style={styles.headerBtn}>
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
               size={22}

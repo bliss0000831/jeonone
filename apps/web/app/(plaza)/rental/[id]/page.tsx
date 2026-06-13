@@ -54,24 +54,30 @@ export default function RentalDetailPage() {
   const total = r ? days * (r.daily_price || 0) : 0
 
   const apply = async () => {
+    if (submitting) return
     if (!user) { toast.error("로그인이 필요합니다"); return }
     if (!start || !end || days <= 0) { toast.error("대여 기간을 선택해주세요"); return }
     const summary = `${days}일 · ${won(total)}${r.deposit ? ` + 보증금 ${won(r.deposit)}` : ""}`
     if (!confirm(`${summary} 으로 대여를 신청하시겠습니까?\n소유자 승인 후 거래가 진행됩니다.`)) return
     setSubmitting(true)
-    const supabase = createClient()
-    // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
-    const { data, error } = await (supabase as any).rpc("create_rental_booking", {
-      p_rental: id,
-      p_start: start,
-      p_end: end,
-    })
-    setSubmitting(false)
-    if (error) { toast.error("신청 실패: " + error.message); return }
-    const res = data as any
-    if (!res?.ok) { toast.error(res?.error || "신청 실패"); return }
-    toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.")
-    setStart(""); setEnd("")
+    try {
+      const supabase = createClient()
+      // 금액·예치금·겹침검사는 서버(RPC)에서 권위적으로 처리 — 클라 계산값 미전송
+      const { data, error } = await (supabase as any).rpc("create_rental_booking", {
+        p_rental: id,
+        p_start: start,
+        p_end: end,
+      })
+      if (error) { toast.error("신청에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+      const res = data as any
+      if (!res?.ok) { toast.error(res?.error || "신청에 실패했어요."); return }
+      toast.success("대여 신청이 접수되었습니다! 소유자 승인을 기다려주세요.")
+      setStart(""); setEnd("")
+    } catch {
+      toast.error("네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) return <div className="min-h-screen grid place-items-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>

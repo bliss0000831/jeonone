@@ -349,7 +349,7 @@ export default function JobsDetailPage() {
         <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
           <div className="text-sm text-muted-foreground mb-1">시급</div>
           <div className="text-2xl font-bold text-teal-600">
-            ₩{(post.hourly_wage || 0).toLocaleString("ko-KR")}
+            {(post.hourly_wage || 0).toLocaleString("ko-KR")}원
           </div>
         </div>
 

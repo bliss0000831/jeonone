@@ -1,6 +1,6 @@
 /** 경매 상세 + 입찰 (RN). 웹 /auction/[id] 과 동일. */
 import { useState, useEffect, useCallback } from "react"
-import { View, Text, ScrollView, Pressable, StyleSheet, TextInput, ActivityIndicator, Alert } from "react-native"
+import { View, Text, ScrollView, Pressable, StyleSheet, TextInput, ActivityIndicator, Alert, FlatList, useWindowDimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
@@ -9,6 +9,7 @@ import { getSupabase } from "@/lib/supabase"
 import { CallButton } from "@/components/CallButton"
 import { useLoginGate } from "@/components/LoginGate"
 import { PostActionsMenu } from "@/components/PostActionsMenu"
+import { ImageLightbox } from "@/components/ImageLightbox"
 
 const GREEN = "#225a39"
 const AUCTION_IMG = require("../../assets/images/card-auction.jpg")
@@ -33,6 +34,9 @@ export default function AuctionDetailScreen() {
   const [amount, setAmount] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [uid, setUid] = useState<string | null>(null)
+  const [imageIndex, setImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const { width } = useWindowDimensions()
 
   const load = useCallback(async () => {
     const sb = getSupabase()
@@ -52,18 +56,24 @@ export default function AuctionDetailScreen() {
   const minBid = a ? Math.max(a.start_price, (a.current_price || 0) + a.bid_increment) : 0
 
   const placeBid = async () => {
+    if (submitting) return
     if (!requireLogin("입찰")) return
     const amt = parseInt((amount || "").replace(/[^0-9]/g, ""), 10)
     if (!amt || amt < minBid) { Alert.alert("입찰 실패", `최소 입찰가는 ${won(minBid)} 입니다`); return }
     setSubmitting(true)
-    const { data, error } = await (getSupabase() as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
-    setSubmitting(false)
-    if (error) { Alert.alert("입찰 실패", error.message); return }
-    const res = data as any
-    if (!res?.ok) { Alert.alert("입찰 실패", res?.error || "오류"); return }
-    Alert.alert("입찰 완료", "입찰되었습니다!")
-    setAmount("")
-    load()
+    try {
+      const { data, error } = await (getSupabase() as any).rpc("place_auction_bid", { p_auction: id, p_amount: amt })
+      if (error) { Alert.alert("입찰 실패", "입찰에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+      const res = data as any
+      if (!res?.ok) { Alert.alert("입찰 실패", res?.error || "입찰에 실패했어요."); return }
+      Alert.alert("입찰 완료", "입찰되었습니다!")
+      setAmount("")
+      load()
+    } catch {
+      Alert.alert("입찰 실패", "네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const markDeal = (status: "completed" | "no_show") => {
@@ -98,14 +108,20 @@ export default function AuctionDetailScreen() {
       { text: "취소", style: "cancel" },
       {
         text: "구매", onPress: async () => {
+          if (submitting) return
           setSubmitting(true)
-          const { data, error } = await (getSupabase() as any).rpc("buy_now_auction", { p_auction: id })
-          setSubmitting(false)
-          if (error) { Alert.alert("구매 실패", error.message); return }
-          const res = data as any
-          if (!res?.ok) { Alert.alert("구매 실패", res?.error || "오류"); return }
-          Alert.alert("즉시구매 완료", "구매가 완료되었습니다! 🎉")
-          load()
+          try {
+            const { data, error } = await (getSupabase() as any).rpc("buy_now_auction", { p_auction: id })
+            if (error) { Alert.alert("구매 실패", "구매에 실패했어요. 잠시 후 다시 시도해주세요."); return }
+            const res = data as any
+            if (!res?.ok) { Alert.alert("구매 실패", res?.error || "구매에 실패했어요."); return }
+            Alert.alert("즉시구매 완료", "구매가 완료되었습니다! 🎉")
+            load()
+          } catch {
+            Alert.alert("구매 실패", "네트워크 상태를 확인하고 다시 시도해주세요.")
+          } finally {
+            setSubmitting(false)
+          }
         },
       },
     ])
@@ -131,7 +147,32 @@ export default function AuctionDetailScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        <Image source={a.post?.images?.[0] ? { uri: a.post.images[0] } : AUCTION_IMG} style={styles.img} contentFit="cover" />
+        {(a.post?.images?.length ?? 0) > 0 ? (
+          <View>
+            <FlatList
+              data={a.post.images as string[]}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(it, idx) => `${idx}-${it}`}
+              onMomentumScrollEnd={(e) => setImageIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
+              renderItem={({ item, index }) => (
+                <Pressable onPress={() => { setImageIndex(index); setLightboxOpen(true) }}>
+                  <Image source={{ uri: item }} style={{ width, height: 260 }} contentFit="cover" />
+                </Pressable>
+              )}
+            />
+            {a.post.images.length > 1 && (
+              <View style={styles.dots}>
+                {(a.post.images as string[]).map((_, i) => (
+                  <View key={i} style={[styles.dot, i === imageIndex && styles.dotActive]} />
+                ))}
+              </View>
+            )}
+          </View>
+        ) : (
+          <Image source={AUCTION_IMG} style={styles.img} contentFit="cover" />
+        )}
         <View style={{ padding: 16 }}>
           <Text style={styles.title}>{a.post?.title || "경매 물품"}</Text>
           <View style={styles.priceBox}>
@@ -222,6 +263,12 @@ export default function AuctionDetailScreen() {
           </View>
         </View>
       )}
+      <ImageLightbox
+        visible={lightboxOpen}
+        images={(a.post?.images as string[]) ?? []}
+        initialIndex={imageIndex}
+        onClose={() => setLightboxOpen(false)}
+      />
     </SafeAreaView>
   )
 }
@@ -231,6 +278,9 @@ const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, height: 48, borderBottomWidth: 1, borderBottomColor: "#eee" },
   barTitle: { fontSize: 17, fontWeight: "800", color: "#1e293b" },
   img: { width: "100%", height: 260 },
+  dots: { flexDirection: "row", justifyContent: "center", gap: 6, paddingVertical: 10 },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#cbd5e1" },
+  dotActive: { backgroundColor: "#225a39", width: 18 },
   title: { fontSize: 22, fontWeight: "900", color: "#1e293b", marginBottom: 12 },
   priceBox: { borderWidth: 2, borderColor: "rgba(34,90,57,0.2)", borderRadius: 16, padding: 16, marginBottom: 14 },
   label: { fontSize: 13, color: "#64748b" },

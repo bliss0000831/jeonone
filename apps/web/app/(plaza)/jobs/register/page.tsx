@@ -245,12 +245,12 @@ export default function JobsRegisterPage() {
           />
           {wageNum > 0 && (
             <div className="mt-1 text-sm text-muted-foreground">
-              입력: ₩{wageNum.toLocaleString("ko-KR")}
+              입력: {wageNum.toLocaleString("ko-KR")}원
             </div>
           )}
           {wageBelowMin && (
             <div className="mt-1 text-sm text-amber-600">
-              경고: 2026년 최저시급(₩{MIN_WAGE_2026.toLocaleString("ko-KR")}) 미만입니다
+              경고: 2026년 최저시급({MIN_WAGE_2026.toLocaleString("ko-KR")}원) 미만입니다
             </div>
           )}
         </div>

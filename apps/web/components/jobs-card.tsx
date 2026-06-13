@@ -56,7 +56,7 @@ const kindStyles: Record<string, { label: string; className: string }> = {
 
 export function formatWage(n: number): string {
   if (!n && n !== 0) return ""
-  return `\u20A9${n.toLocaleString("ko-KR")}`
+  return `${n.toLocaleString("ko-KR")}\uC6D0`
 }
 
 export const JobsCard = memo(function JobsCard({ post, currentUserId, isAdmin = false }: JobsCardProps) {
