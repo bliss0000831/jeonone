@@ -24,6 +24,7 @@ export default function SecondhandEditPage() {
   useBeforeUnload(formDirty)
   const [images, setImages] = useState<string[]>([])
   const [subRegion, setSubRegion] = useState("")
+  const [listingType, setListingType] = useState<string>("sale")
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -78,6 +79,7 @@ export default function SecondhandEditPage() {
       })
       setImages(p.images || [])
       setSubRegion(p.sub_region || "")
+      setListingType(p.listing_type || "sale")
       setIsLoading(false)
     }
 
@@ -288,35 +290,45 @@ export default function SecondhandEditPage() {
           <p className="text-xs text-muted-foreground mt-1">선택 안 해도 됩니다.</p>
         </div>
 
-        {/* 가격 */}
-        <div>
-          <label className="block text-sm font-medium mb-2">가격 (원) *</label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₩</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={formData.price ? Number(formData.price).toLocaleString() : ""}
-              onChange={(e) => {
-                const raw = e.target.value.replace(/[^0-9]/g, "")
-                setFormData((prev) => ({ ...prev, price: raw }))
-              }}
-              placeholder="0 (무료나눔/가격제안)"
-              className="w-full pl-8 pr-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+        {/* 가격 — 일반 판매에서만. 경매/대여는 거래 조건을 여기서 수정 불가 */}
+        {listingType === "sale" ? (
+          <div>
+            <label className="block text-sm font-medium mb-2">가격 (원) *</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₩</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={formData.price ? Number(formData.price).toLocaleString() : ""}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, "")
+                  setFormData((prev) => ({ ...prev, price: raw }))
+                }}
+                placeholder="0 (무료나눔/가격제안)"
+                className="w-full pl-8 pr-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <label className="flex items-center gap-2 mt-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.isPriceNegotiable}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, isPriceNegotiable: e.target.checked }))
+                }
+                className="w-4 h-4 accent-amber-500"
+              />
+              <span className="text-sm">가격 제안 환영</span>
+            </label>
           </div>
-          <label className="flex items-center gap-2 mt-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isPriceNegotiable}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, isPriceNegotiable: e.target.checked }))
-              }
-              className="w-4 h-4 accent-amber-500"
-            />
-            <span className="text-sm">가격 제안 환영</span>
-          </label>
-        </div>
+        ) : (
+          <div>
+            <label className="block text-sm font-medium mb-2">{listingType === "auction" ? "경매 상품" : "대여 상품"}</label>
+            <div className="rounded-lg bg-muted/60 border border-border p-3 text-sm text-foreground/80 leading-relaxed">
+              {listingType === "auction" ? "경매" : "대여"} 상품입니다. 시작가·{listingType === "auction" ? "기간" : "대여료·보증금"} 등 거래 조건은 이 화면에서 바꿀 수 없습니다.
+              여기서는 제목·설명·사진·카테고리만 수정됩니다.
+            </div>
+          </div>
+        )}
 
         {/* 설명 */}
         <div>

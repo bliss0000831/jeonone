@@ -54,6 +54,11 @@ const COMMUNITY: { label: string; route: string }[] = [
   { label: "궁금해요", route: "/board/c/qna" },
 ]
 
+const LIFE: { icon: any; label: string; route: string }[] = [
+  { icon: "speedometer-outline", label: "주변 주유소 가격", route: "/gas-stations" },
+  { icon: "location-outline", label: "공중화장실 찾기", route: "/toilets" },
+]
+
 export function HamburgerMenu({ visible, onClose, cityName }: Props) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -119,6 +124,19 @@ export function HamburgerMenu({ visible, onClose, cityName }: Props) {
             {COMMUNITY.map((c) => (
               <Pressable key={c.label} style={({ pressed }) => [styles.boardRow, pressed && styles.boardRowPressed]} onPress={() => go(c.route)}>
                 <Text style={styles.boardLabel}>{c.label}</Text>
+              </Pressable>
+            ))}
+
+            <View style={styles.sep} />
+
+            {/* 생활 편의 */}
+            <Text style={styles.sectionLabel}>생활 편의</Text>
+            {LIFE.map((m) => (
+              <Pressable key={m.label} style={({ pressed }) => [styles.navRow, pressed && styles.navRowPressed]} onPress={() => go(m.route)}>
+                <View style={styles.navIcon}>
+                  <Ionicons name={m.icon} size={24} color={GREEN} />
+                </View>
+                <Text style={styles.navLabel}>{m.label}</Text>
               </Pressable>
             ))}
           </ScrollView>

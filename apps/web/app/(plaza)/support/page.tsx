@@ -16,7 +16,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { getCurrentPlaza } from "@/lib/plaza/server"
 import { createClient } from "@/lib/supabase/server"
 
-const SUPPORT_EMAIL = "support@chuncheonplaza.com"
+const SUPPORT_EMAIL = "ikdohyeon@gmail.com"
 
 export default async function SupportPage() {
   const plazaId = await getCurrentPlaza()
@@ -55,7 +55,7 @@ export default async function SupportPage() {
           </h2>
           <div className="rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
             <a
-              href={`mailto:${SUPPORT_EMAIL}?subject=%5B%EC%B6%98%EC%B2%9C%EA%B4%91%EC%9E%A5%5D%20%EB%AC%B8%EC%9D%98`}
+              href={`mailto:${SUPPORT_EMAIL}?subject=%5B%EC%A0%84%EC%9B%90%EC%9D%BC%EA%B8%B0%5D%20%EB%AC%B8%EC%9D%98`}
               className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 border-b border-border/60 transition-colors"
             >
               <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-emerald-500/10 flex-shrink-0">
@@ -160,7 +160,7 @@ export default async function SupportPage() {
 
         {/* 1:1 문의 — mailto 로 직접 연결 */}
         <a
-          href={`mailto:${SUPPORT_EMAIL}?subject=%5B%EC%B6%98%EC%B2%9C%EA%B4%91%EC%9E%A5%5D%201%3A1%20%EB%AC%B8%EC%9D%98`}
+          href={`mailto:${SUPPORT_EMAIL}?subject=%5B%EC%A0%84%EC%9B%90%EC%9D%BC%EA%B8%B0%5D%201%3A1%20%EB%AC%B8%EC%9D%98`}
           className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
         >
           <MessageCircle className="w-5 h-5" />

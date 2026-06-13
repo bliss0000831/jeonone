@@ -60,11 +60,13 @@ export default function SecondhandEditScreen() {
   const [location, setLocation] = useState("")
   const [regionId, setRegionId] = useState<string | null>(null)
   const [condition, setCondition] = useState<string>("")
+  const [listingType, setListingType] = useState<string>("sale")
 
   useEffect(() => {
     if (!id) return
     getSecondhandPost(getSupabase(), id, DEFAULT_PLAZA, null).then(({ post }) => {
       if (post) {
+        setListingType((post as any).listing_type || "sale")
         setTitle(post.title || "")
         setDescription(post.description || "")
         setCategory(post.category || SECONDHAND_CATEGORIES[0])
@@ -291,21 +293,31 @@ export default function SecondhandEditScreen() {
             </ScrollView>
           </Field>
 
-          <Field label="가격 (원)">
-            <TextInput
-              value={price}
-              onChangeText={(v) => setPrice(v.replace(/[^0-9]/g, ""))}
-              keyboardType="number-pad"
-              style={styles.input}
-              placeholderTextColor={lightColors.ink500}
-            />
-            <Pressable onPress={() => setIsPriceNegotiable((v) => !v)} style={styles.checkRow}>
-              <View style={[styles.checkbox, isPriceNegotiable && { backgroundColor: AMBER, borderColor: AMBER }]}>
-                {isPriceNegotiable && <Ionicons name="checkmark" size={12} color="#ffffff" />}
+          {listingType === "sale" ? (
+            <Field label="가격 (원)">
+              <TextInput
+                value={price}
+                onChangeText={(v) => setPrice(v.replace(/[^0-9]/g, ""))}
+                keyboardType="number-pad"
+                style={styles.input}
+                placeholderTextColor={lightColors.ink500}
+              />
+              <Pressable onPress={() => setIsPriceNegotiable((v) => !v)} style={styles.checkRow}>
+                <View style={[styles.checkbox, isPriceNegotiable && { backgroundColor: AMBER, borderColor: AMBER }]}>
+                  {isPriceNegotiable && <Ionicons name="checkmark" size={12} color="#ffffff" />}
+                </View>
+                <Text style={styles.checkLabel}>가격 제안 받기</Text>
+              </Pressable>
+            </Field>
+          ) : (
+            <Field label={listingType === "auction" ? "경매 상품" : "대여 상품"}>
+              <View style={{ backgroundColor: lightColors.muted, borderRadius: 10, padding: 12 }}>
+                <Text style={{ fontSize: 14, color: lightColors.ink700, lineHeight: 20 }}>
+                  {listingType === "auction" ? "경매" : "대여"} 상품이에요. 시작가·{listingType === "auction" ? "기간" : "대여료·보증금"} 등 거래 조건은 이 화면에서 바꿀 수 없어요.{"\n"}여기서는 제목·설명·사진·카테고리만 수정됩니다.
+                </Text>
               </View>
-              <Text style={styles.checkLabel}>가격 제안 받기</Text>
-            </Pressable>
-          </Field>
+            </Field>
+          )}
 
           <Field label="설명 *">
             <TextInput

@@ -32,7 +32,7 @@ export default function SupportScreen() {
 
         <View style={styles.card}>
           <Pressable
-            onPress={() => Linking.openURL("mailto:support@chuncheonplaza.com")}
+            onPress={() => Linking.openURL("mailto:ikdohyeon@gmail.com")}
             style={({ pressed }) => [styles.row, pressed && { backgroundColor: lightColors.muted }]}
           >
             <View style={[styles.iconWrap, { backgroundColor: "rgba(59,130,246,0.1)" }]}>
@@ -40,7 +40,7 @@ export default function SupportScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>이메일</Text>
-              <Text style={styles.value}>support@chuncheonplaza.com</Text>
+              <Text style={styles.value}>ikdohyeon@gmail.com</Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color={lightColors.ink500} />
           </Pressable>
