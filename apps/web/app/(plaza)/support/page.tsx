@@ -43,7 +43,7 @@ export default async function SupportPage() {
         {/* 안내 카드 */}
         <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/15 p-5">
           <h2 className="text-base font-bold text-foreground mb-1">무엇을 도와드릴까요?</h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             궁금한 점이 있으시면 자주 묻는 질문을 먼저 확인해주세요. 그래도 해결되지 않으면 이메일로 문의해주시기 바랍니다.
           </p>
         </div>

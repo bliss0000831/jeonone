@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     borderRadius: radius.sm,
   },
-  badgeText: { fontSize: 10, fontWeight: "600" },
+  badgeText: { fontSize: 12, fontWeight: "600" },
   domain: { fontSize: fontSize.xs, color: lightColors.ink500 },
   title: {
     fontSize: fontSize.md,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 6,
   },
-  date: { fontSize: 11, color: lightColors.ink500 },
+  date: { fontSize: 13, color: lightColors.ink500 },
   confirmBtn: {
     flexDirection: "row",
     alignItems: "center",

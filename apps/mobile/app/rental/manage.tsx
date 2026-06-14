@@ -68,7 +68,7 @@ export default function RentalManageScreen() {
     const { error } = await (getSupabase() as any).from("rental_bookings")
       .update({ status: next, updated_at: new Date().toISOString() }).eq("id", b.id)
     setBusy(null)
-    if (error) { Alert.alert("처리 실패", error.message); return }
+    if (error) { console.error("[rental status]", error); Alert.alert("처리 실패", "처리하지 못했어요. 잠시 후 다시 시도해주세요."); return }
     const title = b.rental?.post?.title || "농기구"
     if (next === "approved") notify(b.renter_id, "대여 승인됨", `${title} 대여가 승인되었습니다`, b.rental?.plaza_id)
     else if (next === "cancelled") notify(b.renter_id, "대여 거절됨", `${title} 대여 신청이 거절되었습니다`, b.rental?.plaza_id)
@@ -82,7 +82,7 @@ export default function RentalManageScreen() {
     const { error } = await (getSupabase() as any).from("rental_bookings")
       .update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", b.id)
     setBusy(null)
-    if (error) { Alert.alert("취소 실패", error.message); return }
+    if (error) { console.error("[rental cancel]", error); Alert.alert("취소 실패", "취소하지 못했어요. 잠시 후 다시 시도해주세요."); return }
     load()
   }
 
@@ -132,6 +132,14 @@ export default function RentalManageScreen() {
         {mine && (b.status === "requested" || b.status === "approved") && (
           <Pressable style={styles.fullBtn} onPress={() => cancelMine(b)} disabled={busy === b.id}>
             {busy === b.id ? <ActivityIndicator color="#64748b" size="small" /> : <><Ionicons name="close" size={16} color="#64748b" /><Text style={[styles.actionText, { color: "#64748b" }]}>신청 취소</Text></>}
+          </Pressable>
+        )}
+        {mine && b.status === "in_use" && (
+          <Text style={styles.mineNote}>대여 중입니다. 반납일에 소유자에게 반납해 주세요.{"\n"}반납 확인은 소유자가 합니다.</Text>
+        )}
+        {mine && (b.status === "returned" || b.status === "completed") && b.rental?.owner_id && (
+          <Pressable style={styles.fullBtn} onPress={() => router.push(`/mypage/write-review?reviewed_user_id=${b.rental.owner_id}&source_type=rental&source_id=${b.id}&target_name=${encodeURIComponent(b.rental?.post?.title || "소유자")}` as any)}>
+            <Ionicons name="star" size={16} color={GREEN} /><Text style={[styles.actionText, { color: GREEN }]}>소유자 후기 작성</Text>
           </Pressable>
         )}
       </View>
@@ -203,4 +211,5 @@ const styles = StyleSheet.create({
   vline: { width: 1, backgroundColor: "#eee" },
   fullBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 11, borderTopWidth: 1, borderTopColor: "#eee" },
   actionText: { fontSize: 14, fontWeight: "800" },
+  mineNote: { fontSize: 13, color: "#64748b", textAlign: "center", lineHeight: 19, paddingHorizontal: 12, paddingVertical: 11, borderTopWidth: 1, borderTopColor: "#eee" },
 })

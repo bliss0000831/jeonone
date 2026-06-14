@@ -82,7 +82,8 @@ export default function BlockedPage() {
         .eq("blocker_id", user.id)
         .eq("blocked_id", target.blocked_id)
       if (error) {
-        toast.error("해제 실패: " + error.message)
+        console.error("[blocked unblock]", error)
+        toast.error("차단 해제에 실패했어요. 잠시 후 다시 시도해주세요.")
         return
       }
       setRows((prev) => prev.filter((r) => r.blocked_id !== target.blocked_id))

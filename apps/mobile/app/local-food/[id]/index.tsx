@@ -478,12 +478,22 @@ export default function LocalFoodDetailScreen() {
             </Pressable>
             {/* 보조: 전화 걸기 — 판매자 phone 있을 때만 노출 */}
             <CallButton userId={author?.id} color={lightColors.primary} />
+            {/* 온라인 결제 준비 중 — 헛걸음 방지: 폼 대신 채팅 문의로 유도 (openCheckout 은 결제 재개 시 사용) */}
             <Pressable
               style={[styles.actionPrimary, { flex: 1 }]}
-              onPress={openCheckout}
+              onPress={() =>
+                Alert.alert(
+                  "온라인 결제 준비 중",
+                  "지금은 앱에서 바로 결제할 수 없어요. 판매자에게 채팅으로 문의해 거래해주세요.",
+                  [
+                    { text: "취소", style: "cancel" },
+                    { text: "채팅하기", onPress: () => { void openChat() } },
+                  ],
+                )
+              }
             >
               <Ionicons name="bag-handle" size={18} color="#ffffff" />
-              <Text style={styles.actionPrimaryText}>바로 구매</Text>
+              <Text style={styles.actionPrimaryText}>구매 문의</Text>
             </Pressable>
           </>
         )}

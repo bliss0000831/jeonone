@@ -528,7 +528,7 @@ export default function ChatListTab() {
       <View style={styles.header}>
         {bulkMode ? (
           <>
-            <Pressable onPress={exitBulk} hitSlop={8} style={styles.headerBtn}>
+            <Pressable accessibilityRole="button" accessibilityLabel="선택 취소" onPress={exitBulk} hitSlop={8} style={styles.headerBtn}>
               <Ionicons name="close" size={22} color={lightColors.ink900} />
             </Pressable>
             <Text style={styles.headerTitle}>{bulkSelected.size}개 선택</Text>
@@ -553,6 +553,8 @@ export default function ChatListTab() {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               {user && (
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="알림"
                   onPress={() => router.push("/notifications" as any)}
                   hitSlop={8}
                   style={styles.headerBtn}
@@ -568,6 +570,8 @@ export default function ChatListTab() {
                 </Pressable>
               )}
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="메뉴"
                 onPress={() => setHeaderMenuOpen(true)}
                 hitSlop={8}
                 style={styles.headerBtn}

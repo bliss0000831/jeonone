@@ -8,7 +8,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
-import { CalendarDays, ArrowLeft, Loader2, Inbox, Send, Check, X, PackageCheck } from "lucide-react"
+import { CalendarDays, ArrowLeft, Loader2, Inbox, Send, Check, X, PackageCheck, Star } from "lucide-react"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
 const won = (n: number) => (n ? `${n.toLocaleString()}원` : "0원")
@@ -103,7 +103,7 @@ export default function RentalManagePage() {
     const { error } = await (supabase as any)
       .from("rental_bookings").update({ status: next, updated_at: new Date().toISOString() }).eq("id", b.id)
     setBusy(null)
-    if (error) { toast.error("처리 실패: " + error.message); return }
+    if (error) { console.error("[rental status]", error); toast.error("처리하지 못했어요. 잠시 후 다시 시도해주세요."); return }
     const title = b.rental?.post?.title || "농기구"
     if (next === "approved") { toast.success("승인했습니다"); notify(b.renter_id, "대여 승인됨", `${title} 대여가 승인되었습니다`, b.rental?.plaza_id) }
     else if (next === "cancelled") { toast.success("거절했습니다"); notify(b.renter_id, "대여 거절됨", `${title} 대여 신청이 거절되었습니다`, b.rental?.plaza_id) }
@@ -119,7 +119,7 @@ export default function RentalManagePage() {
     const { error } = await (supabase as any)
       .from("rental_bookings").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", b.id)
     setBusy(null)
-    if (error) { toast.error("취소 실패: " + error.message); return }
+    if (error) { console.error("[rental cancel]", error); toast.error("취소하지 못했어요. 잠시 후 다시 시도해주세요."); return }
     toast.success("신청을 취소했습니다")
     load()
   }
@@ -181,6 +181,17 @@ export default function RentalManagePage() {
             className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted border-t border-border disabled:opacity-50">
             {busy === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}신청 취소
           </button>
+        )}
+        {mine && b.status === "in_use" && (
+          <p className="px-3 py-2.5 border-t border-border text-xs text-muted-foreground text-center leading-relaxed">
+            대여 중입니다. 반납일에 소유자에게 반납해 주세요.<br />반납 확인은 소유자가 합니다.
+          </p>
+        )}
+        {mine && (b.status === "returned" || b.status === "completed") && b.rental?.owner_id && (
+          <Link href={`/mypage/write-review?reviewed_user_id=${b.rental.owner_id}&source_type=rental&source_id=${b.id}&target_name=${encodeURIComponent(b.rental?.post?.title || "소유자")}`}
+            className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-primary hover:bg-primary/5 border-t border-border">
+            <Star className="w-4 h-4" /> 소유자 후기 작성
+          </Link>
         )}
       </div>
     )

@@ -28,12 +28,16 @@ export default function RentalDetailScreen() {
   const [showStart, setShowStart] = useState(false)
   const [showEnd, setShowEnd] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [uid, setUid] = useState<string | null>(null)
   const [imageIndex, setImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const { width } = useWindowDimensions()
 
   const load = useCallback(async () => {
-    const { data } = await (getSupabase() as any).from("rental_listings")
+    const sb = getSupabase()
+    const { data: { user } } = await sb.auth.getUser()
+    setUid(user?.id ?? null)
+    const { data } = await (sb as any).from("rental_listings")
       .select("*, post:secondhand_posts(title, description, images)").eq("id", id).maybeSingle()
     setR(data); setLoading(false)
   }, [id])
@@ -121,6 +125,8 @@ export default function RentalDetailScreen() {
           </View>
           {r.post?.description ? <Text style={styles.desc}>{r.post.description}</Text> : null}
 
+          {uid !== r.owner_id && (
+          <>
           <Text style={styles.label}>대여 기간 선택</Text>
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={{ flex: 1 }}>
@@ -176,14 +182,24 @@ export default function RentalDetailScreen() {
               <Text style={styles.total}>{won(total)}{r.deposit ? ` + 보증금 ${won(r.deposit)}` : ""}</Text>
             </View>
           )}
+          </>
+          )}
         </View>
       </ScrollView>
       <View style={styles.btnBar}>
-        {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
-        <CallButton userId={r.owner_id} color={GREEN} />
-        <Pressable style={[styles.btn, { flex: 1 }]} onPress={apply} disabled={submitting}>
-          {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
-        </Pressable>
+        {uid === r.owner_id ? (
+          <Pressable style={[styles.btn, { flex: 1 }]} onPress={() => router.push("/rental/manage" as any)}>
+            <Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>내 대여 상품 · 예약 관리</Text>
+          </Pressable>
+        ) : (
+          <>
+            {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
+            <CallButton userId={r.owner_id} color={GREEN} />
+            <Pressable style={[styles.btn, { flex: 1 }]} onPress={apply} disabled={submitting}>
+              {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
+            </Pressable>
+          </>
+        )}
       </View>
       <ImageLightbox
         visible={lightboxOpen}

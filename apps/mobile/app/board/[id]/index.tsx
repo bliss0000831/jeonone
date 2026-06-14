@@ -403,21 +403,21 @@ export default function BoardDetailScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
+        <Pressable accessibilityRole="button" accessibilityLabel="뒤로가기" onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
         <View style={styles.headerTitleWrap} pointerEvents="none">
           <Text style={styles.headerTitle} numberOfLines={1}>게시글</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <Pressable onPress={handleLike} hitSlop={8} style={styles.headerBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel={isLiked ? "좋아요 취소" : "좋아요"} onPress={handleLike} hitSlop={8} style={styles.headerBtn}>
             <Ionicons
               name={isLiked ? "heart" : "heart-outline"}
               size={22}
               color={isLiked ? "#ef4444" : lightColors.ink900}
             />
           </Pressable>
-          <Pressable onPress={handleShare} hitSlop={8} style={styles.headerBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="공유하기" onPress={handleShare} hitSlop={8} style={styles.headerBtn}>
             <Ionicons name="share-social-outline" size={22} color={lightColors.ink900} />
           </Pressable>
           <PostActionsMenu

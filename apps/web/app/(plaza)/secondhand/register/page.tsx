@@ -210,7 +210,7 @@ export default function SecondhandRegisterPage() {
       }
     } catch (error) {
       console.error("Secondhand submit error:", error)
-      toast.error("등록에 실패했습니다: " + (error instanceof Error ? error.message : "알 수 없는 오류"))
+      toast.error("등록에 실패했어요. 네트워크를 확인하고 다시 시도해주세요.")
     } finally {
       setIsSubmitting(false)
     }

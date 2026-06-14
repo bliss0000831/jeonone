@@ -113,7 +113,8 @@ export default function RentalDetailPage() {
         </div>
         {r.post?.description && <p className="text-sm text-foreground/80 whitespace-pre-wrap mb-5">{r.post.description}</p>}
 
-        {/* 대여 신청 */}
+        {/* 대여 신청 — 소유자에겐 숨김(자기 물건 신청 방지) */}
+        {user?.id !== r.owner_id && (
         <div className="rounded-2xl border bg-card p-5">
           <h3 className="font-bold mb-3">대여 기간 선택</h3>
           <div className="grid grid-cols-2 gap-3">
@@ -133,6 +134,7 @@ export default function RentalDetailPage() {
             </div>
           )}
         </div>
+        )}
       </main>
 
       <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border p-3 z-40">
@@ -143,13 +145,19 @@ export default function RentalDetailPage() {
               {chatLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <MessageCircle className="w-5 h-5" />} 채팅으로 문의
             </button>
           )}
-          <div className="flex items-center gap-3">
-            {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
-            <CallButton userId={r.owner_id} />
-            <button onClick={apply} disabled={submitting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
-              {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CalendarDays className="w-5 h-5" />} 대여 신청{total > 0 ? ` · ${won(total)}` : ""}
-            </button>
-          </div>
+          {user?.id === r.owner_id ? (
+            <Link href="/rental/manage" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5">
+              <CalendarDays className="w-5 h-5" /> 내 대여 상품 · 예약 관리
+            </Link>
+          ) : (
+            <div className="flex items-center gap-3">
+              {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
+              <CallButton userId={r.owner_id} />
+              <button onClick={apply} disabled={submitting} className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5 disabled:opacity-50">
+                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CalendarDays className="w-5 h-5" />} 대여 신청{total > 0 ? ` · ${won(total)}` : ""}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

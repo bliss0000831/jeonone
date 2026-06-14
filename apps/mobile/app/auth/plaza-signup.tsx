@@ -169,11 +169,13 @@ export default function PlazaSignupScreen() {
             { onConflict: "user_id,plaza_id" },
           )
           if (retry.error) {
-            Alert.alert("가입 실패", retry.error.message)
+            console.error("[plaza-signup retry]", retry.error)
+            Alert.alert("가입 실패", "가입에 실패했어요. 잠시 후 다시 시도해주세요.")
             return
           }
         } else {
-          Alert.alert("가입 실패", error.message)
+          console.error("[plaza-signup]", error)
+          Alert.alert("가입 실패", "가입에 실패했어요. 잠시 후 다시 시도해주세요.")
           return
         }
       }

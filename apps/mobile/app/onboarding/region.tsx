@@ -105,7 +105,8 @@ export default function OnboardingRegionScreen() {
         .update({ location })
         .eq("id", user.id)
       if (error) {
-        Alert.alert("저장 실패", error.message)
+        console.error("[onboarding region]", error)
+        Alert.alert("저장 실패", "저장에 실패했어요. 다시 시도해주세요.")
         return
       }
       if (plaza) {
