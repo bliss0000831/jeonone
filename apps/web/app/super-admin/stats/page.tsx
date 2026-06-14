@@ -2,7 +2,7 @@
 
 /**
  * 슈퍼관리자 — 전체 플랫폼 통계.
- * 광장간 비교 분석, 전체 성장 추이.
+ * 지역간 비교 분석, 전체 성장 추이.
  */
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -48,7 +48,7 @@ export default function SuperAdminStatsPage() {
         return
       }
 
-      // 각 광장별 간단 통계 — 모든 광장을 Promise.all 로 병렬 처리 (N+1 → 1+3N 병렬)
+      // 각 지역별 간단 통계 — 모든 지역을 Promise.all 로 병렬 처리 (N+1 → 1+3N 병렬)
       const statsPromises = plazas.map(async (p: any) => {
         const [{ count: memberCount }, { count: postCount }, { count: propCount }] = await Promise.all([
           supabase.from('plaza_profiles').select('user_id', { count: 'exact', head: true }).eq('plaza_id', p.id),
@@ -100,7 +100,7 @@ export default function SuperAdminStatsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">전체 플랫폼 통계</h1>
-          <p className="text-gray-500 mt-1">광장간 비교 분석 및 성장 추이</p>
+          <p className="text-gray-500 mt-1">지역간 비교 분석 및 성장 추이</p>
         </div>
         <Button variant="outline" size="sm" onClick={loadData}>
           <RotateCcw className="w-4 h-4 mr-2" />
@@ -113,7 +113,7 @@ export default function SuperAdminStatsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Building2 className="w-4 h-4" /> 광장 수
+              <Building2 className="w-4 h-4" /> 지역 수
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -152,19 +152,19 @@ export default function SuperAdminStatsPage() {
         </Card>
       </div>
 
-      {/* 광장별 비교 */}
+      {/* 지역별 비교 */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
-            광장별 비교
+            지역별 비교
           </CardTitle>
         </CardHeader>
         <CardContent>
           {plazaStats.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Building2 className="w-10 h-10 mb-3 opacity-30" />
-              <p className="text-sm">등록된 광장이 없습니다</p>
+              <p className="text-sm">등록된 지역이 없습니다</p>
             </div>
           ) : (
             <div className="space-y-4">

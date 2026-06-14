@@ -50,7 +50,7 @@ export default async function SuperAdminBillingPage() {
           <div>
             <h1 className="text-2xl font-bold">결제 / 정산 대시보드</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              구독 / 결제 / 광장 협회 정산 종합 관리
+              구독 / 결제 / 지역 협회 정산 종합 관리
             </p>
           </div>
           <Link
@@ -134,7 +134,7 @@ export default async function SuperAdminBillingPage() {
                 href="/super-admin/plaza-associations"
                 className="text-sm text-primary hover:underline"
               >
-                광장 협회 관리 →
+                지역 협회 관리 →
               </Link>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default async function SuperAdminBillingPage() {
                     <th className="text-left p-3 font-medium">기간</th>
                     <th className="text-right p-3 font-medium">총 매출</th>
                     <th className="text-right p-3 font-medium">본사 (20%)</th>
-                    <th className="text-right p-3 font-medium">광장 (80%)</th>
+                    <th className="text-right p-3 font-medium">지역 (80%)</th>
                     <th className="text-left p-3 font-medium">상태</th>
                   </tr>
                 </thead>

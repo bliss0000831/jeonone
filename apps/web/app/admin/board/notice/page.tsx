@@ -48,7 +48,7 @@ export default function NoticeAdminPage() {
     is_pinned: false,
     is_published: true,
   })
-  // 시군 옵션 — 현재 광장 coverage
+  // 시군 옵션 — 현재 지역 coverage
   const [regionOptions, setRegionOptions] = useState<string[]>([])
   useEffect(() => {
     let alive = true

@@ -2,7 +2,7 @@
  * 슈퍼 어드민 공통 레이아웃 — 본사 전용 페이지들에 통합 사이드바.
  *
  * 인증: SUPER_ADMIN_COOKIE 검증 (각 페이지에서도 한 번 더 체크).
- * 광장 어드민(/admin) 과 시각적으로 구분되도록 다크 톤 + 왕관 아이콘.
+ * 지역 어드민(/admin) 과 시각적으로 구분되도록 다크 톤 + 왕관 아이콘.
  */
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -36,7 +36,7 @@ export default async function SuperAdminLayout({
   }
 
   return (
-    // 슈퍼어드민 전용 테마 — 광장 사이트는 화이트 강제, 슈퍼어드민만 토글 가능 (기본 화이트)
+    // 슈퍼어드민 전용 테마 — 지역 사이트는 화이트 강제, 슈퍼어드민만 토글 가능 (기본 화이트)
     <SuperAdminThemeWrapper>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
         <SuperAdminNav authed={authed} />

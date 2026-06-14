@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * 광장 운영/수익 통합 페이지.
+ * 지역 운영/수익 통합 페이지.
  *
  * 탭:
  *  - 부스트 결제 (boost_orders)
  *  - 구독 회원 (subscriptions)
  *  - 거래 수수료 (transactions)
- *  - 정산 내역 (payouts) — 광장 협회 운영자에게 보임
+ *  - 정산 내역 (payouts) — 지역 협회 운영자에게 보임
  *
- * 모든 데이터는 현재 광장으로 자동 필터링 (RLS).
+ * 모든 데이터는 현재 지역으로 자동 필터링 (RLS).
  */
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -217,7 +217,7 @@ export default function AdminBillingPage() {
 
       {/* 안내 */}
       <div className="rounded-lg border border-border/50 bg-muted/20 px-4 py-3 text-[12px] text-muted-foreground">
-        RLS 로 자동 필터링되어 현재 광장 데이터만 표시됩니다.
+        RLS 로 자동 필터링되어 현재 지역 데이터만 표시됩니다.
         전체 통합 보기는 <code className="text-[11px] bg-muted px-1 py-0.5 rounded">/super-admin/billing</code> 에서 확인하세요.
       </div>
     </div>

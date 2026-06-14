@@ -2,7 +2,7 @@
 
 /**
  * 슈퍼관리자 — 전체 수익 현황.
- * 모든 광장의 매출 합산, 본사 수수료, 순 분배금 집계.
+ * 모든 지역의 매출 합산, 본사 수수료, 순 분배금 집계.
  */
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -28,7 +28,7 @@ export default function SuperAdminRevenuePage() {
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      // 광장 목록 + 정산 데이터 조인
+      // 지역 목록 + 정산 데이터 조인
       const { data: plazas } = await supabase
         .from('plazas')
         .select('id, name')
@@ -40,7 +40,7 @@ export default function SuperAdminRevenuePage() {
         return
       }
 
-      // 각 광장의 정산 합계 조회
+      // 각 지역의 정산 합계 조회
       const { data: settlements } = await (supabase as any)
         .from('plaza_settlements')
         .select('plaza_id, total_revenue, platform_fee, net_amount, status')
@@ -95,7 +95,7 @@ export default function SuperAdminRevenuePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">전체 수익 현황</h1>
-          <p className="text-gray-500 mt-1">모든 광장의 매출 집계 및 수수료 현황</p>
+          <p className="text-gray-500 mt-1">모든 지역의 매출 집계 및 수수료 현황</p>
         </div>
         <Button variant="outline" size="sm" onClick={loadData}>
           <RotateCcw className="w-4 h-4 mr-2" />
@@ -128,7 +128,7 @@ export default function SuperAdminRevenuePage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Building2 className="w-4 h-4" /> 광장 분배금
+              <Building2 className="w-4 h-4" /> 지역 분배금
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -145,23 +145,23 @@ export default function SuperAdminRevenuePage() {
         </Card>
       </div>
 
-      {/* 광장별 수익 테이블 */}
+      {/* 지역별 수익 테이블 */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">광장별 수익 현황</CardTitle>
+          <CardTitle className="text-base">지역별 수익 현황</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {plazaRevenues.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Building2 className="w-10 h-10 mb-3 opacity-30" />
-              <p className="text-sm">등록된 광장이 없습니다</p>
+              <p className="text-sm">등록된 지역이 없습니다</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium">광장</th>
+                    <th className="text-left px-4 py-3 font-medium">지역</th>
                     <th className="text-right px-4 py-3 font-medium">총 매출</th>
                     <th className="text-right px-4 py-3 font-medium">본사 수수료</th>
                     <th className="text-right px-4 py-3 font-medium">분배금</th>

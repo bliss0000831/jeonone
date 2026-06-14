@@ -88,7 +88,7 @@ export default function ThemeAdminPage() {
     const plaza = getCurrentPlazaClient()
     let error: any = null
     if (plaza) {
-      // 광장별 테마 — plazas.theme 에 병합 저장
+      // 지역별 테마 — plazas.theme 에 병합 저장
       const { data: cur } = await supabase
         .from('plazas')
         .select('theme')

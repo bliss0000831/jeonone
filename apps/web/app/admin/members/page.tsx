@@ -872,7 +872,7 @@ export default function MembersPage() {
               회원 차단 — {banTarget?.nickname || banTarget?.full_name}
             </DialogTitle>
             <DialogDescription className="text-[13px]">
-              현재 광장에서만 적용됩니다.
+              현재 지역에서만 적용됩니다.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

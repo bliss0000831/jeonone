@@ -186,14 +186,14 @@ export function LabelsEditor({ initial }: { initial: SiteLabel[] }) {
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold">전역 적용 — 모든 광장에 영향</p>
+              <p className="font-semibold">전역 적용 — 모든 지역에 영향</p>
               <p className="mt-1">
-                여기서 변경한 값은 <strong>모든 광장의 모든 사용자</strong> 에게 즉시(다음 페이지 로드부터)
-                반영됩니다. 광장별로 다른 값을 쓰시려면 별도 기능이 필요합니다.
+                여기서 변경한 값은 <strong>모든 지역의 모든 사용자</strong> 에게 즉시(다음 페이지 로드부터)
+                반영됩니다. 지역별로 다른 값을 쓰시려면 별도 기능이 필요합니다.
               </p>
               <p className="mt-1">
                 <code className="bg-amber-500/10 px-1 rounded text-[11px]">{"{{plaza_city}}"}</code>{" "}
-                토큰을 쓰면 광장 도시명(예: 춘천)이 자동 치환됩니다.
+                토큰을 쓰면 지역 도시명(예: 춘천)이 자동 치환됩니다.
               </p>
               <p className="mt-1">
                 각 입력 아래에 <strong>권장 글자 수</strong>가 표시되니 디자인이 깨지지 않게 참고하세요.

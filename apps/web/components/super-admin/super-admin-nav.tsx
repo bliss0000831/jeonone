@@ -35,12 +35,12 @@ const NAV: NavItem[] = [
   { href: '/super-admin',                          label: '통합 대시보드',    icon: <LayoutDashboard className="w-4 h-4" />, group: '메인' },
   // 수익 관리
   { href: '/super-admin/revenue',                  label: '전체 수익 현황',   icon: <Wallet className="w-4 h-4" />,          group: '수익 관리' },
-  { href: '/super-admin/revenue/settlements',      label: '광장별 정산',      icon: <CreditCard className="w-4 h-4" />,     group: '수익 관리' },
+  { href: '/super-admin/revenue/settlements',      label: '지역별 정산',      icon: <CreditCard className="w-4 h-4" />,     group: '수익 관리' },
   { href: '/super-admin/revenue/commission',       label: '수수료 설정',      icon: <Percent className="w-4 h-4" />,        group: '수익 관리' },
   { href: '/super-admin/revenue/statements',       label: '정산 내역서',      icon: <FileText className="w-4 h-4" />,       group: '수익 관리' },
   // 운영
   { href: '/super-admin/billing',                  label: '결제 / 정산',      icon: <CreditCard className="w-4 h-4" />,     group: '운영' },
-  { href: '/super-admin/plaza-associations',       label: '광장 협회',        icon: <Building2 className="w-4 h-4" />,      group: '운영' },
+  { href: '/super-admin/plaza-associations',       label: '지역 협회',        icon: <Building2 className="w-4 h-4" />,      group: '운영' },
   { href: '/super-admin/business-flags',           label: '업자 자동차단',    icon: <Shield className="w-4 h-4" />,         group: '운영' },
   // 통계
   { href: '/super-admin/stats',                    label: '전체 통계',        icon: <BarChart3 className="w-4 h-4" />,      group: '통계' },
@@ -111,14 +111,14 @@ export function SuperAdminNav({ authed }: { authed: boolean }) {
         ))}
       </nav>
 
-      {/* 하단 — 광장 admin 으로 돌아가기 */}
+      {/* 하단 — 지역 admin 으로 돌아가기 */}
       <div className="p-3 border-t border-gray-200 dark:border-gray-800">
         <Link
           href="/admin"
           className="flex items-center gap-2 px-3 py-2 text-xs rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
         >
           <Home className="w-3.5 h-3.5" />
-          <span>광장 어드민으로</span>
+          <span>지역 어드민으로</span>
         </Link>
       </div>
     </aside>

@@ -3,7 +3,7 @@
 /**
  * 슈퍼어드민 전용 테마 컨텍스트.
  *
- * 전역 next-themes (광장 사이트) 는 화이트 강제. 슈퍼어드민만 별도로
+ * 전역 next-themes (지역 사이트) 는 화이트 강제. 슈퍼어드민만 별도로
  * localStorage 키 'super-admin-theme' 으로 light/dark 토글 가능.
  *
  * Tailwind 의 `dark:` variant 가 동작하도록 wrapper div 에 `dark` 클래스 토글.

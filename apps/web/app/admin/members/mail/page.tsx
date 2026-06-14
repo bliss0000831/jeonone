@@ -102,7 +102,7 @@ export default function MemberMailPage() {
     loadLogs()
   }, [])
 
-  // 수신자 해석 — 이메일 API(plaza_profiles 기반)와 동일하게 광장 격리.
+  // 수신자 해석 — 이메일 API(plaza_profiles 기반)와 동일하게 지역 격리.
   // 미리보기 수와 실제 쪽지 발송 대상이 일치하도록 단일 소스로 사용.
   const resolveRecipientIds = async (): Promise<string[]> => {
     const plaza = getCurrentPlazaClient()

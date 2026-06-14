@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * 광장 전환기 — super 만 표시.
- * 현재 광장 표시 + 드롭다운으로 다른 광장 선택.
- * 클릭 시 buildPlazaUrl 로 해당 광장 도메인(또는 ?plaza= 쿼리) 으로 이동.
+ * 지역 전환기 — super 만 표시.
+ * 현재 지역 표시 + 드롭다운으로 다른 지역 선택.
+ * 클릭 시 buildPlazaUrl 로 해당 지역 도메인(또는 ?plaza= 쿼리) 으로 이동.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -44,7 +44,7 @@ export default function PlazaSwitcher({ isSuper, currentPlaza, currentPlazaName 
     return plazas.filter((p) => p.name.toLowerCase().includes(q))
   }, [plazas, search])
 
-  // super 일 때만 광장 목록 fetch
+  // super 일 때만 지역 목록 fetch
   useEffect(() => {
     if (!isSuper) return
     let cancelled = false
@@ -69,7 +69,7 @@ export default function PlazaSwitcher({ isSuper, currentPlaza, currentPlazaName 
   }, [isSuper])
 
   if (!isSuper) {
-    // 일반 admin — 그냥 현재 광장 라벨 노출
+    // 일반 admin — 그냥 현재 지역 라벨 노출
     return currentPlazaName ? (
       <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium border border-primary/20">
         <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
@@ -96,14 +96,14 @@ export default function PlazaSwitcher({ isSuper, currentPlaza, currentPlazaName 
         <Button variant="outline" size="sm" className="gap-1.5 h-8">
           <MapPin className="w-3.5 h-3.5 text-primary" />
           <span className="font-medium text-xs">
-            {currentPlazaName || current || '광장 선택'}
+            {currentPlazaName || current || '지역 선택'}
           </span>
           <span className="text-[10px] text-amber-600 font-bold">SUPER</span>
           <ChevronDown className="w-3 h-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 max-h-[60vh] overflow-y-auto">
-        <DropdownMenuLabel className="text-xs">광장 전환</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">지역 전환</DropdownMenuLabel>
         {plazas.length > 3 && (
           <div className="px-2 pb-1.5">
             <div className="relative">
@@ -111,7 +111,7 @@ export default function PlazaSwitcher({ isSuper, currentPlaza, currentPlazaName 
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="광장 검색…"
+                placeholder="지역 검색…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.stopPropagation()}
@@ -127,7 +127,7 @@ export default function PlazaSwitcher({ isSuper, currentPlaza, currentPlazaName 
           </div>
         )}
         {!loading && plazas.length === 0 && (
-          <div className="px-2 py-2 text-xs text-muted-foreground">광장 정보 없음</div>
+          <div className="px-2 py-2 text-xs text-muted-foreground">지역 정보 없음</div>
         )}
         {!loading && search.trim() && filtered.length === 0 && (
           <div className="px-2 py-2 text-xs text-muted-foreground">검색 결과 없음</div>

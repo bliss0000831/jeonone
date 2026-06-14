@@ -43,7 +43,7 @@ export function SuperAdminLogin() {
             <Crown className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">슈퍼 관리자</h1>
-          <p className="text-sm text-gray-500 mt-1.5">전 광장 통합 관리 콘솔</p>
+          <p className="text-sm text-gray-500 mt-1.5">전 지역 통합 관리 콘솔</p>
         </div>
 
         {/* 카드 */}

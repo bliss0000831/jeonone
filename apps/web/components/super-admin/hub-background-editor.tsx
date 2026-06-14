@@ -159,13 +159,13 @@ export function HubBackgroundEditor({ initial }: Props) {
           {/* 샘플 글자 */}
           <div className="relative z-10 h-full flex flex-col items-start justify-end p-6">
             <p className="text-xs px-2 py-0.5 rounded-full bg-white/15 backdrop-blur text-white/90 mb-2">
-              전국 광장 플랫폼
+              전국 전원일기 플랫폼
             </p>
             <h2
               className="text-3xl font-bold text-white"
               style={{ textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
             >
-              광장
+              전원일기
             </h2>
             <p
               className="text-sm text-white/80 mt-1"

@@ -207,7 +207,7 @@ export default function PermissionsPage() {
         </CardContent>
       </Card>
 
-      {/* 현재 광장 관리자 목록 */}
+      {/* 현재 지역 관리자 목록 */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">현재 전원일기 관리자</CardTitle>

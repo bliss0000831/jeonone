@@ -21,7 +21,7 @@ export default async function SuperAdminPage() {
     return <SuperAdminLogin />
   }
 
-  // 인증됨 — 모든 광장 + 통계 fetch
+  // 인증됨 — 모든 지역 + 통계 fetch
   const supabase = await createClient()
   const [plazasRes, plazaAdminsRes] = await Promise.all([
     supabase

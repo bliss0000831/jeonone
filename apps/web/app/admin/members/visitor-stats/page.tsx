@@ -3,7 +3,7 @@
 /**
  * 접속자 집계 — 리메이크.
  *
- * 서버사이드 API (/api/admin/stats/visitors) 사용 → RLS 우회 + 광장별 격리.
+ * 서버사이드 API (/api/admin/stats/visitors) 사용 → RLS 우회 + 지역별 격리.
  * 앱/웹 소스 구분, 기기·브라우저·OS·시간대 집계 표시.
  */
 import { useState, useEffect, useCallback } from 'react'

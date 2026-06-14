@@ -122,7 +122,7 @@ export default function AdminPermissionsMatrixPage() {
             권한 매트릭스
           </h1>
           <p className="text-muted-foreground mt-1">
-            관리자별 광장 권한을 한눈에 확인합니다 (읽기 전용).
+            관리자별 지역 권한을 한눈에 확인합니다 (읽기 전용).
           </p>
         </div>
         <Link href="/admin/settings/multi-admin">
@@ -141,7 +141,7 @@ export default function AdminPermissionsMatrixPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">관리자 × 광장 × 역할</CardTitle>
+          <CardTitle className="text-base">관리자 × 지역 × 역할</CardTitle>
           <CardDescription>plaza_admins 테이블 기준</CardDescription>
         </CardHeader>
         <CardContent className="p-0">

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * 슈퍼관리자 — 광장별 정산 관리.
+ * 슈퍼관리자 — 지역별 정산 관리.
  * 정산 조회, 상태 변경 (pending → confirmed → settled → paid).
  */
 import { useState, useEffect, useCallback } from 'react'
@@ -107,7 +107,7 @@ export default function SuperAdminSettlementsPage() {
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">광장별 정산</h1>
+          <h1 className="text-2xl font-bold">지역별 정산</h1>
           <p className="text-gray-500 mt-1">정산 상태 관리 및 지급 처리</p>
         </div>
         <Button variant="outline" size="sm" onClick={loadData}>
@@ -143,7 +143,7 @@ export default function SuperAdminSettlementsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium">광장</th>
+                    <th className="text-left px-4 py-3 font-medium">지역</th>
                     <th className="text-left px-4 py-3 font-medium">정산 기간</th>
                     <th className="text-right px-4 py-3 font-medium">매출</th>
                     <th className="text-right px-4 py-3 font-medium">수수료 ({'%'})</th>

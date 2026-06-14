@@ -1,7 +1,7 @@
 /**
- * 슈퍼 어드민 — 광장 협회 관리.
+ * 슈퍼 어드민 — 지역 협회 관리.
  *
- * 각 광장의 운영 사업자(협회) 등록, 승인, 통장 정보 관리.
+ * 각 지역의 운영 사업자(협회) 등록, 승인, 통장 정보 관리.
  */
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -36,9 +36,9 @@ export default async function PlazaAssociationsPage() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold">광장 협회 관리</h1>
+            <h1 className="text-2xl font-bold">지역 협회 관리</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              각 광장의 운영 사업자 (별개 사업자등록). 본사와 분리된 회계 / 통장.
+              각 지역의 운영 사업자 (별개 사업자등록). 본사와 분리된 회계 / 통장.
             </p>
           </div>
           <Link href="/super-admin/billing" className="text-sm text-muted-foreground">
@@ -48,7 +48,7 @@ export default async function PlazaAssociationsPage() {
 
         {associations.length === 0 ? (
           <div className="rounded-lg border border-border bg-muted/20 p-8 text-center">
-            <p className="text-sm text-muted-foreground mb-2">등록된 광장 협회가 없습니다.</p>
+            <p className="text-sm text-muted-foreground mb-2">등록된 지역 협회가 없습니다.</p>
             <p className="text-xs text-muted-foreground">
               협회는 API <code className="px-1 py-0.5 bg-muted rounded">POST /api/billing/plaza-associations</code> 로 등록합니다.
             </p>
@@ -90,7 +90,7 @@ export default async function PlazaAssociationsPage() {
             <li>협회로부터 사업자등록증 + 통장사본 + 대표자 정보 수령</li>
             <li>본 페이지 또는 API 로 등록 (status=&apos;pending&apos;)</li>
             <li>본사 검수 후 승인 (status=&apos;active&apos;)</li>
-            <li>해당 광장에서 발생한 매출의 80%가 자동 정산 대상이 됨</li>
+            <li>해당 지역에서 발생한 매출의 80%가 자동 정산 대상이 됨</li>
           </ol>
         </div>
       </div>

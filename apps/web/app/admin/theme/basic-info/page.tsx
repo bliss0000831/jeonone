@@ -44,10 +44,10 @@ export default function ThemeBasicInfoPage() {
     const load = async () => {
       const plaza = getCurrentPlazaClient()
       if (plaza) {
-        // 광장별 — plazas.theme 에서 로고/이름 조회 + theme_basic_info 는 광장 단위
+        // 지역별 — plazas.theme 에서 로고/이름 조회 + theme_basic_info 는 지역 단위
         const [{ data: plazaRow }, { data: settingsData }] = await Promise.all([
           supabase.from('plazas').select('name, theme').eq('id', plaza).maybeSingle(),
-          // theme_basic_info 는 일단 site_settings 글로벌 — Phase 3 에서 광장별 분리 검토
+          // theme_basic_info 는 일단 site_settings 글로벌 — Phase 3 에서 지역별 분리 검토
           supabase.from('site_settings').select('key, value').in('key', ['theme_basic_info']),
         ])
         if (plazaRow?.name) setSiteName(plazaRow.name)
@@ -138,7 +138,7 @@ export default function ThemeBasicInfoPage() {
       const plaza = getCurrentPlazaClient()
 
       if (plaza) {
-        // 광장별 — plazas.theme.logoUrl + plazas.name + theme_basic_info (글로벌)
+        // 지역별 — plazas.theme.logoUrl + plazas.name + theme_basic_info (글로벌)
         // RLS 가 막으면 silent 0-row 가 나서 옛 로고가 그대로 보였던 버그 →
         // .select() 로 실제 update 된 row 를 받아서 검증한다.
         const { data: cur } = await supabase.from('plazas').select('theme').eq('id', plaza).maybeSingle()
@@ -157,14 +157,14 @@ export default function ThemeBasicInfoPage() {
         })
         const [plazaRes] = await Promise.all([updatePlaza, updateSettings])
         if (plazaRes.error) {
-          toast.error('광장 정보 저장 실패: ' + plazaRes.error.message)
+          toast.error('지역 정보 저장 실패: ' + plazaRes.error.message)
           return
         }
         const updated = plazaRes.data?.[0]
         if (!updated) {
           toast.error(
             '⚠️ 권한이 없어 저장되지 않았습니다.\n\n' +
-              '이 광장(' + plaza + ')에 대한 어드민 권한이 없습니다.\n' +
+              '이 지역(' + plaza + ')에 대한 어드민 권한이 없습니다.\n' +
               '슈퍼관리자에게 문의하세요.'
           )
           return
@@ -177,7 +177,7 @@ export default function ThemeBasicInfoPage() {
           return
         }
         try { sessionStorage.removeItem('siteBranding') } catch {}
-        toast.success('저장되었습니다 (광장: ' + updated.name + '). 새로고침합니다.')
+        toast.success('저장되었습니다 (지역: ' + updated.name + '). 새로고침합니다.')
         // 캐시 무효화 후 hard reload
         try {
           await fetch('/api/site-settings', { method: 'PUT', cache: 'no-store' })

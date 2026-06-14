@@ -3,7 +3,7 @@
 /**
  * 다중 관리자 관리 페이지.
  *
- * plaza_admins 테이블 기반으로 현재 광장의 관리자를 관리.
+ * plaza_admins 테이블 기반으로 현재 지역의 관리자를 관리.
  * 회원 검색 → 역할 선택 → 관리자로 추가/제거.
  */
 import { useState, useEffect, useCallback } from 'react'
@@ -220,7 +220,7 @@ export default function MultiAdminPage() {
             다중 관리자 관리
           </h1>
           <p className="text-muted-foreground mt-1">
-            이 광장의 관리자를 추가하고 역할을 설정합니다.
+            이 지역의 관리자를 추가하고 역할을 설정합니다.
           </p>
         </div>
         <div className="flex items-center gap-2">

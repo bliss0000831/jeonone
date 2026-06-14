@@ -2,7 +2,7 @@
 
 /**
  * 슈퍼관리자 — 수수료 설정.
- * 광장별/카테고리별 수수료율 관리.
+ * 지역별/카테고리별 수수료율 관리.
  */
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -118,7 +118,7 @@ export default function SuperAdminCommissionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">수수료 설정</h1>
-          <p className="text-gray-500 mt-1">광장별/카테고리별 플랫폼 수수료율 관리</p>
+          <p className="text-gray-500 mt-1">지역별/카테고리별 플랫폼 수수료율 관리</p>
         </div>
         <Button variant="outline" size="sm" onClick={loadData}>
           <RotateCcw className="w-4 h-4 mr-2" />
@@ -137,7 +137,7 @@ export default function SuperAdminCommissionPage() {
         <CardContent>
           <div className="flex flex-wrap gap-3 items-end">
             <div className="space-y-1">
-              <label className="text-xs text-gray-500">광장</label>
+              <label className="text-xs text-gray-500">지역</label>
               <select
                 value={newPlaza}
                 onChange={(e) => setNewPlaza(e.target.value)}
@@ -201,7 +201,7 @@ export default function SuperAdminCommissionPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium">광장</th>
+                    <th className="text-left px-4 py-3 font-medium">지역</th>
                     <th className="text-left px-4 py-3 font-medium">카테고리</th>
                     <th className="text-right px-4 py-3 font-medium">수수료율</th>
                     <th className="text-left px-4 py-3 font-medium">적용일</th>

@@ -21,7 +21,7 @@ const isHex = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())
 /**
  * 허브 (gwangjang.app) 의 테마/로고/사이트명 편집.
  * 슈퍼 관리자만 접근 — site_settings 의 hub_* 키에 저장.
- * 광장 도메인 settings 와 격리.
+ * 지역 도메인 settings 와 격리.
  */
 export function SuperAdminHubBranding() {
   const supabase = createClient()
@@ -32,7 +32,7 @@ export function SuperAdminHubBranding() {
   const [primary, setPrimary] = useState('#0ea5e9')
   const [accent, setAccent] = useState('#f59e0b')
   const [logo, setLogo] = useState('/logo.png?v=3')
-  const [siteName, setSiteName] = useState('전국 광장')
+  const [siteName, setSiteName] = useState('전국 전원일기')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export function SuperAdminHubBranding() {
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            placeholder="전국 광장"
+            placeholder="전국 전원일기"
             className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
           />
         </div>

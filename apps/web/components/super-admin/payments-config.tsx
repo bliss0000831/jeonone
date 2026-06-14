@@ -93,7 +93,7 @@ export function PaymentsConfig() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <CreditCard className="w-5 h-5 text-amber-500" />
-            <h1 className="font-bold text-gray-900 dark:text-white">광장별 결제 설정</h1>
+            <h1 className="font-bold text-gray-900 dark:text-white">지역별 결제 설정</h1>
             <div className="ml-auto">
               <SuperAdminThemeToggle />
             </div>
@@ -106,8 +106,8 @@ export function PaymentsConfig() {
             <div>
               <p className="font-semibold mb-1">PortOne 채널 분리 정산</p>
               <p className="text-xs leading-relaxed">
-                각 광장 운영자가 자기 사업자등록증으로 PortOne 에 채널을 추가하고,
-                여기에 store ID + channel key 를 입력하면 광장별로 결제 / 정산이 분리됩니다.
+                각 지역 운영자가 자기 사업자등록증으로 PortOne 에 채널을 추가하고,
+                여기에 store ID + channel key 를 입력하면 지역별로 결제 / 정산이 분리됩니다.
                 <br />
                 <strong>payments_enabled</strong> 가 ON 이고 channel key 가 있으면 실 결제가 활성화되며,
                 그렇지 않으면 mock 결제로 진행됩니다.
@@ -203,7 +203,7 @@ export function PaymentsConfig() {
                           label="상호"
                           value={p.business_name || ""}
                           onChange={(v) => updateField(p.id, "business_name", v)}
-                          placeholder="(주)광장"
+                          placeholder="(주)전원일기"
                         />
                         <Field
                           label="대표자명"

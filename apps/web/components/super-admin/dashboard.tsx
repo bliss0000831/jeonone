@@ -69,11 +69,11 @@ export function SuperAdminDashboard({
       .map((r) => ({ region: r, plazas: map.get(r)!.sort((a, b) => a.sort_order - b.sort_order) }))
   }, [filtered])
 
-  // 광장당 admin 수 카운트
+  // 지역당 admin 수 카운트
   const adminCounts = useMemo(() => {
     const m = new Map<string, number>()
     for (const a of plazaAdmins) {
-      // 모든 역할의 관리자를 카운트 (super 제외 — 전체 광장 관리자)
+      // 모든 역할의 관리자를 카운트 (super 제외 — 전체 지역 관리자)
       if (a.role !== 'super') m.set(a.plaza_id, (m.get(a.plaza_id) || 0) + 1)
     }
     return m
@@ -134,7 +134,7 @@ export function SuperAdminDashboard({
           <StatCard
             icon={<MapPin className="w-5 h-5" />}
             value={stats.total}
-            label="전체 광장"
+            label="전체 지역"
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
           />
@@ -163,13 +163,13 @@ export function SuperAdminDashboard({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="광장 검색 — 이름, 권역, ID, 커버리지 지역"
+              placeholder="지역 검색 — 이름, 권역, ID, 커버리지 지역"
               className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 shadow-sm"
             />
           </div>
           {query && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 ml-1">
-              "{query}" 검색 결과: <span className="font-semibold text-gray-900 dark:text-gray-100">{filtered.length}</span>개 광장
+              "{query}" 검색 결과: <span className="font-semibold text-gray-900 dark:text-gray-100">{filtered.length}</span>개 지역
             </p>
           )}
         </section>
@@ -179,7 +179,7 @@ export function SuperAdminDashboard({
           <h2 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-3">수익 관리</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <ToolLink href="/super-admin/revenue" icon={<Banknote className="w-4 h-4" />} label="전체 수익 현황" tone="amber" />
-            <ToolLink href="/super-admin/revenue/settlements" icon={<CreditCard className="w-4 h-4" />} label="광장별 정산" tone="emerald" />
+            <ToolLink href="/super-admin/revenue/settlements" icon={<CreditCard className="w-4 h-4" />} label="지역별 정산" tone="emerald" />
             <ToolLink href="/super-admin/revenue/commission" icon={<Settings className="w-4 h-4" />} label="수수료 설정" tone="blue" />
             <ToolLink href="/super-admin/revenue/statements" icon={<Tag className="w-4 h-4" />} label="정산 내역서" tone="purple" />
           </div>
@@ -200,7 +200,7 @@ export function SuperAdminDashboard({
         {/* 허브 브랜딩 — gwangjang.app 전용 */}
         <SuperAdminHubBranding />
 
-        {/* 광장 리스트 */}
+        {/* 지역 리스트 */}
         <section className="space-y-8">
           {grouped.map(({ region, plazas: ps }) => (
             <div key={region}>
@@ -370,7 +370,7 @@ function PlazaRow({
       <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
         <span className="flex items-center gap-1.5">
           <Users className="w-3.5 h-3.5" />
-          광장 admin <span className="font-semibold text-gray-700 dark:text-gray-200">{adminCount}</span>명
+          지역 admin <span className="font-semibold text-gray-700 dark:text-gray-200">{adminCount}</span>명
         </span>
       </div>
 
@@ -388,7 +388,7 @@ function PlazaRow({
           type="button"
           onClick={onView}
           className="flex items-center justify-center px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-medium transition"
-          title="광장 사용자 화면"
+          title="지역 사용자 화면"
         >
           <Eye className="w-3.5 h-3.5" />
         </button>

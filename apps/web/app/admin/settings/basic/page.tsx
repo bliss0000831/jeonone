@@ -96,7 +96,7 @@ export default function BasicSettingsPage() {
           setSettings(newSettings)
         }
 
-        // 광장별 설정: plazas 테이블에서 오버라이드 (광장 격리)
+        // 지역별 설정: plazas 테이블에서 오버라이드 (지역 격리)
         if (plaza) {
           const { data: plazaData } = await supabase
             .from('plazas')
@@ -134,7 +134,7 @@ export default function BasicSettingsPage() {
       const plaza = getCurrentPlazaClient()
 
       if (plaza) {
-        // 광장별 설정: plazas.theme 에 병합 저장 (광장 격리)
+        // 지역별 설정: plazas.theme 에 병합 저장 (지역 격리)
         const { data: cur } = await supabase
           .from('plazas')
           .select('theme')
@@ -184,9 +184,9 @@ export default function BasicSettingsPage() {
       })
       const result = await res.json()
       if (!res.ok) {
-        // plaza admin 이 글로벌 설정을 수정 못하는 건 정상 — 광장별 저장은 이미 완료
+        // plaza admin 이 글로벌 설정을 수정 못하는 건 정상 — 지역별 저장은 이미 완료
         if (plaza && res.status === 403) {
-          setMessage({ type: 'success', text: '광장 설정이 저장되었습니다. (글로벌 설정은 슈퍼관리자만 변경 가능)' })
+          setMessage({ type: 'success', text: '지역 설정이 저장되었습니다. (글로벌 설정은 슈퍼관리자만 변경 가능)' })
           return
         }
         throw new Error(result.error || '저장 실패')

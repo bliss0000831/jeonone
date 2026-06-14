@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * 광장별 사업자 정보 관리.
+ * 지역별 사업자 정보 관리.
  *
- * 현재 광장(서브도메인 또는 plaza_admins 매핑) 의 plazas.business_info 를
+ * 현재 지역(서브도메인 또는 plaza_admins 매핑) 의 plazas.business_info 를
  * 직접 편집. RPC update_plaza_business_info 로 권한 검증.
  *
  * 입력값은 약관·푸터·면책 띠 등 모든 곳에 자동 반영됨.
@@ -122,9 +122,9 @@ export default function BusinessSettingsPage() {
         <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
           <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
           <div>
-            <p className="font-medium text-amber-900">광장 도메인에서 접근해주세요</p>
+            <p className="font-medium text-amber-900">지역 도메인에서 접근해주세요</p>
             <p className="text-sm text-amber-800 mt-1">
-              사업자 정보는 광장별로 격리되어 저장됩니다. 허브 도메인이 아닌 각 광장의 서브도메인에서 관리해주세요.
+              사업자 정보는 지역별로 격리되어 저장됩니다. 허브 도메인이 아닌 각 지역의 서브도메인에서 관리해주세요.
             </p>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function BusinessSettingsPage() {
           사업자 정보
         </h1>
         <p className="text-muted-foreground mt-1">
-          <strong>{plazaName}</strong> 광장의 사업자 정보입니다. 이용약관·푸터·면책 고지·결제 화면 등 법적 표시가
+          <strong>{plazaName}</strong> 지역의 사업자 정보입니다. 이용약관·푸터·면책 고지·결제 화면 등 법적 표시가
           필요한 모든 곳에 자동 반영됩니다.
         </p>
       </div>
@@ -148,9 +148,9 @@ export default function BusinessSettingsPage() {
       <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
         <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
         <div className="text-blue-900">
-          <p className="font-medium">⚠ 광장별로 다른 사업자가 운영합니다</p>
+          <p className="font-medium">⚠ 지역별로 다른 사업자가 운영합니다</p>
           <p className="mt-1">
-            이 정보는 <strong>{plazaName}</strong> 에만 적용되며, 다른 광장에는 표시되지 않습니다.
+            이 정보는 <strong>{plazaName}</strong> 에만 적용되며, 다른 지역에는 표시되지 않습니다.
             한 번 저장하면 약관·푸터·면책 문구가 모두 자동 갱신되니, 정확한 정보를 입력해주세요.
           </p>
         </div>
@@ -174,7 +174,7 @@ export default function BusinessSettingsPage() {
                 id="business_name"
                 value={info.business_name}
                 onChange={(e) => setInfo({ ...info, business_name: e.target.value })}
-                placeholder="예) 광장 / 주식회사 광장"
+                placeholder="예) 전원일기 / 주식회사 전원일기"
               />
             </div>
             <div className="grid gap-2">
@@ -222,7 +222,7 @@ export default function BusinessSettingsPage() {
               id="address"
               value={info.address}
               onChange={(e) => setInfo({ ...info, address: e.target.value })}
-              placeholder="예) 강원특별자치도 춘천시 중앙로 1, 광장빌딩 5층"
+              placeholder="예) 강원특별자치도 춘천시 중앙로 1, 전원일기빌딩 5층"
               rows={2}
             />
           </div>

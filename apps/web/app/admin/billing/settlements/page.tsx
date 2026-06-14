@@ -2,7 +2,7 @@
 
 /**
  * 업체별 정산 페이지.
- * 광장 내 업체들의 정산금 계산, 수수료 공제, 지급 처리.
+ * 지역 내 업체들의 정산금 계산, 수수료 공제, 지급 처리.
  */
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'

@@ -1,8 +1,8 @@
 /**
- * 광장 운영자 (협회) 대시보드 — /plaza-admin
+ * 지역 운영자 (협회) 대시보드 — /plaza-admin
  *
  * 인증: plaza_admins 테이블에 본인이 등록되어 있어야 함.
- * 표시: 본인이 운영하는 광장의 협회 정보 + 매출 / 정산 내역.
+ * 표시: 본인이 운영하는 지역의 협회 정보 + 매출 / 정산 내역.
  *
  * 6개월 무료 기간 동안에는 정산 데이터가 없으므로 안내 메시지.
  */
@@ -27,7 +27,7 @@ export default async function PlazaAdminPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  // 본인이 운영하는 광장 조회
+  // 본인이 운영하는 지역 조회
   const { data: myAdminRows } = await supabase
     .from('plaza_admins')
     .select('plaza_id, role')
@@ -40,9 +40,9 @@ export default async function PlazaAdminPage() {
         <Header user={user} />
         <main className="max-w-2xl mx-auto px-4 py-12 text-center">
           <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-          <h1 className="text-xl font-bold mb-2">광장 운영자 권한이 없습니다</h1>
+          <h1 className="text-xl font-bold mb-2">지역 운영자 권한이 없습니다</h1>
           <p className="text-sm text-muted-foreground mb-4">
-            이 페이지는 광장 협회로 등록된 운영자만 접근할 수 있습니다.
+            이 페이지는 지역 협회로 등록된 운영자만 접근할 수 있습니다.
           </p>
           <Link href="/" className="text-sm text-primary hover:underline">
             홈으로
@@ -52,7 +52,7 @@ export default async function PlazaAdminPage() {
     )
   }
 
-  // 첫 번째 광장 데이터 (다중 광장 운영 시 향후 셀렉터 추가)
+  // 첫 번째 지역 데이터 (다중 지역 운영 시 향후 셀렉터 추가)
   const plazaId = myPlazas[0].plaza_id
   const [association, payouts, payoutsEnabled] = await Promise.all([
     getPlazaAssociation(plazaId),
@@ -60,7 +60,7 @@ export default async function PlazaAdminPage() {
     isFeatureEnabled('monetization.payouts'),
   ])
 
-  // 광장 이름
+  // 지역 이름
   const { data: plazaRow } = await supabase
     .from('plazas')
     .select('name')
@@ -84,7 +84,7 @@ export default async function PlazaAdminPage() {
           {plazaDisplayName} 운영자 대시보드
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          광장 협회 (운영 사업자) 정보 / 정산 내역 / 회원사 관리
+          지역 협회 (운영 사업자) 정보 / 정산 내역 / 회원사 관리
         </p>
 
         {/* 무료 기간 안내 */}
@@ -136,7 +136,7 @@ export default async function PlazaAdminPage() {
             <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/20 p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-900 dark:text-amber-200">
-                광장 협회가 아직 등록되지 않았습니다. 본사 운영팀에 문의해 주세요.
+                지역 협회가 아직 등록되지 않았습니다. 본사 운영팀에 문의해 주세요.
               </p>
             </div>
           )}

@@ -1,5 +1,5 @@
 /**
- * 슈퍼관리자 — 광장별 PortOne 결제 채널 / 사업자 정보
+ * 슈퍼관리자 — 지역별 PortOne 결제 채널 / 사업자 정보
  *
  * gwangjang.app/admin/payments (rewrite via middleware)
  */
