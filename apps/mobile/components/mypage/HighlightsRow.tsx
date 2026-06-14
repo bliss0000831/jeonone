@@ -2,15 +2,15 @@
  * HighlightsRow — 광장 web 의 components/profile/profile-highlights.tsx 1:1 미러.
  *
  * 핵심 분기 (웹 정독 기반):
- *   1. 빈 + self 모드: 작은 인라인 "+ 하이라이트 추가" 링크 (큰 원 X)
+ *   1. 빈 + self 모드: 작은 인라인 "+ 대표 사진 추가" 링크 (큰 원 X)
  *   2. 빈 + other 모드: 섹션 자체 숨김 (null)
  *   3. 채워짐: 가로 스크롤
  *      - self 면 첫 칸에 "추가/수정" 점선 원
- *      - 각 하이라이트는 gradient ring (yellow→pink→purple, p-0.5)
+ *      - 각 대표 사진는 gradient ring (yellow→pink→purple, p-0.5)
  *        안에 background bg p-0.5, 그 안에 이미지 원형
  *      - 비디오면 우하단에 ▶ 뱃지
  *
- * 하이라이트 원 = 64x64. ring = 2px outer + 2px inner padding.
+ * 대표 사진 원 = 64x64. ring = 2px outer + 2px inner padding.
  */
 
 import { useEffect } from "react"
@@ -56,7 +56,7 @@ export function HighlightsRow({ items, mode = "self", onAdd, onOpen }: Props) {
           hitSlop={6}
         >
           <Ionicons name="add" size={14} color={lightColors.ink500} />
-          <Text style={styles.emptyText}>하이라이트 추가</Text>
+          <Text style={styles.emptyText}>대표 사진 추가</Text>
         </Pressable>
       </View>
     )

@@ -70,7 +70,7 @@ export function HeaderActions({ cityName: cityNameProp }: { cityName?: string })
   }, [user, plazaId])
 
   const handleSearch = () => {
-    router.push({ pathname: "/(tabs)/search", params: { q: "", _t: String(Date.now()) } } as any)
+    router.push({ pathname: "/search", params: { q: "", _t: String(Date.now()) } } as any)
   }
 
   return (

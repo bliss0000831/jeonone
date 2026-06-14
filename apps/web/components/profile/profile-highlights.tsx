@@ -39,7 +39,7 @@ export function ProfileHighlights({
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
-          하이라이트 추가
+          대표 사진 추가
         </button>
       </div>
     )

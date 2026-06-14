@@ -57,6 +57,8 @@ export function OrderRow({ order, role = "buyer", onConfirmReceived, onWriteRevi
     role === "buyer" && order.status === "shipped" && !!onConfirmReceived
   const canReview =
     role === "buyer" && (order.status === "completed" || order.status === "confirmed") && !!onWriteReview
+  const waitingHint =
+    role === "buyer" && order.status === "paid" ? "판매자가 상품을 보낼 때까지 기다려주세요." : null
 
   function openTracking() {
     if (!order.tracking_number) return
@@ -130,6 +132,7 @@ export function OrderRow({ order, role = "buyer", onConfirmReceived, onWriteRevi
             </Pressable>
           )}
         </View>
+        {waitingHint && <Text style={styles.waitingHint}>{waitingHint}</Text>}
       </View>
     </View>
   )
@@ -161,6 +164,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   body: { flex: 1, gap: 2 },
+  waitingHint: { fontSize: 12, color: lightColors.ink500, marginTop: 4 },
   statusRow: {
     flexDirection: "row",
     alignItems: "center",

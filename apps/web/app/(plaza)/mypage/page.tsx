@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
+import { useConfirm } from "@/components/confirm-provider"
 import { getCurrentPlazaClient } from "@/lib/plaza/client"
 import { useSiteBranding } from "@/components/site-branding-client"
 import { getProfileCard, getPointBalance, type ProfileCardData } from "@gwangjang/features/profile"
@@ -51,6 +52,7 @@ const SUPPORT_MENU = [
 
 export default function MyPageDashboard() {
   const router = useRouter()
+  const confirm = useConfirm()
   const { name: plazaName } = useSiteBranding()
   const [userId, setUserId] = useState<string | null>(null)
   const [checking, setChecking] = useState(true)
@@ -172,7 +174,7 @@ export default function MyPageDashboard() {
         {/* 로그아웃 */}
         <button
           onClick={async () => {
-            if (!window.confirm("정말 로그아웃 하시겠어요?")) return
+            if (!(await confirm({ title: "로그아웃", description: "정말 로그아웃 하시겠어요?", confirmText: "로그아웃" }))) return
             const supabase = createClient()
             await supabase.auth.signOut()
             router.push("/")

@@ -68,7 +68,7 @@ export default function WebViewScreen() {
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.center}>
-          <Text style={styles.errorText}>URL이 없습니다</Text>
+          <Text style={styles.errorText}>주소를 불러올 수 없어요</Text>
         </View>
       </SafeAreaView>
     )

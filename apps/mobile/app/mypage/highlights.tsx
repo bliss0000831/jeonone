@@ -1,9 +1,9 @@
 /**
- * 하이라이트 관리 — 광장 web /mypage/highlights 1:1 매핑.
+ * 대표 사진 관리 — 광장 web /mypage/highlights 1:1 매핑.
  *
  * 구조:
- *   - Header: "하이라이트 관리"
- *   - 새 하이라이트 추가 카드: 제목 입력 + [사진][영상] 버튼
+ *   - Header: "대표 사진 관리"
+ *   - 새 대표 사진 추가 카드: 제목 입력 + [사진][영상] 버튼
  *   - 목록: 위/아래 화살표 + 그라데이션 원형 썸네일 + 제목/타입 + 수정/삭제
  *   - 영상 지원 + 순서 변경 지원
  */
@@ -78,7 +78,7 @@ export default function HighlightsScreen() {
         setItems(rows as Row[])
       } catch (e) {
         console.warn("[highlights] load failed", e)
-        Alert.alert("불러오기 실패", "하이라이트를 불러오지 못했어요. 다시 시도해 주세요.")
+        Alert.alert("불러오기 실패", "대표 사진를 불러오지 못했어요. 다시 시도해 주세요.")
       } finally {
         setLoading(false)
       }
@@ -170,7 +170,7 @@ export default function HighlightsScreen() {
       return
     }
     if (items.length >= MAX_HIGHLIGHTS) {
-      showAlert("알림", `하이라이트는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
+      showAlert("알림", `대표 사진는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
       return
     }
 
@@ -245,7 +245,7 @@ export default function HighlightsScreen() {
   }
 
   async function confirmDelete(id: string) {
-    const ok = await confirmAsync("이 하이라이트를 삭제할까요?")
+    const ok = await confirmAsync("이 대표 사진를 삭제할까요?")
     if (!ok) return
     try {
       await deleteHighlight(getSupabase(), id)
@@ -287,7 +287,7 @@ export default function HighlightsScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
           <Ionicons name="chevron-back" size={24} color={lightColors.ink900} />
         </Pressable>
-        <Text style={styles.headerTitle}>하이라이트 관리</Text>
+        <Text style={styles.headerTitle}>대표 사진 관리</Text>
         <View style={styles.headerBtn} />
       </View>
 
@@ -297,9 +297,9 @@ export default function HighlightsScreen() {
         </View>
       ) : (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
-          {/* 새 하이라이트 추가 카드 */}
+          {/* 새 대표 사진 추가 카드 */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>새 하이라이트 추가</Text>
+            <Text style={styles.cardTitle}>새 대표 사진 추가</Text>
             <TextInput
               value={title}
               onChangeText={(v) => setTitle(v.slice(0, MAX_TITLE_LEN))}
@@ -353,7 +353,7 @@ export default function HighlightsScreen() {
           <View style={styles.listCard}>
             {items.length === 0 ? (
               <View style={styles.empty}>
-                <Text style={styles.emptyText}>등록된 하이라이트가 없습니다</Text>
+                <Text style={styles.emptyText}>등록된 대표 사진가 없습니다</Text>
               </View>
             ) : (
               items.map((h, i) => (
@@ -485,7 +485,7 @@ export default function HighlightsScreen() {
             onPress={() => !renameBusy && setRenameTarget(null)}
           />
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>하이라이트 제목 수정</Text>
+            <Text style={styles.modalTitle}>대표 사진 제목 수정</Text>
             <Text style={styles.modalHint}>최대 {MAX_TITLE_LEN}자까지 입력할 수 있어요</Text>
             <TextInput
               autoFocus

@@ -91,7 +91,7 @@ export default function HighlightsManagePage() {
       return
     }
     if (items.length >= MAX_HIGHLIGHTS) {
-      toast(`하이라이트는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
+      toast(`대표 사진는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
       return
     }
     if (kind === "image") imageInputRef.current?.click()
@@ -173,7 +173,7 @@ export default function HighlightsManagePage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!(await confirm({ description: "이 하이라이트를 삭제할까요?", destructive: true }))) return
+    if (!(await confirm({ description: "이 대표 사진를 삭제할까요?", destructive: true }))) return
     const target = items.find((x) => x.id === id)
     const { error } = await supabase.from("profile_highlights").delete().eq("id", id)
     if (error) {
@@ -230,14 +230,14 @@ export default function HighlightsManagePage() {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="font-semibold text-base ml-1">하이라이트 관리</h1>
+          <h1 className="font-semibold text-base ml-1">대표 사진 관리</h1>
         </div>
       </header>
 
       <div className="max-w-xl mx-auto px-4 py-4 space-y-4">
         {/* 추가 폼 */}
         <div className="bg-card rounded-xl border border-border p-4 space-y-3">
-          <h2 className="text-sm font-semibold">새 하이라이트 추가</h2>
+          <h2 className="text-sm font-semibold">새 대표 사진 추가</h2>
           <Input
             placeholder="제목 (예: 신메뉴, 후기, 작업)"
             value={title}
@@ -298,7 +298,7 @@ export default function HighlightsManagePage() {
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           {items.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
-              등록된 하이라이트가 없습니다
+              등록된 대표 사진가 없습니다
             </div>
           ) : (
             <ul className="divide-y divide-border">
@@ -393,7 +393,7 @@ export default function HighlightsManagePage() {
             className="relative w-full max-w-sm bg-card rounded-2xl shadow-2xl p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold mb-1">하이라이트 제목 수정</h2>
+            <h2 className="text-base font-semibold mb-1">대표 사진 제목 수정</h2>
             <p className="text-xs text-muted-foreground mb-3">최대 12자까지 입력할 수 있어요</p>
             <Input
               autoFocus

@@ -96,7 +96,7 @@ export function StoryViewer({
     setLoaded(false)
   }, [index])
 
-  // ⚡️ 열리자마자 전체 하이라이트 이미지 prefetch (memory-disk).
+  // ⚡️ 열리자마자 전체 대표 사진 이미지 prefetch (memory-disk).
   // 인스타 처럼 누르자마자 뜨도록 — 동영상은 expo-video 가 알아서 스트리밍 시작.
   useEffect(() => {
     if (!visible || items.length === 0) return
@@ -200,7 +200,7 @@ export function StoryViewer({
   async function handleDelete() {
     if (!canDelete || !current || deleting) return
     setPaused(true)
-    Alert.alert("삭제 확인", "이 하이라이트를 삭제할까요?", [
+    Alert.alert("삭제 확인", "이 대표 사진를 삭제할까요?", [
       { text: "취소", style: "cancel", onPress: () => setPaused(false) },
       {
         text: "삭제",

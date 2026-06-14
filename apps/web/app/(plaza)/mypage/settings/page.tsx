@@ -159,6 +159,7 @@ export default function SettingsPage() {
   }
 
   const handleLogout = async () => {
+    if (!(await confirm({ title: "로그아웃", description: "정말 로그아웃 하시겠어요?", confirmText: "로그아웃" }))) return
     await supabase.auth.signOut()
     window.location.href = "/"
   }
