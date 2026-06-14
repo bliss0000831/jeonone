@@ -72,6 +72,8 @@ export default function RentalManageScreen() {
     const title = b.rental?.post?.title || "농기구"
     if (next === "approved") notify(b.renter_id, "대여 승인됨", `${title} 대여가 승인되었습니다`, b.rental?.plaza_id)
     else if (next === "cancelled") notify(b.renter_id, "대여 거절됨", `${title} 대여 신청이 거절되었습니다`, b.rental?.plaza_id)
+    else if (next === "in_use") notify(b.renter_id, "대여 시작됨", `${title} 대여가 시작되었습니다`, b.rental?.plaza_id)
+    else if (next === "returned") notify(b.renter_id, "반납 완료", `${title} 반납이 확인되었습니다. 후기를 남겨주세요.`, b.rental?.plaza_id)
     load()
   }
 
@@ -112,8 +114,19 @@ export default function RentalManageScreen() {
           </View>
         )}
         {!mine && b.status === "approved" && (
-          <Pressable style={styles.fullBtn} onPress={() => setStatus(b, "completed")} disabled={busy === b.id}>
-            {busy === b.id ? <ActivityIndicator color={GREEN} size="small" /> : <><Ionicons name="cube-outline" size={16} color={GREEN} /><Text style={[styles.actionText, { color: GREEN }]}>반납 완료 처리</Text></>}
+          <View style={styles.actionRow}>
+            <Pressable style={styles.actionBtn} onPress={() => setStatus(b, "in_use")} disabled={busy === b.id}>
+              {busy === b.id ? <ActivityIndicator color="#1d4ed8" size="small" /> : <><Ionicons name="send-outline" size={16} color="#1d4ed8" /><Text style={[styles.actionText, { color: "#1d4ed8" }]}>대여 시작</Text></>}
+            </Pressable>
+            <View style={styles.vline} />
+            <Pressable style={styles.actionBtn} onPress={() => setStatus(b, "cancelled")} disabled={busy === b.id}>
+              <Ionicons name="close" size={16} color="#e11d48" /><Text style={[styles.actionText, { color: "#e11d48" }]}>취소</Text>
+            </Pressable>
+          </View>
+        )}
+        {!mine && b.status === "in_use" && (
+          <Pressable style={styles.fullBtn} onPress={() => setStatus(b, "returned")} disabled={busy === b.id}>
+            {busy === b.id ? <ActivityIndicator color={GREEN} size="small" /> : <><Ionicons name="cube-outline" size={16} color={GREEN} /><Text style={[styles.actionText, { color: GREEN }]}>반납 확인</Text></>}
           </Pressable>
         )}
         {mine && (b.status === "requested" || b.status === "approved") && (

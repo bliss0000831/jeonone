@@ -59,6 +59,11 @@ interface SharingPost {
 }
 
 const STATUS_BADGES: Record<string, { label: string; className: string }> = {
+  // DB 실제 초기값은 'active' — 'available' 은 레거시 호환용으로 함께 둠(둘 다 '나눔중')
+  active: {
+    label: "나눔중",
+    className: "bg-green-500 text-white",
+  },
   available: {
     label: "나눔중",
     className: "bg-green-500 text-white",

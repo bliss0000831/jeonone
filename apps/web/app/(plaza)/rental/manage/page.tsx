@@ -107,6 +107,8 @@ export default function RentalManagePage() {
     const title = b.rental?.post?.title || "농기구"
     if (next === "approved") { toast.success("승인했습니다"); notify(b.renter_id, "대여 승인됨", `${title} 대여가 승인되었습니다`, b.rental?.plaza_id) }
     else if (next === "cancelled") { toast.success("거절했습니다"); notify(b.renter_id, "대여 거절됨", `${title} 대여 신청이 거절되었습니다`, b.rental?.plaza_id) }
+    else if (next === "in_use") { toast.success("대여를 시작했습니다"); notify(b.renter_id, "대여 시작됨", `${title} 대여가 시작되었습니다`, b.rental?.plaza_id) }
+    else if (next === "returned") { toast.success("반납을 확인했습니다"); notify(b.renter_id, "반납 완료", `${title} 반납이 확인되었습니다. 후기를 남겨주세요.`, b.rental?.plaza_id) }
     else if (next === "completed") { toast.success("반납 완료 처리했습니다") }
     load()
   }
@@ -157,9 +159,21 @@ export default function RentalManagePage() {
           </div>
         )}
         {!mine && b.status === "approved" && (
-          <button onClick={() => setStatus(b, "completed")} disabled={busy === b.id}
+          <div className="flex border-t border-border">
+            <button onClick={() => setStatus(b, "in_use")} disabled={busy === b.id}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-50 disabled:opacity-50">
+              {busy === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}대여 시작
+            </button>
+            <button onClick={() => setStatus(b, "cancelled")} disabled={busy === b.id}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-rose-600 hover:bg-rose-50 border-l border-border disabled:opacity-50">
+              <X className="w-4 h-4" />취소
+            </button>
+          </div>
+        )}
+        {!mine && b.status === "in_use" && (
+          <button onClick={() => setStatus(b, "returned")} disabled={busy === b.id}
             className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-primary hover:bg-primary/5 border-t border-border disabled:opacity-50">
-            {busy === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <PackageCheck className="w-4 h-4" />}반납 완료 처리
+            {busy === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <PackageCheck className="w-4 h-4" />}반납 확인
           </button>
         )}
         {mine && (b.status === "requested" || b.status === "approved") && (

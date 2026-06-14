@@ -61,6 +61,8 @@ import { AddressMapPreview } from "@/components/AddressMapPreview"
 
 
 const STATUS_BADGE: Record<string, { label: string; bg: string }> = {
+  // DB 실제 초기값은 'active' — 'available' 은 레거시 호환용으로 함께 둠(둘 다 '나눔중')
+  active: { label: "나눔중", bg: "#22c55e" },
   available: { label: "나눔중", bg: "#22c55e" },
   reserved: { label: "예약중", bg: "#eab308" },
   completed: { label: "나눔완료", bg: "#6b7280" },
