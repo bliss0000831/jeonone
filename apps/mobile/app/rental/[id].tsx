@@ -29,6 +29,7 @@ export default function RentalDetailScreen() {
   const [showEnd, setShowEnd] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [uid, setUid] = useState<string | null>(null)
+  const [myBooking, setMyBooking] = useState<any>(null)
   const [imageIndex, setImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const { width } = useWindowDimensions()
@@ -39,7 +40,16 @@ export default function RentalDetailScreen() {
     setUid(user?.id ?? null)
     const { data } = await (sb as any).from("rental_listings")
       .select("*, post:secondhand_posts(title, description, images)").eq("id", id).maybeSingle()
-    setR(data); setLoading(false)
+    setR(data)
+    // 내가 이미 신청한 진행 중 예약 — 중복 신청 방지 안내
+    if (user && data && data.owner_id !== user.id) {
+      const { data: bk } = await (sb as any).from("rental_bookings")
+        .select("id, status").eq("rental_id", id).eq("renter_id", user.id)
+        .in("status", ["requested", "approved", "in_use"])
+        .order("created_at", { ascending: false }).limit(1).maybeSingle()
+      setMyBooking(bk ?? null)
+    } else setMyBooking(null)
+    setLoading(false)
   }, [id])
   useEffect(() => { load() }, [load])
 
@@ -124,6 +134,15 @@ export default function RentalDetailScreen() {
             {r.deposit ? <Text style={styles.dep}>보증금 {won(r.deposit)} (반납 후 환급)</Text> : null}
           </View>
           {r.post?.description ? <Text style={styles.desc}>{r.post.description}</Text> : null}
+
+          {myBooking && (
+            <Pressable onPress={() => router.push("/rental/manage" as any)} style={styles.myBookingBanner}>
+              <Ionicons name="information-circle-outline" size={18} color={GREEN} />
+              <Text style={styles.myBookingText}>
+                이미 신청한 예약이 있어요 ({myBooking.status === "requested" ? "승인 대기" : myBooking.status === "approved" ? "승인됨" : "대여중"}) · 신청 현황 보기 →
+              </Text>
+            </Pressable>
+          )}
 
           {uid !== r.owner_id && (
           <>
@@ -226,6 +245,8 @@ const styles = StyleSheet.create({
   per: { fontSize: 15, fontWeight: "700", color: "#64748b" },
   dep: { fontSize: 13, color: "#94a3b8", marginTop: 4 },
   desc: { fontSize: 14, color: "#334155", lineHeight: 21, marginBottom: 16 },
+  myBookingBanner: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 2, borderColor: "rgba(34,90,57,0.3)", backgroundColor: "rgba(34,90,57,0.06)", borderRadius: 12, padding: 12, marginBottom: 14 },
+  myBookingText: { flex: 1, fontSize: 13, fontWeight: "700", color: GREEN, lineHeight: 18 },
   label: { fontSize: 16, fontWeight: "800", color: "#1e293b", marginBottom: 8 },
   fieldLabel: { fontSize: 13, color: "#64748b", marginBottom: 4 },
   dateBtn: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 14 },

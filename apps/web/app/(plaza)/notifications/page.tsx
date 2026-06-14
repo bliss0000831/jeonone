@@ -20,6 +20,7 @@ import {
   CalendarDays,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { useConfirm } from "@/components/confirm-provider"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -134,6 +135,7 @@ function formatTime(dateString: string) {
 }
 
 export default function NotificationsPage() {
+  const confirm = useConfirm()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
@@ -216,6 +218,7 @@ export default function NotificationsPage() {
   }
 
   const deleteNotification = async (id: string) => {
+    if (!(await confirm({ title: "알림 삭제", description: "이 알림을 삭제하시겠습니까?", confirmText: "삭제", destructive: true }))) return
     try {
       const { error } = await supabase.from("notifications").delete().eq("id", id)
       if (error) throw error

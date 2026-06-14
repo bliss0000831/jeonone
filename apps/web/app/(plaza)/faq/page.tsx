@@ -47,7 +47,7 @@ export default async function FAQPage() {
       <main className="max-w-2xl mx-auto p-4">
         {groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p className="text-sm">등록된 FAQ가 없습니다.</p>
+            <p className="text-sm">아직 등록된 질문이 없어요.</p>
           </div>
         ) : (
           groups.map(([category, items]) => (

@@ -66,7 +66,7 @@ export default function FaqScreen() {
         </View>
       ) : faqs.length === 0 ? (
         <View style={styles.center}>
-          <Text style={{ color: lightColors.ink500 }}>등록된 FAQ가 없습니다.</Text>
+          <Text style={{ color: lightColors.ink500 }}>아직 등록된 질문이 없어요.</Text>
         </View>
       ) : (
         <ScrollView

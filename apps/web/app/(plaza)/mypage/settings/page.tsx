@@ -560,7 +560,7 @@ function Row({ item, divider }: { item: Item; divider: boolean }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
         {item.helper && (
-          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{item.helper}</p>
+          <p className="text-[13px] text-muted-foreground truncate mt-0.5">{item.helper}</p>
         )}
       </div>
     </>

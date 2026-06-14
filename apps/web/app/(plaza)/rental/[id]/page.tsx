@@ -26,6 +26,7 @@ export default function RentalDetailPage() {
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [myBooking, setMyBooking] = useState<any>(null)
   const confirm = useConfirm()
   // 채팅 문의 — 대여는 내부적으로 secondhand_posts 라 동일 경로 재사용(서버가 작성자 검증)
   const { handleChat, chatLoading } = usePostChat({
@@ -38,12 +39,25 @@ export default function RentalDetailPage() {
 
   const load = useCallback(async () => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    const { data: { user: u } } = await supabase.auth.getUser()
+    setUser(u)
     const { data } = await (supabase as any)
       .from("rental_listings")
       .select("*, post:secondhand_posts(title, description, images, location)")
       .eq("id", id).maybeSingle()
     setR(data)
+    // 내가 이미 신청한 진행 중 예약 — 중복 신청 방지 안내
+    if (u && data && (data as any).owner_id !== u.id) {
+      const { data: bk } = await (supabase as any)
+        .from("rental_bookings")
+        .select("id, status")
+        .eq("rental_id", id).eq("renter_id", u.id)
+        .in("status", ["requested", "approved", "in_use"])
+        .order("created_at", { ascending: false }).limit(1).maybeSingle()
+      setMyBooking(bk ?? null)
+    } else {
+      setMyBooking(null)
+    }
     setLoading(false)
   }, [id])
 
@@ -96,7 +110,7 @@ export default function RentalDetailPage() {
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="min-h-screen flex flex-col bg-background pb-28">
+    <div className="min-h-screen flex flex-col bg-background pb-40">
       <Header user={user} />
       <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-5">
         <Link href="/rental" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-3"><ArrowLeft className="w-4 h-4" />농기구 대여</Link>
@@ -112,6 +126,13 @@ export default function RentalDetailPage() {
           {r.deposit ? <p className="text-sm text-muted-foreground mt-1">보증금 {won(r.deposit)} (반납 후 환급)</p> : null}
         </div>
         {r.post?.description && <p className="text-sm text-foreground/80 whitespace-pre-wrap mb-5">{r.post.description}</p>}
+
+        {/* 내가 이미 신청한 예약 안내 — 중복 신청 방지 */}
+        {myBooking && (
+          <Link href="/rental/manage" className="block rounded-xl border-2 border-primary/30 bg-primary/5 p-3 mb-4 text-sm font-bold text-primary text-center">
+            이미 신청한 예약이 있어요 ({myBooking.status === "requested" ? "승인 대기" : myBooking.status === "approved" ? "승인됨" : "대여중"}) · 신청 현황 보기 →
+          </Link>
+        )}
 
         {/* 대여 신청 — 소유자에겐 숨김(자기 물건 신청 방지) */}
         {user?.id !== r.owner_id && (
