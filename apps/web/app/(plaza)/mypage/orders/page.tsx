@@ -42,6 +42,8 @@ export default function MyOrdersPage() {
   const [reviewTarget, setReviewTarget] = useState<{ orderId: string; sellerId: string } | null>(null)
   const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set())
   const [loadError, setLoadError] = useState(false)
+  const [refundTarget, setRefundTarget] = useState<string | null>(null)
+  const [refundReason, setRefundReason] = useState("")
 
   useEffect(() => {
     const init = async () => {
@@ -105,14 +107,17 @@ export default function MyOrdersPage() {
     else toast.error("처리 실패")
     setActing(null)
   }
-  const refund = async (orderId: string) => {
-    const reason = window.prompt("환불 사유를 입력해주세요")
-    if (!reason || !reason.trim()) return
+  // 환불 사유 입력 — window.prompt(모바일 웹뷰 먹통) 대신 앱 모달
+  const submitRefund = async () => {
+    const orderId = refundTarget
+    const reason = refundReason.trim()
+    if (!orderId || !reason) return
+    setRefundTarget(null)
     setActing(orderId)
     const res = await fetch(`/api/local-food-orders/${orderId}/refund`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reason: reason.trim() }),
+      body: JSON.stringify({ reason }),
     })
     if (res.ok) { await reload(); toast.success("환불 요청을 접수했습니다") }
     else toast.error("처리 실패")
@@ -248,7 +253,7 @@ export default function MyOrdersPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => refund(order.id)}
+                          onClick={() => { setRefundTarget(order.id); setRefundReason("") }}
                           disabled={acting === order.id}
                         >
                           <RotateCcw className="w-4 h-4 mr-1" />
@@ -269,7 +274,7 @@ export default function MyOrdersPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => refund(order.id)}
+                        onClick={() => { setRefundTarget(order.id); setRefundReason("") }}
                         disabled={acting === order.id}
                       >
                         <RotateCcw className="w-4 h-4 mr-1" />
@@ -316,6 +321,34 @@ export default function MyOrdersPage() {
               setReviewedOrders((prev) => new Set(prev).add(reviewTarget.orderId))
             }}
           />
+        )}
+
+        {/* 환불 사유 입력 모달 — window.prompt 대체 */}
+        {refundTarget && (
+          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setRefundTarget(null)} aria-hidden />
+            <div className="relative w-full md:w-[420px] bg-card rounded-t-2xl md:rounded-2xl p-5">
+              <h3 className="text-base font-bold mb-1">환불 요청</h3>
+              <p className="text-sm text-muted-foreground mb-3">환불 사유를 입력해주세요.</p>
+              <textarea
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                rows={3}
+                maxLength={200}
+                autoFocus
+                placeholder="예) 상품이 파손되어 도착했어요"
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+              />
+              <div className="flex gap-2 mt-4">
+                <button onClick={() => setRefundTarget(null)} className="flex-1 py-2.5 rounded-xl border border-border font-bold text-muted-foreground hover:bg-secondary">
+                  취소
+                </button>
+                <button onClick={submitRefund} disabled={!refundReason.trim()} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50">
+                  환불 요청
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
 

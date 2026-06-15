@@ -134,8 +134,8 @@ export default function RentalDetailPage() {
           </Link>
         )}
 
-        {/* 대여 신청 — 소유자에겐 숨김(자기 물건 신청 방지) */}
-        {user?.id !== r.owner_id && (
+        {/* 대여 신청 — 소유자·이미 신청한 사람에겐 숨김(중복 신청 방지) */}
+        {user?.id !== r.owner_id && !myBooking && (
         <div className="rounded-2xl border bg-card p-5">
           <h3 className="font-bold mb-3">대여 기간 선택</h3>
           <div className="grid grid-cols-2 gap-3">
@@ -169,6 +169,10 @@ export default function RentalDetailPage() {
           {user?.id === r.owner_id ? (
             <Link href="/rental/manage" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5">
               <CalendarDays className="w-5 h-5" /> 내 대여 상품 · 예약 관리
+            </Link>
+          ) : myBooking ? (
+            <Link href="/rental/manage" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-bold py-3.5">
+              <CalendarDays className="w-5 h-5" /> 신청 현황 보기
             </Link>
           ) : (
             <div className="flex items-center gap-3">

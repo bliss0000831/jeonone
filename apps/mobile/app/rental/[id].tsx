@@ -6,7 +6,8 @@ import { useRouter, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import DateTimePicker from "@react-native-community/datetimepicker"
-import { getSupabase } from "@/lib/supabase"
+import { getSupabase, gwangjangFetch } from "@/lib/supabase"
+import { startPostChat } from "@gwangjang/features/chat"
 import { CallButton } from "@/components/CallButton"
 import { PostActionsMenu } from "@/components/PostActionsMenu"
 import { ImageLightbox } from "@/components/ImageLightbox"
@@ -28,6 +29,7 @@ export default function RentalDetailScreen() {
   const [showStart, setShowStart] = useState(false)
   const [showEnd, setShowEnd] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [chatBusy, setChatBusy] = useState(false)
   const [uid, setUid] = useState<string | null>(null)
   const [myBooking, setMyBooking] = useState<any>(null)
   const [imageIndex, setImageIndex] = useState(0)
@@ -81,6 +83,26 @@ export default function RentalDetailScreen() {
       Alert.alert("신청 실패", "네트워크 상태를 확인하고 다시 시도해주세요.")
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  // 채팅으로 문의 — 대여는 내부적으로 secondhand_posts (웹과 동일 경로)
+  const openChat = async () => {
+    if (chatBusy || !r) return
+    if (!uid) { Alert.alert("로그인 필요", "로그인이 필요합니다"); return }
+    if (uid === r.owner_id) { Alert.alert("알림", "본인 글에는 채팅할 수 없습니다"); return }
+    setChatBusy(true)
+    try {
+      const res = await startPostChat(
+        (u, init) => gwangjangFetch(u, init as any),
+        { postId: r.post_id, postType: "secondhand" },
+      )
+      if (!res.ok || !res.roomId) { Alert.alert("채팅 실패", "채팅방을 열지 못했어요. 잠시 후 다시 시도해주세요."); return }
+      router.push(`/chat/${res.roomId}` as any)
+    } catch {
+      Alert.alert("채팅 실패", "네트워크 상태를 확인하고 다시 시도해주세요.")
+    } finally {
+      setChatBusy(false)
     }
   }
 
@@ -144,7 +166,7 @@ export default function RentalDetailScreen() {
             </Pressable>
           )}
 
-          {uid !== r.owner_id && (
+          {uid !== r.owner_id && !myBooking && (
           <>
           <Text style={styles.label}>대여 기간 선택</Text>
           <View style={{ flexDirection: "row", gap: 10 }}>
@@ -212,11 +234,21 @@ export default function RentalDetailScreen() {
           </Pressable>
         ) : (
           <>
+            {/* 먼저 물어보기 — 구속력 있는 신청 전에 채팅 문의 */}
+            <Pressable style={styles.chatIconBtn} onPress={openChat} disabled={chatBusy}>
+              {chatBusy ? <ActivityIndicator color={GREEN} size="small" /> : <Ionicons name="chatbubble-ellipses-outline" size={22} color={GREEN} />}
+            </Pressable>
             {/* 보조: 소유자에게 전화 걸기 — phone 있을 때만 노출 */}
             <CallButton userId={r.owner_id} color={GREEN} />
-            <Pressable style={[styles.btn, { flex: 1 }]} onPress={apply} disabled={submitting}>
-              {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
-            </Pressable>
+            {myBooking ? (
+              <Pressable style={[styles.btn, { flex: 1 }]} onPress={() => router.push("/rental/manage" as any)}>
+                <Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>신청 현황 보기</Text>
+              </Pressable>
+            ) : (
+              <Pressable style={[styles.btn, { flex: 1 }]} onPress={apply} disabled={submitting}>
+                {submitting ? <ActivityIndicator color="#fff" /> : <><Ionicons name="calendar" size={18} color="#fff" /><Text style={styles.btnText}>대여 신청{total > 0 ? ` · ${won(total)}` : ""}</Text></>}
+              </Pressable>
+            )}
           </>
         )}
       </View>
@@ -257,4 +289,5 @@ const styles = StyleSheet.create({
   btnBar: { position: "absolute", bottom: 0, left: 0, right: 0, flexDirection: "row", gap: 8, padding: 12, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#eee" },
   btn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: GREEN, borderRadius: 12, paddingVertical: 14 },
   btnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
+  chatIconBtn: { width: 48, alignItems: "center", justifyContent: "center", borderWidth: 1.5, borderColor: GREEN, borderRadius: 12 },
 })

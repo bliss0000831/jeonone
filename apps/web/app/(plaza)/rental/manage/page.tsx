@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
+import { useConfirm } from "@/components/confirm-provider"
 import { CalendarDays, ArrowLeft, Loader2, Inbox, Send, Check, X, PackageCheck, Star } from "lucide-react"
 
 const FALLBACK_IMG = "/images/card-farm-equipment.jpg"
@@ -41,6 +42,7 @@ interface Booking {
 }
 
 export default function RentalManagePage() {
+  const confirm = useConfirm()
   const [user, setUser] = useState<User | null>(null)
   const [tab, setTab] = useState<"received" | "sent">("received")
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -98,6 +100,9 @@ export default function RentalManagePage() {
   }
 
   const setStatus = async (b: Booking, next: string) => {
+    // 비가역/중요 전이는 확인 (오탭 방지)
+    if (next === "cancelled" && !(await confirm({ title: "대여 거절", description: "이 대여 신청을 거절하시겠습니까?", confirmText: "거절", destructive: true }))) return
+    if (next === "returned" && !(await confirm({ title: "반납 확인", description: "반납을 확인 처리하시겠습니까?", confirmText: "반납 확인" }))) return
     setBusy(b.id)
     const supabase = createClient()
     const { error } = await (supabase as any)
@@ -114,6 +119,7 @@ export default function RentalManagePage() {
   }
 
   const cancelMine = async (b: Booking) => {
+    if (!(await confirm({ title: "신청 취소", description: "대여 신청을 취소하시겠습니까?", confirmText: "신청 취소", destructive: true }))) return
     setBusy(b.id)
     const supabase = createClient()
     const { error } = await (supabase as any)

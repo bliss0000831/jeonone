@@ -64,6 +64,20 @@ export default function RentalManageScreen() {
   }
 
   const setStatus = async (b: any, next: string) => {
+    // 비가역/중요 전이는 확인 (오탭 방지)
+    if (next === "cancelled" || next === "returned") {
+      const ok = await new Promise<boolean>((resolve) =>
+        Alert.alert(
+          next === "returned" ? "반납 확인" : "대여 거절",
+          next === "returned" ? "반납을 확인 처리하시겠습니까?" : "이 대여 신청을 거절하시겠습니까?",
+          [
+            { text: "취소", style: "cancel", onPress: () => resolve(false) },
+            { text: next === "returned" ? "반납 확인" : "거절", style: next === "returned" ? "default" : "destructive", onPress: () => resolve(true) },
+          ],
+        ),
+      )
+      if (!ok) return
+    }
     setBusy(b.id)
     const { error } = await (getSupabase() as any).from("rental_bookings")
       .update({ status: next, updated_at: new Date().toISOString() }).eq("id", b.id)
@@ -78,6 +92,13 @@ export default function RentalManageScreen() {
   }
 
   const cancelMine = async (b: any) => {
+    const ok = await new Promise<boolean>((resolve) =>
+      Alert.alert("신청 취소", "대여 신청을 취소하시겠습니까?", [
+        { text: "아니요", style: "cancel", onPress: () => resolve(false) },
+        { text: "신청 취소", style: "destructive", onPress: () => resolve(true) },
+      ]),
+    )
+    if (!ok) return
     setBusy(b.id)
     const { error } = await (getSupabase() as any).from("rental_bookings")
       .update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", b.id)

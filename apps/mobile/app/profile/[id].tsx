@@ -110,6 +110,7 @@ export default function PublicProfileScreen() {
   const [activeTab, setActiveTab] = useState<ProfileTabId>("posts")
   const [posts, setPosts] = useState<UnifiedPost[]>([])
   const [postsLoading, setPostsLoading] = useState(false)
+  const [postsHidden, setPostsHidden] = useState(false)
 
   const [reviewsOpen, setReviewsOpen] = useState(false)
   const [reviews, setReviews] = useState<ReviewEntry[]>([])
@@ -255,6 +256,15 @@ export default function PublicProfileScreen() {
     const supabase = getSupabase()
     setPostsLoading(true)
     try {
+      // 글 비공개 설정 — 타인 프로필이면 owner 의 posts_public 확인 (웹과 동일하게 숨김)
+      if (!isSelf) {
+        const { data: prof } = await (supabase as any)
+          .from("profiles").select("posts_public").eq("id", id).maybeSingle()
+        if (prof && prof.posts_public === false) {
+          setPosts([]); setPostsHidden(true); return
+        }
+      }
+      setPostsHidden(false)
       const data = await listMyPosts(supabase, id, {
         plazaId: DEFAULT_PLAZA,
       })
@@ -262,7 +272,7 @@ export default function PublicProfileScreen() {
     } finally {
       setPostsLoading(false)
     }
-  }, [id, role.type, DEFAULT_PLAZA])
+  }, [id, role.type, DEFAULT_PLAZA, isSelf])
 
   useEffect(() => {
     if (!id || !activeTab) return
@@ -602,6 +612,8 @@ export default function PublicProfileScreen() {
             <View style={styles.tabContent}>
               {postsLoading ? (
                 <ActivityIndicator color={lightColors.primary} />
+              ) : postsHidden ? (
+                <EmptyHint label="이 사용자가 게시글을 비공개로 설정했어요" />
               ) : generalPosts.length === 0 ? (
                 <EmptyHint label="아직 게시글이 없어요" />
               ) : (
