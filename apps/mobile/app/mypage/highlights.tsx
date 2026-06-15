@@ -78,7 +78,7 @@ export default function HighlightsScreen() {
         setItems(rows as Row[])
       } catch (e) {
         console.warn("[highlights] load failed", e)
-        Alert.alert("불러오기 실패", "대표 사진를 불러오지 못했어요. 다시 시도해 주세요.")
+        Alert.alert("불러오기 실패", "대표 사진을 불러오지 못했어요. 다시 시도해 주세요.")
       } finally {
         setLoading(false)
       }
@@ -170,7 +170,7 @@ export default function HighlightsScreen() {
       return
     }
     if (items.length >= MAX_HIGHLIGHTS) {
-      showAlert("알림", `대표 사진는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
+      showAlert("알림", `대표 사진은 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
       return
     }
 
@@ -245,7 +245,7 @@ export default function HighlightsScreen() {
   }
 
   async function confirmDelete(id: string) {
-    const ok = await confirmAsync("이 대표 사진를 삭제할까요?")
+    const ok = await confirmAsync("이 대표 사진을 삭제할까요?")
     if (!ok) return
     try {
       await deleteHighlight(getSupabase(), id)
@@ -353,7 +353,7 @@ export default function HighlightsScreen() {
           <View style={styles.listCard}>
             {items.length === 0 ? (
               <View style={styles.empty}>
-                <Text style={styles.emptyText}>등록된 대표 사진가 없습니다</Text>
+                <Text style={styles.emptyText}>등록된 대표 사진이 없습니다</Text>
               </View>
             ) : (
               items.map((h, i) => (

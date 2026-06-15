@@ -5,6 +5,9 @@ import Image from "next/image"
 import { ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+/** URL 확장자로 동영상 판별 — 갤러리에서 .mp4 등을 img 로 렌더해 깨지던 문제 방지 */
+const isVideoUrl = (u?: string | null) => !!u && /\.(mp4|mov|webm|m4v)(\?|$)/i.test(u)
+
 interface DetailGalleryProps {
   images?: string[] | null
   alt?: string
@@ -119,6 +122,14 @@ export function DetailGallery({
         onTouchEnd={handleTouchEnd}
       >
         {hasImages ? (
+          isVideoUrl(imgs[index]) ? (
+            <video
+              src={imgs[index]}
+              controls
+              playsInline
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+            />
+          ) : (
           <button
             type="button"
             onClick={() => {
@@ -138,6 +149,7 @@ export function DetailGallery({
               suppressHydrationWarning
             />
           </button>
+          )
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
             <div className="text-center">
@@ -386,7 +398,17 @@ function Lightbox({
         </div>
       )}
 
-      {/* 이미지 — object-contain + 줌/패닝 */}
+      {/* 이미지/동영상 — object-contain + 줌/패닝 (동영상은 줌 없이 재생) */}
+      {isVideoUrl(images[index]) ? (
+        <video
+          src={images[index]}
+          controls
+          autoPlay
+          playsInline
+          className="max-w-full max-h-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : (
       <img
         src={images[index]}
         alt={alt}
@@ -403,6 +425,7 @@ function Lightbox({
         }}
         onWheel={handleWheel}
       />
+      )}
 
       {/* 좌우 네비 (줌 상태에서는 숨김) */}
       {multiple && !isZoomed && (

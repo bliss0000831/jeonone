@@ -200,7 +200,7 @@ export function StoryViewer({
   async function handleDelete() {
     if (!canDelete || !current || deleting) return
     setPaused(true)
-    Alert.alert("삭제 확인", "이 대표 사진를 삭제할까요?", [
+    Alert.alert("삭제 확인", "이 대표 사진을 삭제할까요?", [
       { text: "취소", style: "cancel", onPress: () => setPaused(false) },
       {
         text: "삭제",

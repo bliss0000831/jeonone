@@ -91,7 +91,7 @@ export default function HighlightsManagePage() {
       return
     }
     if (items.length >= MAX_HIGHLIGHTS) {
-      toast(`대표 사진는 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
+      toast(`대표 사진은 최대 ${MAX_HIGHLIGHTS}개까지 등록할 수 있습니다`)
       return
     }
     if (kind === "image") imageInputRef.current?.click()
@@ -173,7 +173,7 @@ export default function HighlightsManagePage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!(await confirm({ description: "이 대표 사진를 삭제할까요?", destructive: true }))) return
+    if (!(await confirm({ description: "이 대표 사진을 삭제할까요?", destructive: true }))) return
     const target = items.find((x) => x.id === id)
     const { error } = await supabase.from("profile_highlights").delete().eq("id", id)
     if (error) {
@@ -298,7 +298,7 @@ export default function HighlightsManagePage() {
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           {items.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
-              등록된 대표 사진가 없습니다
+              등록된 대표 사진이 없습니다
             </div>
           ) : (
             <ul className="divide-y divide-border">

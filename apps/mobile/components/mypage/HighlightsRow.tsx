@@ -6,7 +6,7 @@
  *   2. 빈 + other 모드: 섹션 자체 숨김 (null)
  *   3. 채워짐: 가로 스크롤
  *      - self 면 첫 칸에 "추가/수정" 점선 원
- *      - 각 대표 사진는 gradient ring (yellow→pink→purple, p-0.5)
+ *      - 각 대표 사진은 gradient ring (yellow→pink→purple, p-0.5)
  *        안에 background bg p-0.5, 그 안에 이미지 원형
  *      - 비디오면 우하단에 ▶ 뱃지
  *

@@ -98,7 +98,7 @@ export function StoryViewer({
   const handleDelete = async () => {
     if (!canDelete || !current || deleting) return
     setPaused(true)
-    const ok = confirm("이 대표 사진를 삭제할까요?")
+    const ok = confirm("이 대표 사진을 삭제할까요?")
     if (!ok) {
       setPaused(false)
       return

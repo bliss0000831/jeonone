@@ -476,17 +476,15 @@ export default function SecondhandDetailScreen() {
 
       {/* Action bar */}
       <View style={[styles.actionBar, { paddingBottom: Math.max(spacing[4], insets.bottom + spacing[2]) }]}>
-        {isCompleted ? (
+        {isOwner ? (
+          <Pressable style={[styles.actionPrimary, { flex: 1 }]} onPress={openHostMenu} disabled={busy}>
+            <Ionicons name="settings-outline" size={18} color="#ffffff" />
+            <Text style={styles.actionPrimaryText}>판매 상태 변경 · 관리</Text>
+          </Pressable>
+        ) : isCompleted ? (
           <Pressable style={[styles.actionOutline, { flex: 1 }]} disabled>
             <Text style={[styles.actionOutlineText, { color: lightColors.ink500 }]}>
               판매완료
-            </Text>
-          </Pressable>
-        ) : isOwner ? (
-          <Pressable style={[styles.actionOutline, { flex: 1 }]} disabled>
-            <Ionicons name="bag-handle-outline" size={18} color={lightColors.ink500} />
-            <Text style={[styles.actionOutlineText, { color: lightColors.ink500 }]}>
-              내가 등록한 상품
             </Text>
           </Pressable>
         ) : (

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ChevronLeft, MoreVertical, Shield } from "lucide-react"
+import { ChevronLeft, MoreVertical, Shield, Ban } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { getCurrentPlazaClient } from "@/lib/plaza/client"
 import { useSiteBranding } from "@/components/site-branding-client"
@@ -31,6 +31,7 @@ import {
   type AccountType,
 } from "./role-config"
 import { toast } from "sonner"
+import { useConfirm } from "@/components/confirm-provider"
 
 // ─── Types ────────────────────────────────────────────────
 interface ProfileRow extends SidebarData {
@@ -117,7 +118,30 @@ export function ProfileShell({
 }: ProfileShellProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const confirm = useConfirm()
+  const [moreOpen, setMoreOpen] = useState(false)
   const supabase = useMemo(() => createClient(), [])
+
+  const handleBlockUser = async () => {
+    setMoreOpen(false)
+    if (!currentUserId) { router.push(`/auth/login?redirect=/profile/${userId}`); return }
+    if (currentUserId === userId) return
+    if (!(await confirm({
+      title: "사용자 차단",
+      description: "이 사용자를 차단하시겠습니까?\n차단하면 서로의 채팅이 목록에서 가려집니다. (차단 목록에서 해제할 수 있어요)",
+      confirmText: "차단",
+      destructive: true,
+    }))) return
+    const { error } = await (supabase as any)
+      .from("block_users")
+      .insert({ blocker_id: currentUserId, blocked_id: userId })
+    if (error && error.code !== "23505") { // 23505 = 이미 차단됨(중복) → 성공 취급
+      console.error("[profile block]", error)
+      toast.error("차단에 실패했어요. 잠시 후 다시 시도해주세요.")
+      return
+    }
+    toast.success("차단했습니다.")
+  }
   const { name: plazaBrandName } = useSiteBranding()
   // 멀티-광장 격리 — 모든 콘텐츠 쿼리에 plaza_id 필터 자동 주입
   const plaza = useMemo(() => getCurrentPlazaClient(), [])
@@ -684,9 +708,28 @@ export function ProfileShell({
               />
             )}
             {mode === "other" && (
-              <button className="p-2 -mr-1 rounded-full hover:bg-secondary" aria-label="더보기">
-                <MoreVertical className="w-5 h-5" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setMoreOpen((v) => !v)}
+                  className="p-2 -mr-1 rounded-full hover:bg-secondary"
+                  aria-label="더보기 (차단)"
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+                {moreOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} aria-hidden />
+                    <div className="absolute right-0 mt-1 z-50 w-40 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+                      <button
+                        onClick={handleBlockUser}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-destructive hover:bg-secondary text-left"
+                      >
+                        <Ban className="w-4 h-4" /> 차단하기
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>

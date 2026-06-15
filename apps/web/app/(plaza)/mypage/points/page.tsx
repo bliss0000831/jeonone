@@ -228,20 +228,22 @@ export default function MyPointsPage() {
             <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
               {items.map((t) => {
                 const k = txKindClass(t)
+                // 적립(credit)만 초록↑, 차감(spend·expire·penalty·revert 등)은 빨강↓ — 부호와 일치
+                const isCredit = t.type === "earn" || t.type === "manual_adjust" || t.type === "event"
                 return (
                   <div key={t.id} className="flex items-center gap-3 px-3 py-3">
                     <span
                       className={cn(
                         "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0",
-                        t.type === "spend"
-                          ? "bg-rose-100 text-rose-600 dark:bg-rose-950/40"
-                          : "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40",
+                        isCredit
+                          ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40"
+                          : "bg-rose-100 text-rose-600 dark:bg-rose-950/40",
                       )}
                     >
-                      {t.type === "spend" ? (
-                        <ArrowDown className="w-4 h-4" />
-                      ) : (
+                      {isCredit ? (
                         <ArrowUp className="w-4 h-4" />
+                      ) : (
+                        <ArrowDown className="w-4 h-4" />
                       )}
                     </span>
                     <div className="flex-1 min-w-0">

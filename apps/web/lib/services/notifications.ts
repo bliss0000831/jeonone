@@ -83,6 +83,24 @@ export async function notify(
     if (fromUserId && fromUserId === input.user_id) return
     if (!input.user_id) return
 
+    // 수신자 알림 설정 존중 — 사용자가 끈 카테고리는 DB·푸시 모두 발송하지 않음
+    //   chat → notif_chat, favorite/price_change → notif_property
+    //   (그 외 주문·대여·시스템 등은 사용자가 끌 수 없는 필수 알림이라 항상 발송)
+    const prefKey: "notif_chat" | "notif_property" | null =
+      input.type === "chat" ? "notif_chat"
+      : input.type === "favorite" || input.type === "price_change" ? "notif_property"
+      : null
+    if (prefKey) {
+      try {
+        const { data: pref } = await client
+          .from("profiles")
+          .select(prefKey)
+          .eq("id", input.user_id)
+          .maybeSingle()
+        if (pref && (pref as any)[prefKey] === false) return // 수신 거부
+      } catch { /* 조회 실패 시 보수적으로 발송 */ }
+    }
+
     const plaza_id = await resolvePlaza(input.plaza_id)
 
     await client.from("notifications").insert({

@@ -18,6 +18,7 @@ import {
 import { Image } from "expo-image"
 import { Ionicons } from "@expo/vector-icons"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { MediaItem, isVideoUrl } from "./MediaItem"
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window")
 
@@ -68,6 +69,12 @@ export function ImageLightbox({ visible, images, initialIndex = 0, onClose }: Im
           }}
         >
           {images.map((uri, i) => (
+            isVideoUrl(uri) ? (
+              // 동영상은 줌 대신 재생(MediaItem) — 검은 화면 방지
+              <View key={i} style={styles.imageWrap}>
+                <MediaItem uri={uri} style={styles.image} />
+              </View>
+            ) : (
             // 각 페이지를 줌 가능한 ScrollView 로 — 두 손가락 핀치 확대(iOS 네이티브).
             // 이미지 탭으로는 닫지 않음(오작동 방지). 닫기는 우상단 X.
             <ScrollView
@@ -87,6 +94,7 @@ export function ImageLightbox({ visible, images, initialIndex = 0, onClose }: Im
                 cachePolicy="memory-disk"
               />
             </ScrollView>
+            )
           ))}
         </ScrollView>
 

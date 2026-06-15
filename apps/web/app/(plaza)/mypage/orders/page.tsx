@@ -41,6 +41,7 @@ export default function MyOrdersPage() {
   const [acting, setActing] = useState<string | null>(null)
   const [reviewTarget, setReviewTarget] = useState<{ orderId: string; sellerId: string } | null>(null)
   const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set())
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
     const init = async () => {
@@ -61,10 +62,17 @@ export default function MyOrdersPage() {
 
   const reload = async () => {
     setLoading(true)
-    const lfRes = await fetch("/api/local-food-orders?role=buyer", { cache: "no-store" })
-      .then((r) => r.json())
-      .catch(() => ({}))
-    setOrders(lfRes?.orders || [])
+    setLoadError(false)
+    try {
+      const r = await fetch("/api/local-food-orders?role=buyer", { cache: "no-store" })
+      if (!r.ok) throw new Error("load failed")
+      const lfRes = await r.json()
+      setOrders(lfRes?.orders || [])
+    } catch (e) {
+      console.error("[orders] load failed", e)
+      setLoadError(true)
+      setOrders([])
+    }
     // 후기 작성한 주문 (로컬푸드)
     try {
       const supabase = createClient()
@@ -145,7 +153,15 @@ export default function MyOrdersPage() {
 
         {/* 로컬푸드 주문 */}
         {!loading && (
-          orders.length === 0 ? (
+          loadError ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Package className="w-10 h-10 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">주문 내역을 불러오지 못했어요.</p>
+              <button onClick={reload} className="inline-block mt-3 text-sm text-primary hover:underline">
+                다시 시도
+              </button>
+            </div>
+          ) : orders.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <Package className="w-10 h-10 mx-auto mb-3 opacity-50" />
               <p className="text-sm">아직 구매한 상품이 없습니다</p>

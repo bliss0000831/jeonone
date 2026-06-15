@@ -167,7 +167,7 @@ export async function POST(
         message: pgCancelled
           ? `주문 환불이 PG사를 통해 처리되었습니다. 사유: ${reason.slice(0, 50)}`
           : `구매자가 환불을 요청했습니다. 사유: ${reason.slice(0, 50)}`,
-        link: `/local-food/orders/${id}`,
+        link: `/mypage/sales`,
       }, user.id)
     } catch (notifyErr) {
       console.error("[refund] notify seller failed (non-fatal):", notifyErr)
