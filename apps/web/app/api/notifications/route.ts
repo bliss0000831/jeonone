@@ -48,9 +48,21 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: '처리에 실패했습니다' }, { status: 500 })
   }
 
+  // 정확한 안읽음 총수 (목록 limit 와 무관) — 벨 뱃지가 20·50개에 갇히지 않도록
+  let unreadQ: any = reader
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("is_read", false)
+  if (plaza) unreadQ = unreadQ.eq("plaza_id", plaza)
+  const { count: unreadCount } = await unreadQ
+
   // 클라이언트 60초 polling — 브라우저 HTTP private cache 20초로 RTT 절감
   return NextResponse.json(notifications, {
-    headers: { 'Cache-Control': 'private, max-age=20' },
+    headers: {
+      'Cache-Control': 'private, max-age=20',
+      'X-Unread-Count': String(unreadCount ?? 0),
+    },
   })
 }
 

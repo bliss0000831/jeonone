@@ -183,9 +183,9 @@ export default function MyOrdersPage() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-base font-semibold ${STATUS_TONES[order.status]}`}
+                    className={`px-2 py-0.5 rounded-full text-base font-semibold ${STATUS_TONES[order.status] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}
                   >
-                    {STATUS_LABELS[order.status]}
+                    {STATUS_LABELS[order.status] ?? order.status}
                   </span>
                   <span className="text-sm text-muted-foreground">
                     {new Date(order.created_at).toLocaleDateString("ko-KR")}
@@ -271,15 +271,18 @@ export default function MyOrdersPage() {
                       </>
                     )}
                     {(order.status === "paid") && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { setRefundTarget(order.id); setRefundReason("") }}
-                        disabled={acting === order.id}
-                      >
-                        <RotateCcw className="w-4 h-4 mr-1" />
-                        환불
-                      </Button>
+                      <>
+                        <span className="text-xs text-muted-foreground mr-auto self-center">판매자가 상품을 보낼 때까지 기다려주세요.</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setRefundTarget(order.id); setRefundReason("") }}
+                          disabled={acting === order.id}
+                        >
+                          <RotateCcw className="w-4 h-4 mr-1" />
+                          환불
+                        </Button>
+                      </>
                     )}
                     {/* 구매확정/정산 후 — 후기 남기기 (이미 작성한 주문은 비활성) */}
                     {(order.status === "confirmed" || order.status === "completed" || order.status === "settled") && (

@@ -67,6 +67,11 @@ function typeMeta(type: string): { bg: string; icon: any } {
   if (type === "expert_invitation") return { bg: "#14b8a6", icon: "person-add" }
   if (type === "expert_invitation_response") return { bg: "#0d9488", icon: "checkmark-circle" }
   if (type === "admin_notice") return { bg: "#f97316", icon: "megaphone" }
+  if (type.startsWith("order")) return { bg: "#2563eb", icon: "cube" }
+  if (type.startsWith("rental")) return { bg: "#16a34a", icon: "calendar" }
+  if (type.startsWith("auction")) return { bg: "#d97706", icon: "hammer" }
+  if (type === "follow") return { bg: "#db2777", icon: "person-add" }
+  if (type === "account_type_review") return { bg: "#6366f1", icon: "shield-checkmark" }
   if (type === "system") return { bg: "#f59e0b", icon: "notifications" }
   return { bg: "#71717a", icon: "information-circle" }
 }

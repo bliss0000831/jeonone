@@ -66,7 +66,13 @@ export function NotificationBell() {
       if (response.ok) {
         const data = await response.json()
         setNotifications(data)
-        setUnreadCount(data.filter((n: Notification) => !n.is_read).length)
+        // 정확한 안읽음 총수는 헤더에서 (목록 20개 한도와 무관). 헤더 없으면 fallback.
+        const headerCount = response.headers.get("X-Unread-Count")
+        setUnreadCount(
+          headerCount != null
+            ? Number(headerCount)
+            : data.filter((n: Notification) => !n.is_read).length,
+        )
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error)

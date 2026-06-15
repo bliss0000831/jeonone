@@ -301,6 +301,7 @@ export default function LocalFoodRegisterScreen() {
           {/* Images */}
           <View>
             <Text style={styles.label}>상품 이미지 (최대 {MAX_IMAGES}장)</Text>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, marginBottom: 8 }}>사진을 1장 이상 올려주세요. 첫 번째 사진(⭐)이 대표 사진이에요.</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {images.map((url, idx) => (
                 <View key={idx} style={styles.imgWrap}>
@@ -343,6 +344,7 @@ export default function LocalFoodRegisterScreen() {
               placeholder="예: 춘천 햇사과 (꿀맛)"
               placeholderTextColor={lightColors.ink500}
               style={styles.input}
+              maxLength={60}
             />
           </Field>
 
@@ -526,6 +528,7 @@ export default function LocalFoodRegisterScreen() {
               maxLength={3000}
               style={[styles.input, styles.textarea]}
             />
+            <Text style={{ fontSize: 12, color: lightColors.ink500, textAlign: "right", marginTop: 4 }}>{content.length}/3000</Text>
           </Field>
 
           {/* 거래 장소 / 동·면 필드 제거 — 농가명으로 대체 */}

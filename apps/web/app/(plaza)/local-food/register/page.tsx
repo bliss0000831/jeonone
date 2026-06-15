@@ -366,6 +366,7 @@ export default function LocalFoodRegisterPage() {
               maxLength={3000}
               rows={6}
             />
+            <p className="text-xs text-muted-foreground text-right mt-1">{form.content.length}/3000</p>
           </div>
 
           {/* 동의 체크 */}
