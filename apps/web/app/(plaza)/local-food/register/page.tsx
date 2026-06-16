@@ -34,6 +34,8 @@ export default function LocalFoodRegisterPage() {
   const [subRegion, setSubRegion] = useState("")
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
   const consentRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLInputElement>(null)
+  const priceRef = useRef<HTMLInputElement>(null)
   const focusField = (ref: React.RefObject<HTMLElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
     ref.current?.focus({ preventScroll: true })
@@ -96,10 +98,12 @@ export default function LocalFoodRegisterPage() {
     
     if (!form.title.trim()) {
       toast("상품명을 입력해주세요")
+      focusField(titleRef)
       return
     }
     if (!form.price) {
       toast("가격을 입력해주세요")
+      focusField(priceRef)
       return
     }
     if (!consented) {
@@ -208,6 +212,7 @@ export default function LocalFoodRegisterPage() {
           <div>
             <Label htmlFor="title" className="mb-2 block">상품명 *</Label>
             <Input
+              ref={titleRef}
               id="title"
               value={form.title}
               onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
@@ -296,6 +301,7 @@ export default function LocalFoodRegisterPage() {
               <Label htmlFor="price" className="mb-2 block">판매가 *</Label>
               <div className="relative">
                 <Input
+                  ref={priceRef}
                   id="price"
                   type="text"
                   inputMode="numeric"

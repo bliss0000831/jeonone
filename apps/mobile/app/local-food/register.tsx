@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   imgWrap: { width: 100, height: 100, position: "relative", overflow: "visible" },
   img: { width: 100, height: 100, borderRadius: radius.md },
   imgRemove: {
-    position: "absolute", top: 2, right: 2, width: 20, height: 20, borderRadius: 10,
+    position: "absolute", top: 2, right: 2, width: 30, height: 30, borderRadius: 15,
     backgroundColor: "#ef4444", alignItems: "center", justifyContent: "center",
   },
   imgPick: {
@@ -628,9 +628,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 4,
     left: 4,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",
