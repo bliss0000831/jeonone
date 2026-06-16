@@ -373,9 +373,9 @@ export default function CreatePostPage() {
               placeholder="게시글 제목을 입력해주세요"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
+              maxLength={100}
             />
-            <p className="text-sm text-muted-foreground text-right">{title.length}/200</p>
+            <p className="text-sm text-muted-foreground text-right">{title.length}/100</p>
           </div>
 
           {/* 내용 */}
@@ -386,9 +386,10 @@ export default function CreatePostPage() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={8}
+              maxLength={3000}
               className="resize-none"
             />
-            <p className="text-sm text-muted-foreground text-right">{content.length}자</p>
+            <p className="text-sm text-muted-foreground text-right">{content.length}/3000</p>
           </div>
 
           {/* 버튼 */}

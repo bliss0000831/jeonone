@@ -2,7 +2,7 @@
  * 받은 후기 목록.
  */
 
-import { useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { useFocusEffect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { lightColors, fontSize, spacing } from "@gwangjang/tokens"
 import { listReviews, type ReviewEntry } from "@gwangjang/features/profile"
@@ -24,20 +25,25 @@ export default function ReviewsScreen() {
   const [items, setItems] = useState<ReviewEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user) return
-    ;(async () => {
-      try {
-        const list = await listReviews(getSupabase(), user.id)
-        setItems(list)
-      } catch (e) {
-        console.warn("[reviews] load failed", e)
-        Alert.alert("불러오기 실패", "후기를 불러오지 못했어요. 다시 시도해 주세요.")
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [user])
+  // 화면에 들어올 때마다 재조회 — 후기 작성 후 돌아오면 즉시 반영
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return
+      let alive = true
+      ;(async () => {
+        try {
+          const list = await listReviews(getSupabase(), user.id)
+          if (alive) setItems(list)
+        } catch (e) {
+          console.warn("[reviews] load failed", e)
+          if (alive) Alert.alert("불러오기 실패", "후기를 불러오지 못했어요. 다시 시도해 주세요.")
+        } finally {
+          if (alive) setLoading(false)
+        }
+      })()
+      return () => { alive = false }
+    }, [user]),
+  )
 
   const avg =
     items.length === 0

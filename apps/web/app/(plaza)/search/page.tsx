@@ -706,7 +706,11 @@ function ResultList({ hits, showBadge }: { hits: SearchHit[]; showBadge: boolean
 function ResultItem({ hit, showBadge }: { hit: SearchHit; showBadge: boolean }) {
   const meta = CATEGORY_META[hit.category]
   const CIcon = meta.icon
-  const price = null
+  // 검색 결과 가격 — meta.price 가 양수일 때만(중고·로컬푸드). 단위가 있으면 함께 표시.
+  const rawPrice = Number(hit.meta?.price)
+  const price = rawPrice > 0
+    ? `${rawPrice.toLocaleString()}원${hit.meta?.unit ? ` / ${hit.meta.unit}` : ""}`
+    : null
   return (
     <li>
       <Link

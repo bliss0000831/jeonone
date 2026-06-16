@@ -367,6 +367,7 @@ export default function SecondhandRegisterScreen() {
           {/* Images */}
           <View>
             <Text style={styles.label}>사진 (최대 {MAX_IMAGES}장) <Text style={{ color: "#e11d48" }}>· 1장 이상 필수</Text></Text>
+            <Text style={{ fontSize: 13, color: lightColors.ink500, marginBottom: 8 }}>첫 번째 사진(⭐)이 대표 사진이에요. 별을 눌러 대표를 바꿀 수 있어요.</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {images.map((url, idx) => (
                 <View key={idx} style={styles.imgWrap}>

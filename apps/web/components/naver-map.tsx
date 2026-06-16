@@ -32,6 +32,7 @@ export function NaverMap({ address, lat: propLat, lng: propLng, height = 320 }: 
     propLat != null && propLng != null ? { lat: propLat, lng: propLng } : null,
   )
   const [isApproximate, setIsApproximate] = useState(false)
+  const [retryKey, setRetryKey] = useState(0)
 
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID
 
@@ -40,7 +41,7 @@ export function NaverMap({ address, lat: propLat, lng: propLng, height = 320 }: 
 
     const init = async () => {
       if (!clientId) {
-        setError("네이버 지도 Client ID 가 설정되지 않았습니다")
+        setError("지도를 불러올 수 없어요")
         return
       }
 
@@ -48,7 +49,8 @@ export function NaverMap({ address, lat: propLat, lng: propLng, height = 320 }: 
       try {
         await loadNaverMapsScript(clientId)
       } catch (e) {
-        if (!cancelled) setError((e as Error).message)
+        console.error("[NaverMap] script load failed", e)
+        if (!cancelled) setError("지도를 불러오지 못했어요")
         return
       }
       if (cancelled || !window.naver?.maps) return
@@ -157,7 +159,7 @@ export function NaverMap({ address, lat: propLat, lng: propLng, height = 320 }: 
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, clientId])
+  }, [address, clientId, retryKey])
 
   // 위성/일반 전환
   useEffect(() => {
@@ -224,8 +226,27 @@ export function NaverMap({ address, lat: propLat, lng: propLng, height = 320 }: 
         </div>
       )}
       {error && (
-        <div className="absolute inset-0 bg-muted flex items-center justify-center z-[99] p-4">
-          <div className="text-sm text-destructive text-center">{error}</div>
+        <div className="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-3 z-[99] p-4">
+          <div className="text-sm text-muted-foreground text-center">{error}</div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setError(null); setIsLoaded(false); setRetryKey((k) => k + 1) }}
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-bold"
+            >
+              다시 시도
+            </button>
+            {address && (
+              <a
+                href={`https://map.naver.com/p/search/${encodeURIComponent(address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border text-sm font-bold text-foreground"
+              >
+                네이버지도에서 보기
+              </a>
+            )}
+          </div>
         </div>
       )}
     </div>
